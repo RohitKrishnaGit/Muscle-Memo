@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.cs346.musclememo.navigation.AppNavHost
+import com.cs346.musclememo.navigation.BottomNavigationBar
 import com.cs346.musclememo.ui.theme.MuscleMemoTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val navController = rememberNavController()
     Scaffold (
+        bottomBar = { BottomNavigationBar(navHostController = navController) }
     ) {
         Surface(modifier = Modifier.padding(top = it.calculateTopPadding())) {
             Column {

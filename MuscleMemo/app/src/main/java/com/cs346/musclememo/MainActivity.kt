@@ -1,16 +1,19 @@
 package com.cs346.musclememo
 
 import android.os.Bundle
+import androidx.compose.material3.Surface
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.cs346.musclememo.navigation.AppNavHost
 import com.cs346.musclememo.ui.theme.MuscleMemoTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,11 +22,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MuscleMemoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    MainScreen()
                 }
             }
         }
@@ -31,17 +31,23 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun MainScreen() {
+    val navController = rememberNavController()
+    Scaffold (
+    ) {
+        Surface(modifier = Modifier.padding(top = it.calculateTopPadding())) {
+            Column {
+                AppNavHost(navController = navController)
+            }
+        }
+    }
 }
+
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     MuscleMemoTheme {
-        Greeting("Android")
+        MainScreen()
     }
 }

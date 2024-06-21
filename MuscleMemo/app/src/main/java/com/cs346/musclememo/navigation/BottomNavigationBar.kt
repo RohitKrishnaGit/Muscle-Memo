@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
 @Composable
@@ -32,9 +33,11 @@ fun BottomNavigationBar (
                     onClick = { navHostController.navigate(item.screen.route) },
                     modifier = Modifier.weight(0.2f)
                 ) {
-                    Column (modifier = Modifier.fillMaxSize()){
-                        Icon(item.icon, item.name)
-                        Text(text = item.name)
+                    Row (modifier = Modifier.fillMaxSize()){
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Icon(item.icon, item.name)
+                            Text(text = item.name, fontSize = 8.sp)
+                        }
                     }
                 }
             }

@@ -21,17 +21,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardDoubleArrowDown
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,8 +41,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cs346.musclememo.genericcomponents.Colors
+import com.cs346.musclememo.classes.Colors
+import com.cs346.musclememo.classes.Workout
 import com.cs346.musclememo.genericcomponents.MMButton
+import com.cs346.musclememo.genericcomponents.MMDialog
 
 @Composable
 fun WorkoutScreenContent(
@@ -55,18 +54,6 @@ fun WorkoutScreenContent(
         //state = state,
     )
 }
-
-data class Exercise(
-    var weight: MutableState<Int>,
-    var reps: MutableState<Int>
-)
-
-// a workout consists a list of exercises.
-// each element is a map where the key is the exerciseId and the value is a list of sets of
-data class Workout(
-    var workoutName: MutableState<String>,
-    var exercises: MutableList<MutableMap<Int, MutableList<Exercise>>>
-)
 
 // todo: replace with actual data from backend
 val getExerciseById = mapOf(
@@ -81,49 +68,47 @@ private fun WorkoutScreen() {
     val scrollState = rememberScrollState()
     var sheetVisible by remember { mutableStateOf(false) }
     val currentWorkout by remember {
-        mutableStateOf(
-            Workout(
-                workoutName = mutableStateOf("New Workout"),
-                exercises = mutableListOf(
-                    mutableMapOf(
-                        0 to mutableListOf(
-                            Exercise(mutableStateOf(1), mutableStateOf(2)),
-                            Exercise(mutableStateOf(3), mutableStateOf(4)),
-                        ),
-                    ),
-                    mutableMapOf(
-                        1 to mutableListOf(
-                            Exercise(mutableStateOf(11), mutableStateOf(12)),
-                            Exercise(mutableStateOf(13), mutableStateOf(14)),
-                        ),
-                    ),
-                    mutableMapOf(
-                        2 to mutableListOf(
-                            Exercise(mutableStateOf(21), mutableStateOf(22)),
-                            Exercise(mutableStateOf(23), mutableStateOf(24)),
-                        ),
-                    ),
-                    mutableMapOf(
-                        0 to mutableListOf(
-                            Exercise(mutableStateOf(1), mutableStateOf(2)),
-                            Exercise(mutableStateOf(3), mutableStateOf(4)),
-                        ),
-                    ),
-                )
-            )
-        )
+        mutableStateOf(Workout())
     }
+//    val currentWorkout by remember {
+//        mutableStateOf(
+//            Workout(
+//                workoutName = mutableStateOf("New Workout"),
+//                exercises = mutableStateListOf(
+//                    mutableStateMapOf(
+//                        0 to mutableStateListOf(
+//                            Exercise(mutableStateOf(null), mutableStateOf(null)),
+//                            Exercise(mutableStateOf(null), mutableStateOf(null)),
+//                        ),
+//                    ),
+//                    mutableStateMapOf(
+//                        1 to mutableStateListOf(
+//                            Exercise(mutableStateOf(null), mutableStateOf(null)),
+//                            Exercise(mutableStateOf(null), mutableStateOf(null)),
+//                        ),
+//                    ),
+//                    mutableStateMapOf(
+//                        2 to mutableStateListOf(
+//                            Exercise(mutableStateOf(null), mutableStateOf(null)),
+//                            Exercise(mutableStateOf(null), mutableStateOf(null)),
+//                        ),
+//                    ),
+//                )
+//            )
+//        )
+//    }
 
     // main screen
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(24.dp)
         ) {
             Text(
                 text = "Workouts",
-                fontSize = 40.sp
+                fontSize = 40.sp,
+                color = Colors.SECONDARY.color
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -132,7 +117,9 @@ private fun WorkoutScreen() {
                 onClick = {
                     sheetVisible = true
                 },
-                buttonText = "Start A New Workout",
+                text = "Start A New Workout",
+                maxWidth = true,
+                backgroundColor = Colors.PRIMARY.color
             )
 
             Row(
@@ -142,12 +129,13 @@ private fun WorkoutScreen() {
             ) {
                 Text(
                     text = "Templates",
-                    fontSize = 20.sp
+                    fontSize = 20.sp,
+                    color = Colors.SECONDARY.color
                 )
                 IconButton(onClick = {
                     // todo: add a new template
                 }) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add")
+                    Icon(Icons.Filled.Add, contentDescription = "Add", tint = Colors.PRIMARY.color)
                 }
             }
         }
@@ -171,28 +159,52 @@ fun WorkoutSheet(
 ) {
     // dialogs
     var showChangeWorkoutNameDialog by remember { mutableStateOf(false) }
+    var showCancelWorkoutDialog by remember { mutableStateOf(false) }
     var showDeleteExerciseDialog by remember { mutableStateOf(false) }
+    var selectedExerciseIndex by remember { mutableStateOf(-1) }
 
-    CustomDialog(
+    MMDialog(
         showDialog = showChangeWorkoutNameDialog,
         title = "Change Workout Name",
-        initialValue = currentWorkout.workoutName.value,
-        onConfirm = { newValue -> currentWorkout.workoutName.value = newValue },
-        onDismissRequest = { showChangeWorkoutNameDialog = false }
+        initialValue = currentWorkout.getWorkoutName(),
+        onConfirm = { newValue -> currentWorkout.setWorkoutName(newValue) },
+        onDismissRequest = { showChangeWorkoutNameDialog = false },
+        hasText = false
     )
 
-    CustomDialog(
+    MMDialog(
+        showDialog = showCancelWorkoutDialog,
+        title = "Cancel Workout",
+        text = "Are you sure you want to cancel this workout?",
+        initialValue = "",
+        onConfirm = { _ ->
+            currentWorkout.setWorkout()
+            hideSheet()
+        },
+        onDismissRequest = { showCancelWorkoutDialog = false },
+        hasInputField = false,
+    )
+
+    MMDialog(
         showDialog = showDeleteExerciseDialog,
         title = "Delete Exercise",
         text = "Are you sure you want to delete this exercise?",
         initialValue = "",
         onConfirm = { _ ->
-            // TODO: Delete the exercise
+            if (selectedExerciseIndex != -1) {
+                currentWorkout.removeExercise(selectedExerciseIndex)
+                selectedExerciseIndex = -1
+            }
             showDeleteExerciseDialog = false
         },
-        onDismissRequest = { showDeleteExerciseDialog = false },
+        onDismissRequest = {
+            selectedExerciseIndex = -1
+            showDeleteExerciseDialog = false
+        },
         hasInputField = false,
     )
+
+
 
     AnimatedVisibility(
         visible = sheetVisible,
@@ -214,14 +226,14 @@ fun WorkoutSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.DarkGray)
+                        .background(Colors.SECONDARY.color)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(10.dp)
+                        modifier = Modifier.padding(start = 16.dp, end = 24.dp, top = 10.dp, bottom = 10.dp)
                     ) {
                         Text(
-                            text = currentWorkout.workoutName.value,
+                            text = currentWorkout.getWorkoutName(),
                             color = Color.White,
                             fontSize = 20.sp
                         )
@@ -244,63 +256,76 @@ fun WorkoutSheet(
                 }
 
                 // content
+                // should be lazy column but it crashes whenever i switch to lazy column so idk
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(scrollState)
-                        .padding(16.dp),
                 ) {
-                    currentWorkout.exercises.forEachIndexed { index, exerciseMap ->
+                    currentWorkout.exercises.forEachIndexed { exerciseIndex, exerciseMap ->
                         exerciseMap.forEach { (exerciseId, sets) ->
                             Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Colors.LIGHTGRAY.color)
+                                    .padding(start = 16.dp, end = 8.dp)
                             ) {
                                 Text(
                                     text = getExerciseById[exerciseId] ?: "Unknown Exercise",
-                                    color = Colors.PRIMARY.color,
+                                    color = Colors.SECONDARY.color,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                 )
 
                                 IconButton(onClick = {
                                     showDeleteExerciseDialog = true
+                                    selectedExerciseIndex = exerciseIndex
                                 }) {
-                                    Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                                    Icon(
+                                        Icons.Outlined.Delete,
+                                        contentDescription = "Delete Exercise",
+                                        tint = Colors.DANGER.color)
                                 }
                             }
 
-
-                            Spacer(modifier = Modifier.height(4.dp))
-
-                            val setFields = listOf(
-                                Pair("Set", 1f),
-                                Pair("Weight (kg)", 4f),
-                                Pair("Reps", 4f),
-                                Pair("", 1f)
-                            )
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 8.dp, end = 8.dp)
                             ) {
-                                for ((text, weight) in setFields) {
-                                    Box(
-                                        modifier = Modifier.weight(weight),
-                                        contentAlignment = Alignment.Center
+                                val setFields = listOf(
+                                    Pair("Set", 1f),
+                                    Pair("Weight (kg)", 4f),
+                                    Pair("Reps", 4f),
+                                    Pair("", 1f)
+                                )
+
+                                if (sets.isNotEmpty()) {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.Center,
                                     ) {
-                                        Text(
-                                            text = text,
-                                            color = Colors.SECONDARY.color,
-                                            fontWeight = FontWeight.Bold,
-                                        )
+                                        for ((text, weight) in setFields) {
+                                            Box(
+                                                modifier = Modifier.weight(weight),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = text,
+                                                    color = Colors.SECONDARY.color,
+                                                    fontWeight = FontWeight.Bold,
+                                                )
+                                            }
+                                        }
                                     }
                                 }
-                            }
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
 
-                            Column {
-                                sets.forEachIndexed { index, set ->
+                                sets.forEachIndexed { setIndex, set ->
                                     Row(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically,
@@ -311,16 +336,16 @@ fun WorkoutSheet(
                                             horizontalArrangement = Arrangement.Center
                                         ) {
                                             Text(
-                                                text = "${index + 1}",
+                                                text = "${setIndex + 1}",
                                                 color = Colors.SECONDARY.color,
                                                 fontWeight = FontWeight.Bold,
                                             )
                                         }
 
-                                        TextField(
-                                            value = set.weight.value.toString(),
+                                        OutlinedTextField(
+                                            value = set.weight.value?.toString() ?: "",
                                             onValueChange = { newValue ->
-                                                set.weight.value = newValue.toIntOrNull() ?: 0
+                                                set.weight.value = newValue.toIntOrNull()
                                             },
                                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                             modifier = Modifier
@@ -328,10 +353,10 @@ fun WorkoutSheet(
                                                 .padding(start = 8.dp),
                                         )
 
-                                        TextField(
-                                            value = set.reps.value.toString(),
+                                        OutlinedTextField(
+                                            value = set.reps.value?.toString() ?: "",
                                             onValueChange = { newValue ->
-                                                set.reps.value = newValue.toIntOrNull() ?: 0
+                                                set.reps.value = newValue.toIntOrNull()
                                             },
                                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                             modifier = Modifier
@@ -341,7 +366,7 @@ fun WorkoutSheet(
 
                                         IconButton(
                                             onClick = {
-                                                // todo: delete set
+                                                currentWorkout.removeSet(exerciseIndex, setIndex)
                                             },
                                             modifier = Modifier.weight(setFields[3].second)
                                         ) {
@@ -355,10 +380,11 @@ fun WorkoutSheet(
 
                             MMButton(
                                 onClick = {
-                                    // todo: add a new set to the exercise
+                                    currentWorkout.addNewSet(exerciseIndex)
                                 },
-                                buttonText = "Add Set",
-                                backgroundColor = Colors.PRIMARY.color
+                                text = "Add Set",
+                                backgroundColor = Colors.PRIMARY.color,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -367,23 +393,29 @@ fun WorkoutSheet(
 
                     MMButton(
                         onClick = {
-                            // todo: add a new exercise
+                            // todo: select a specific exercise
+                            val selectedExerciseId = java.util.Random().nextInt(3)
+                            currentWorkout.addNewExercise(selectedExerciseId)
                         },
-                        buttonText = "Add New Exercise",
-                        backgroundColor = Colors.SECONDARY.color
+                        text = "Add New Exercise",
+                        backgroundColor = Colors.PRIMARY.color,
+                        maxWidth = true,
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                     ) {
                         MMButton(
                             onClick = {
-                                // todo: cancel workout
+                                showCancelWorkoutDialog = true
                             },
-                            buttonText = "Cancel Workout",
+                            text = "Cancel Workout",
                             backgroundColor = Colors.DANGER.color,
                             modifier = Modifier.weight(1f)
                         )
@@ -392,9 +424,9 @@ fun WorkoutSheet(
 
                         MMButton(
                             onClick = {
-                                // todo finish workout
+                                // todo: send data to backend
                             },
-                            buttonText = "Finish Workout",
+                            text = "Finish Workout",
                             backgroundColor = Colors.SUCCESS.color,
                             modifier = Modifier.weight(1f)
                         )
@@ -402,49 +434,5 @@ fun WorkoutSheet(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun CustomDialog(
-    showDialog: Boolean,
-    title: String,
-    text: String = "",
-    initialValue: String,
-    onConfirm: (String) -> Unit,
-    onDismissRequest: () -> Unit,
-    hasInputField: Boolean = true,
-) {
-    if (showDialog) {
-        var inputValue by remember { mutableStateOf(initialValue) }
-
-        AlertDialog(
-            onDismissRequest = onDismissRequest,
-            title = { Text(title) },
-            text = {
-                if (hasInputField) {
-                    TextField(
-                        value = inputValue,
-                        onValueChange = { inputValue = it },
-                        label = { Text("Input") }
-                    )
-                } else {
-                    Text(text)
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    onConfirm(if (hasInputField) inputValue else "")
-                    onDismissRequest()
-                }) {
-                    Text("Confirm")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismissRequest) {
-                    Text("Cancel")
-                }
-            }
-        )
     }
 }

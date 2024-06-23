@@ -21,7 +21,7 @@ fun AppNavHost (
         startDestination = startDestination
     ) {
         composable(route = Screen.Login.route) {
-            LoginScreenContent()
+            LoginScreenContent(navController)
         }
         composable(route = Screen.Profile.route) {
             ProfileScreenContent()

@@ -1,4 +1,4 @@
-package com.cs346.musclememo.genericcomponents
+package com.cs346.musclememo.screens.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape

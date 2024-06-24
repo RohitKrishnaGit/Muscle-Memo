@@ -56,11 +56,11 @@ private fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        Image(painter = painterResource(id = R.drawable.musclememo),
-            contentDescription = "Login image",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp))
+//        Image(painter = painterResource(id = R.drawable.musclememo),
+//            contentDescription = "Login image",
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(200.dp))
         Text(text = "Welcome Back", fontSize = 28.sp, fontWeight = FontWeight.Bold)
 
        //Username

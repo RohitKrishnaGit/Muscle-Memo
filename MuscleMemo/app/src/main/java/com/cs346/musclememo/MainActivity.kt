@@ -5,6 +5,7 @@ import androidx.compose.material3.Surface
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -36,11 +37,10 @@ fun MainScreen() {
     val navController = rememberNavController()
     Scaffold (
         bottomBar = { BottomNavigationBar(navHostController = navController) }
-    ) {
-        Surface(modifier = Modifier.padding(top = it.calculateTopPadding())) {
-            Column {
+    ) { innerPadding ->
+        // Apply the padding globally to the whole BottomNavScreensController
+        Box(modifier = Modifier.padding(innerPadding)) {
                 AppNavHost(navController = navController)
-            }
         }
     }
 }

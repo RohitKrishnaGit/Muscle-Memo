@@ -9,7 +9,7 @@ import com.cs346.musclememo.screens.HistoryScreenContent
 import com.cs346.musclememo.screens.LeaderboardScreenContent
 import com.cs346.musclememo.screens.LoginScreenContent
 import com.cs346.musclememo.screens.ProfileScreenContent
-import com.cs346.musclememo.screens.WorkoutScreenContent
+import com.cs346.musclememo.screens.WorkoutScreen
 
 @Composable
 fun AppNavHost (
@@ -33,7 +33,7 @@ fun AppNavHost (
             FriendsScreenContent()
         }
         composable(route = Screen.Workout.route) {
-            WorkoutScreenContent()
+            WorkoutScreen()
         }
         composable(route = Screen.History.route) {
             HistoryScreenContent()

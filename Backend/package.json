@@ -1,26 +1,33 @@
 {
-  "name": "muscle-memo-backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
-  "scripts": {
-    "build": "npx tsc",
-    "start": "node dist/app.js",
-    "dev": "nodemon src/app.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "sqlite3": "^5.1.7"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.14.7",
-    "nodemon": "^3.1.4",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.5.2"
-  }
+   "name": "muscle-memo-backend",
+   "version": "1.0.0",
+   "description": "",
+   "main": "dist/app.js",
+   "scripts": {
+      "build": "npx tsc",
+      "start": "ts-node src/index.ts",
+      "dev": "nodemon src/app.ts",
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "typeorm": "npx typeorm-ts-node-esm",
+      "typeorm:migrate": "npx typeorm-ts-node-esm migration:run -d ./src/data-source.ts",
+      "typeorm:migrate:revert": "npx typeorm-ts-node-esm migration:revert -d ./src/data-source.ts"
+   },
+   "author": "",
+   "license": "ISC",
+   "dependencies": {
+      "dotenv": "^16.4.5",
+      "express": "^4.17.2",
+      "reflect-metadata": "^0.1.13",
+      "sqlite3": "^5.0.2",
+      "typeorm": "0.3.20",
+      "body-parser": "^1.19.1"
+   },
+   "devDependencies": {
+      "@types/express": "^4.17.21",
+      "@types/node": "^16.11.10",
+      "@types/validator": "^13.12.0",
+      "nodemon": "^3.1.4",
+      "ts-node": "10.9.1",
+      "typescript": "4.5.2"
+   }
 }

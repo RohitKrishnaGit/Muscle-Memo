@@ -12,12 +12,26 @@ export class UserController {
     async one(request: Request, response: Response, next: NextFunction) {
         const id = parseInt(request.params.id);
 
-        const user = await this.userRepository.findOne({
-            where: { id },
+        const user = await this.userRepository.findOneBy({
+            id,
         });
 
         if (!user) {
             return "unregistered user";
+        }
+        return user;
+    }
+
+    async login(request: Request, response: Response, next: NextFunction) {
+        const { username, password } = request.body;
+
+        const user = await this.userRepository.findOneBy({
+            username,
+            password,
+        });
+
+        if (!user) {
+            return "invalid login";
         }
         return user;
     }
@@ -38,7 +52,9 @@ export class UserController {
     async remove(request: Request, response: Response, next: NextFunction) {
         const id = parseInt(request.params.id);
 
-        let userToRemove = await this.userRepository.findOneBy({ id });
+        let userToRemove = await this.userRepository.findOneBy({
+            id,
+        });
 
         if (!userToRemove) {
             return "this user not exist";

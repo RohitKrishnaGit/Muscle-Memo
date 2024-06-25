@@ -10,7 +10,7 @@ export const Routes = [
     /* User routes */
     {
         method: "get",
-        route: "/users/login",
+        route: "/users/login/:user/:password",
         controller: UserController,
         action: "login",
     },

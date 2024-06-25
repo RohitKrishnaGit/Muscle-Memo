@@ -23,17 +23,18 @@ export class UserController {
     }
 
     async login(request: Request, response: Response, next: NextFunction) {
-        const { username, password } = request.body;
-
+        const username = request.params.user
+        const password = request.params.password
+        console.log("made it here")
         const user = await this.userRepository.findOneBy({
             username,
             password,
         });
 
         if (!user) {
-            return "invalid login";
+            return false;
         }
-        return user;
+        return true;
     }
 
     async save(request: Request, response: Response, next: NextFunction) {

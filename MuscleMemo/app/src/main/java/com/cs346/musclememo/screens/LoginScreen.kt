@@ -17,17 +17,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.R
 import com.cs346.musclememo.screens.viewmodels.LoginScreenViewModel
 
+
 @Composable
 fun LoginScreen(
     onClick: () -> Unit
 ) {
     val viewModel = viewModel<LoginScreenViewModel>()
+    var loginErrorMessage by remember { mutableStateOf("") }
     var username by remember{
         mutableStateOf("")
     }
@@ -69,11 +72,14 @@ fun LoginScreen(
                 onClick()
             else {
                 password = ""
-                // todo: implement error msg
+                loginErrorMessage = "Invalid Credentials. Please try again."
             }
         }){
             Text(text="Login")
         }
+
+        //Invalid Login
+        Text(loginErrorMessage)
 
         Spacer(modifier = Modifier.height(16.dp))
 

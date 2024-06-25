@@ -1,10 +1,12 @@
 package com.cs346.musclememo.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -13,44 +15,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.cs346.musclememo.navigation.NavItem
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cs346.musclememo.R
+import com.cs346.musclememo.screens.viewmodels.LoginScreenViewModel
 
 @Composable
-fun LoginScreenContent(
-    //viewModel: LoginScreenViewModel = hiltViewModel()
-    navController: NavHostController
-){
-    LoginScreen(
-        navController
-    )
-}
-
-@Composable
-private fun LoginScreen(
-    navHostController: NavHostController
-
+fun LoginScreen(
+    onClick: () -> Unit
 ) {
-
+    val viewModel = viewModel<LoginScreenViewModel>()
     var username by remember{
         mutableStateOf("")
     }
     var password by remember{
         mutableStateOf("")
     }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-//        Image(painter = painterResource(id = R.drawable.musclememo),
-//            contentDescription = "Login image",
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(200.dp))
+        Image(painter = painterResource(id = R.drawable.musclememo),
+            contentDescription = "Login image",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp))
         Text(text = "Welcome Back", fontSize = 28.sp, fontWeight = FontWeight.Bold)
 
        //Username
@@ -71,7 +65,12 @@ private fun LoginScreen(
 
         Spacer (modifier = Modifier.height(16.dp))
         Button(onClick = {
-            navHostController.navigate(NavItem.Workout.screen.route)
+            if (viewModel.loginAttempt(username, password))
+                onClick()
+            else {
+                password = ""
+                // todo: implement error msg
+            }
         }){
             Text(text="Login")
         }

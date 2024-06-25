@@ -13,7 +13,7 @@ sealed class NavItem(
     var icon: ImageVector,
     val screen: Screen
 ){
-    object Leaderboard : NavItem("leaderboard", Icons.Default.Leaderboard, Screen.Leaderboard)
+    object Leaderboard : NavItem("Rankings", Icons.Default.Leaderboard, Screen.Leaderboard)
     object Friend : NavItem("Friends", Icons.Default.Favorite, Screen.Friends)
     object Workout : NavItem("Workout", Icons.Default.Add, Screen.Workout)
     object History : NavItem("History", Icons.Default.AccessTime, Screen.History)

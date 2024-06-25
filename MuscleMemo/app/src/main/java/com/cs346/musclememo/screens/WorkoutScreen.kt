@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,12 +32,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.cs346.musclememo.classes.Colors
 import com.cs346.musclememo.screens.components.MMButton
 import com.cs346.musclememo.screens.components.MMDialog
 import com.cs346.musclememo.screens.components.ExerciseSets
@@ -59,7 +58,7 @@ fun WorkoutScreen() {
             Text(
                 text = "Workouts",
                 fontSize = 40.sp,
-                color = Colors.SECONDARY.color
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -70,8 +69,7 @@ fun WorkoutScreen() {
                     viewModel.setVisible(true)
                 },
                 text = "Start A New Workout",
-                maxWidth = true,
-                backgroundColor = Colors.PRIMARY.color
+                maxWidth = true
             )
 
             Row(
@@ -82,12 +80,12 @@ fun WorkoutScreen() {
                 Text(
                     text = "Templates",
                     fontSize = 20.sp,
-                    color = Colors.SECONDARY.color
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 IconButton(onClick = {
                     // todo: add a new template
                 }) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add", tint = Colors.PRIMARY.color)
+                    Icon(Icons.Filled.Add, contentDescription = "Add", tint = MaterialTheme.colorScheme.onSurface)
                 }
             }
         }
@@ -149,6 +147,8 @@ fun WorkoutSheet(
         hasInputField = false,
     )
 
+
+
     AnimatedVisibility(
         visible = viewModel.sheetVisible,
         enter = slideInVertically(initialOffsetY = { it }),
@@ -157,7 +157,7 @@ fun WorkoutSheet(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Column(
                 modifier = Modifier
@@ -169,7 +169,7 @@ fun WorkoutSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Colors.SECONDARY.color)
+                        .background(MaterialTheme.colorScheme.secondary)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -182,13 +182,13 @@ fun WorkoutSheet(
                     ) {
                         Text(
                             text = viewModel.currentWorkout.name,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onSecondary,
                             fontSize = 20.sp
                         )
                         IconButton(onClick = {
                             showChangeWorkoutNameDialog = true
                         }) {
-                            Icon(Icons.Filled.Edit, contentDescription = "Edit", tint = Color.White)
+                            Icon(Icons.Filled.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.onSecondary)
                         }
                     }
                 }
@@ -228,12 +228,10 @@ fun WorkoutSheet(
                             MMButton(
                                 onClick = {
                                     // todo: select a specific exercise
-                                    // todo: custom exercise
                                     val selectedExerciseId = Random().nextInt(2)
                                     viewModel.addNewExercise(exercise = viewModel.exercises[selectedExerciseId])
                                 },
                                 text = "Add New Exercise",
-                                backgroundColor = Colors.PRIMARY.color,
                                 maxWidth = true,
                                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
                             )
@@ -250,7 +248,8 @@ fun WorkoutSheet(
                                         showCancelWorkoutDialog = true
                                     },
                                     text = "Cancel Workout",
-                                    backgroundColor = Colors.DANGER.color,
+                                    backgroundColor = MaterialTheme.colorScheme.errorContainer,
+                                    textColor = MaterialTheme.colorScheme.onErrorContainer,
                                     modifier = Modifier.weight(1f)
                                 )
 
@@ -262,7 +261,8 @@ fun WorkoutSheet(
                                         viewModel.setVisible(false)
                                     },
                                     text = "Finish Workout",
-                                    backgroundColor = Colors.SUCCESS.color,
+                                    backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                    textColor = MaterialTheme.colorScheme.onTertiaryContainer,
                                     modifier = Modifier.weight(1f)
                                 )
                             }

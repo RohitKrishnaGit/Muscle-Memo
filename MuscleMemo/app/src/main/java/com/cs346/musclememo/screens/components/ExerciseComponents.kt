@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +32,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cs346.musclememo.classes.Colors
 import com.cs346.musclememo.classes.Exercise
 import com.cs346.musclememo.classes.ExerciseSet
 
@@ -45,12 +45,12 @@ fun ExerciseTitle(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .background(Colors.LIGHTGRAY.color)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(start = 16.dp, end = 8.dp)
     ) {
         Text(
             text = exercise.name,
-            color = Colors.SECONDARY.color,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
         )
@@ -59,7 +59,7 @@ fun ExerciseTitle(
             Icon(
                 Icons.Outlined.Delete,
                 contentDescription = "Delete Exercise",
-                tint = Colors.DANGER.color
+                tint = MaterialTheme.colorScheme.error
             )
         }
     }
@@ -97,7 +97,7 @@ fun ExerciseSets(
                     ) {
                         Text(
                             text = text,
-                            color = Colors.SECONDARY.color,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -123,7 +123,7 @@ fun ExerciseSets(
                 ) {
                     Text(
                         text = "${setIndex + 1}",
-                        color = Colors.SECONDARY.color,
+                        color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.Bold,
                     )
                 }
@@ -168,7 +168,6 @@ fun ExerciseSets(
         MMButton(
             onClick = addSet,
             text = "Add Set",
-            backgroundColor = Colors.PRIMARY.color,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
     }

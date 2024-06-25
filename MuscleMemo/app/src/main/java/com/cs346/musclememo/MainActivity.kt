@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.cs346.musclememo.navigation.AppNavHost
 import com.cs346.musclememo.navigation.BottomNavigationBar
-import com.cs346.musclememo.ui.theme.MuscleMemoTheme
+import com.example.compose.MuscleMemoTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,12 +36,15 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    Scaffold (
-        bottomBar = { BottomNavigationBar(navHostController = navController) }
-    ) { innerPadding ->
-        // Apply the padding globally to the whole BottomNavScreensController
-        Box(modifier = Modifier.padding(innerPadding)) {
-                AppNavHost(navController = navController)
+    val bottomBarState = rememberSaveable { (mutableStateOf(false)) }
+    MuscleMemoTheme {
+        Scaffold(
+            bottomBar = { BottomNavigationBar(bottomBarState = bottomBarState, navHostController = navController) }
+        ) { innerPadding ->
+            // Apply the padding globally to the whole BottomNavScreensController
+            Box(modifier = Modifier.padding(innerPadding)) {
+                AppNavHost(navController = navController, bottomBarState = bottomBarState)
+            }
         }
     }
 }

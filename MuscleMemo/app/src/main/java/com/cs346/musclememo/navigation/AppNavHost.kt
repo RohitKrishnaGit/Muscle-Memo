@@ -5,11 +5,11 @@ import androidx.compose.runtime.MutableState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.cs346.musclememo.screens.FriendsScreenContent
-import com.cs346.musclememo.screens.HistoryScreenContent
-import com.cs346.musclememo.screens.LeaderboardScreenContent
+import com.cs346.musclememo.screens.FriendsScreen
+import com.cs346.musclememo.screens.HistoryScreen
+import com.cs346.musclememo.screens.LeaderboardScreen
 import com.cs346.musclememo.screens.LoginScreen
-import com.cs346.musclememo.screens.ProfileScreenContent
+import com.cs346.musclememo.screens.ProfileScreen
 import com.cs346.musclememo.screens.WorkoutScreen
 
 @Composable
@@ -29,19 +29,19 @@ fun AppNavHost (
             })
         }
         composable(route = Screen.Profile.route) {
-            ProfileScreenContent()
+            ProfileScreen()
         }
         composable(route = Screen.Leaderboard.route) {
-            LeaderboardScreenContent()
+            LeaderboardScreen()
         }
         composable(route = Screen.Friends.route) {
-            FriendsScreenContent()
+            FriendsScreen()
         }
         composable(route = Screen.Workout.route) {
             WorkoutScreen()
         }
         composable(route = Screen.History.route) {
-            HistoryScreenContent()
+            HistoryScreen()
         }
     }
 }

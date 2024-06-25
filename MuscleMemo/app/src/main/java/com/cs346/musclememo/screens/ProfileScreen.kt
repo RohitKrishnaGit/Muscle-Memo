@@ -7,20 +7,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cs346.musclememo.screens.viewmodels.ProfileScreenViewModel
 
 @Composable
-fun ProfileScreenContent(
-    //viewModel: ProfileScreenViewModel = hiltViewModel()
-){
-    ProfileScreen(
-        //state = state,
-    )
-}
+fun ProfileScreen() {
+    val viewModel = viewModel<ProfileScreenViewModel>()
 
-@Composable
-private fun ProfileScreen(
-    //state:
-) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

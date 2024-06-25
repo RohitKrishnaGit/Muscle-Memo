@@ -7,20 +7,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cs346.musclememo.screens.viewmodels.HistoryScreenViewModel
 
 @Composable
-fun HistoryScreenContent(
-    //viewModel: HistoryScreenViewModel = hiltViewModel()
-){
-    HistoryScreen(
-        //state = state,
-    )
-}
-
-@Composable
-private fun HistoryScreen(
-    //state:
-) {
+fun HistoryScreen() {
+    val viewModel = viewModel<HistoryScreenViewModel>()
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

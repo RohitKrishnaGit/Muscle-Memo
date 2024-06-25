@@ -7,20 +7,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cs346.musclememo.screens.viewmodels.FriendsScreenViewModel
 
 @Composable
-fun FriendsScreenContent(
-    //viewModel: FriendsScreenViewModel = hiltViewModel()
-){
-    FriendsScreen(
-        //state = state,
-    )
-}
+fun FriendsScreen() {
+    val viewModel = viewModel<FriendsScreenViewModel>()
 
-@Composable
-private fun FriendsScreen(
-    //state:
-) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

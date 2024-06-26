@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -170,5 +173,24 @@ fun ExerciseSets(
             text = "Add Set",
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
+    }
+}
+
+@Composable
+fun DisplayExercises(
+    exercises : List<Exercise>
+){
+    val listState = rememberLazyListState()
+    LazyColumn (
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(5.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        items(items = exercises){
+            Row{
+                Text(text = it.id.toString() + " ")
+                Text(text = it.name)
+            }
+        }
     }
 }

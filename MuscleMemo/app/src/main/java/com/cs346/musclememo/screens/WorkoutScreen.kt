@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cs346.musclememo.screens.components.DisplayExercises
 import com.cs346.musclememo.screens.components.MMButton
 import com.cs346.musclememo.screens.components.MMDialog
 import com.cs346.musclememo.screens.components.ExerciseSets
@@ -89,6 +90,7 @@ fun WorkoutScreen() {
                     Icon(Icons.Filled.Add, contentDescription = "Add", tint = MaterialTheme.colorScheme.onSurface)
                 }
             }
+            DisplayExercises(viewModel.exercises)
         }
 
         // current workout sheet that slides up

@@ -50,9 +50,12 @@ import java.util.Random
 @Composable
 fun WorkoutScreen() {
     val viewModel = viewModel<WorkoutScreenViewModel>()
-    LaunchedEffect(Unit){
-        viewModel.getExercises()
-    }
+
+    // TODO Add back later for all workouts
+//    LaunchedEffect(Unit){
+//        viewModel.getExercises()
+//    }
+
     // main screen
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -93,7 +96,6 @@ fun WorkoutScreen() {
                     Icon(Icons.Filled.Add, contentDescription = "Add", tint = MaterialTheme.colorScheme.onSurface)
                 }
             }
-            DisplayExercises(viewModel.exercises)
         }
 
         // current workout sheet that slides up

@@ -1,5 +1,6 @@
 package com.cs346.musclememo.screens.viewmodels
 
+import RetrofitInstance
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -8,6 +9,9 @@ import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.classes.Exercise
 import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.classes.Workout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class WorkoutScreenViewModel : ViewModel() {
     var currentWorkout by mutableStateOf(Workout())
@@ -19,6 +23,7 @@ class WorkoutScreenViewModel : ViewModel() {
     var workoutVisible by mutableStateOf(false)
         private set
 
+
     var summaryVisible by mutableStateOf(false)
         private set
 
@@ -26,9 +31,32 @@ class WorkoutScreenViewModel : ViewModel() {
         summaryVisible = visible
     }
 
-    fun setWorkoutScreenVisible(visible: Boolean){
+    fun setWorkoutScreenVisible(visible: Boolean) {
         workoutVisible = visible
     }
+    fun getExercises(){
+        RetrofitInstance.exerciseService.getExerciseRef().enqueue(object: Callback<List<Exercise>>{
+            override fun onResponse(
+                call: Call<List<Exercise>>,
+                response: Response<List<Exercise>>
+            ) {
+                if (response.isSuccessful){
+                    response.body()?.let{
+                        for (exercise in it){
+                            _exercises.add(Exercise(exercise.name, exercise.id))
+                        }
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<List<Exercise>>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
+
+        })
+    }
+
+
 
     fun setWorkoutName(name : String){
         currentWorkout.setWorkoutName(name)

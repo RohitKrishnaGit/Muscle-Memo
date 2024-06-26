@@ -1,3 +1,4 @@
+import com.cs346.musclememo.screens.services.ExerciseRefService
 import com.cs346.musclememo.screens.services.UserService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -14,5 +15,9 @@ object RetrofitInstance {
 
     val userService: UserService by lazy {
         retrofit.create(UserService::class.java)
+    }
+
+    val exerciseService: ExerciseRefService by lazy {
+        retrofit.create(ExerciseRefService::class.java)
     }
 }

@@ -3,6 +3,7 @@ import { ExerciseRefController } from "./controller/ExerciseRefController";
 import { CustomExerciseRefController } from "./controller/CustomExerciseRefController";
 import { WorkoutController } from "./controller/WorkoutController";
 import { ExerciseController } from "./controller/ExerciseController";
+import { TemplateController } from "./controller/TemplateController";
 
 export const Routes = [
 
@@ -119,6 +120,34 @@ export const Routes = [
         controller: WorkoutController,
         action: "remove",
     },
+
+    /* Template routes */
+    /* Shouldn't need to work with ALL templates, just those per user */
+    {
+        method: "get",
+        route: "/templates/:userId/:id",
+        controller: TemplateController,
+        action: "one",
+    },
+    {
+        method: "get",
+        route: "/templates/:userId",
+        controller: TemplateController,
+        action: "all",
+    },
+    {
+        method: "post",
+        route: "/templates",
+        controller: TemplateController,
+        action: "save",
+    },
+    {
+        method: "delete",
+        route: "/templates/:userId/:id",
+        controller: TemplateController,
+        action: "remove",
+    },
+
 
     /* Exercise routes */
     /* Shouldn't need to work with ALL exercises, just those per workout */

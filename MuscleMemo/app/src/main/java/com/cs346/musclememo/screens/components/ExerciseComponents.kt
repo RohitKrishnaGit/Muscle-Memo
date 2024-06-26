@@ -97,7 +97,7 @@ fun ExerciseSets(
                     ) {
                         Text(
                             text = text,
-                            color = MaterialTheme.colorScheme.onPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                         )
                     }

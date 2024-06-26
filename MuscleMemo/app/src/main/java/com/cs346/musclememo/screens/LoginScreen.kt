@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -17,17 +18,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.R
 import com.cs346.musclememo.screens.viewmodels.LoginScreenViewModel
 
+
 @Composable
 fun LoginScreen(
     onClick: () -> Unit
 ) {
     val viewModel = viewModel<LoginScreenViewModel>()
+    var loginErrorMessage by remember { mutableStateOf("") }
     var username by remember{
         mutableStateOf("")
     }
@@ -51,30 +55,40 @@ fun LoginScreen(
        //Username
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = "Login to your Account")
-        OutlinedTextField(value = username, onValueChange = {
-            username = it
-        }, label = {
-            Text(text = "Username")
-        },)
+        OutlinedTextField(
+            value = username,
+            onValueChange = {
+                username = it
+            },
+            label = {
+                Text(text = "Username")
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+            )
 
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(value = password, onValueChange = {
             password = it
         }, label = {
             Text(text = "Password")
-        })
+        },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+        )
 
         Spacer (modifier = Modifier.height(16.dp))
         Button(onClick = {
-            if (viewModel.loginAttempt(username, password))
+            viewModel.loginAttempt(username, password, {
                 onClick()
-            else {
+            }) {
                 password = ""
-                // todo: implement error msg
+                loginErrorMessage = "Invalid Credentials. Please try again."
             }
         }){
             Text(text="Login")
         }
+
+        //Invalid Login
+        Text(loginErrorMessage)
 
         Spacer(modifier = Modifier.height(16.dp))
 

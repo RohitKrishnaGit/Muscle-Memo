@@ -25,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +50,11 @@ import java.util.Random
 @Composable
 fun WorkoutScreen() {
     val viewModel = viewModel<WorkoutScreenViewModel>()
+
+    // TODO Add back later for all workouts
+//    LaunchedEffect(Unit){
+//        viewModel.getExercises()
+//    }
 
     // main screen
     Box(modifier = Modifier.fillMaxSize()) {
@@ -228,7 +234,8 @@ fun WorkoutSheet(
                             MMButton(
                                 onClick = {
                                     // todo: select a specific exercise
-                                    val selectedExerciseId = Random().nextInt(3)
+
+                                    val selectedExerciseId = Random().nextInt(200)
                                     viewModel.addNewExercise(exercise = viewModel.exercises[selectedExerciseId])
                                 },
                                 text = "Add New Exercise",

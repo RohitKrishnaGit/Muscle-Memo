@@ -235,7 +235,7 @@ fun WorkoutSheet(
                                 onClick = {
                                     // todo: select a specific exercise
 
-                                    val selectedExerciseId = Random().nextInt(200)
+                                    val selectedExerciseId = Random().nextInt(viewModel.exercises.size)
                                     viewModel.addNewExercise(exercise = viewModel.exercises[selectedExerciseId])
                                 },
                                 text = "Add New Exercise",

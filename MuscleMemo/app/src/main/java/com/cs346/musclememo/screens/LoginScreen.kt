@@ -44,7 +44,8 @@ fun LoginScreen(
             contentDescription = "Login image",
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp))
+                .height(130.dp))
+        Spacer(modifier = Modifier.height(25.dp))
         Text(text = "Welcome Back", fontSize = 28.sp, fontWeight = FontWeight.Bold)
 
        //Username

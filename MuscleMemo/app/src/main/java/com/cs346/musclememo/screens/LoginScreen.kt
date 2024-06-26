@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -17,7 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -53,18 +54,25 @@ fun LoginScreen(
        //Username
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = "Login to your Account")
-        OutlinedTextField(value = username, onValueChange = {
-            username = it
-        }, label = {
-            Text(text = "Username")
-        },)
+        OutlinedTextField(
+            value = username,
+            onValueChange = {
+                username = it
+            },
+            label = {
+                Text(text = "Username")
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+            )
 
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(value = password, onValueChange = {
             password = it
         }, label = {
             Text(text = "Password")
-        })
+        },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+        )
 
         Spacer (modifier = Modifier.height(16.dp))
         Button(onClick = {

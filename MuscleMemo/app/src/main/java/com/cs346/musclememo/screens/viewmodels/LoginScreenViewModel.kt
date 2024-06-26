@@ -19,7 +19,17 @@ class LoginScreenViewModel : ViewModel() {
         RetrofitInstance.userService.getAuthentication(user = username, password = password).enqueue(object:
             Callback<Boolean>{
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
-                onSuccess()
+                if (!response.isSuccessful) {
+                    onFailure()
+                    return
+                }
+                response.body()?.let {
+                    if (it) {
+                        onSuccess()
+                    } else {
+                        onFailure()
+                    }
+                }
             }
 
             override fun onFailure(call: Call<Boolean>, t: Throwable) {

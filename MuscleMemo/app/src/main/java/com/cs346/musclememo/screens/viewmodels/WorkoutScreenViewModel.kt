@@ -16,11 +16,18 @@ class WorkoutScreenViewModel : ViewModel() {
     private val _exercises = mutableStateListOf<Exercise>()
     val exercises : List<Exercise>  = _exercises
 
-    var sheetVisible by mutableStateOf(false)
+    var workoutVisible by mutableStateOf(false)
         private set
 
-    fun setVisible(visible: Boolean){
-        sheetVisible = visible
+    var summaryVisible by mutableStateOf(false)
+        private set
+
+    fun setSummaryScreenVisible (visible: Boolean){
+        summaryVisible = visible
+    }
+
+    fun setWorkoutScreenVisible(visible: Boolean){
+        workoutVisible = visible
     }
 
     fun setWorkoutName(name : String){
@@ -53,7 +60,6 @@ class WorkoutScreenViewModel : ViewModel() {
 
     fun finishWorkout(){
         // todo: send data to backend
-        currentWorkout.setWorkout()
     }
 
     init {

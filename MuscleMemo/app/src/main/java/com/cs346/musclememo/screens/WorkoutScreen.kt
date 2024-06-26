@@ -40,6 +40,7 @@ import com.cs346.musclememo.screens.components.MMButton
 import com.cs346.musclememo.screens.components.MMDialog
 import com.cs346.musclememo.screens.components.ExerciseSets
 import com.cs346.musclememo.screens.components.ExerciseTitle
+import com.cs346.musclememo.screens.components.WorkoutHistoryCard
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 import java.util.Random
 
@@ -66,7 +67,7 @@ fun WorkoutScreen() {
             MMButton(
                 onClick = {
                     viewModel.resetWorkout()
-                    viewModel.setVisible(true)
+                    viewModel.setWorkoutScreenVisible(true)
                 },
                 text = "Start A New Workout",
                 maxWidth = true
@@ -122,7 +123,7 @@ fun WorkoutSheet(
         text = "Are you sure you want to cancel this workout?",
         initialValue = "",
         onConfirm = {
-            viewModel.setVisible(false)
+            viewModel.setWorkoutScreenVisible(false)
         },
         onDismissRequest = { showCancelWorkoutDialog = false },
         hasInputField = false,
@@ -147,10 +148,8 @@ fun WorkoutSheet(
         hasInputField = false,
     )
 
-
-
     AnimatedVisibility(
-        visible = viewModel.sheetVisible,
+        visible = viewModel.workoutVisible,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it })
     ) {
@@ -228,7 +227,7 @@ fun WorkoutSheet(
                             MMButton(
                                 onClick = {
                                     // todo: select a specific exercise
-                                    val selectedExerciseId = Random().nextInt(2)
+                                    val selectedExerciseId = Random().nextInt(3)
                                     viewModel.addNewExercise(exercise = viewModel.exercises[selectedExerciseId])
                                 },
                                 text = "Add New Exercise",
@@ -258,7 +257,8 @@ fun WorkoutSheet(
                                 MMButton(
                                     onClick = {
                                         viewModel.finishWorkout()
-                                        viewModel.setVisible(false)
+                                        viewModel.setWorkoutScreenVisible(false)
+                                        viewModel.setSummaryScreenVisible(true)
                                     },
                                     text = "Finish Workout",
                                     backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -268,6 +268,40 @@ fun WorkoutSheet(
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+    AnimatedVisibility(
+        visible = viewModel.summaryVisible,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
+        Box (
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ){
+            Column {
+                Spacer(modifier = Modifier.weight(1f))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = "Keep up the good work!",
+                        fontSize = 30.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                WorkoutHistoryCard(workout = viewModel.currentWorkout)
+                Spacer(modifier = Modifier.weight(1f))
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    MMButton(onClick = { viewModel.setSummaryScreenVisible(false) }, text = "Done")
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }

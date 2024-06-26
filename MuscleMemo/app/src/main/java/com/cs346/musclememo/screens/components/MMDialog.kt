@@ -20,7 +20,8 @@ fun MMDialog(
     onConfirm: (String) -> Unit,
     onDismissRequest: () -> Unit,
     hasInputField: Boolean = true,
-    hasText: Boolean = true
+    hasText: Boolean = true,
+    labelText: String = "Name"
 ) {
     if (showDialog) {
         var inputValue by remember { mutableStateOf(initialValue) }
@@ -34,7 +35,7 @@ fun MMDialog(
                     if (hasInputField) TextField(
                         value = inputValue,
                         onValueChange = { inputValue = it },
-                        label = { Text("Input") }
+                        label = { Text(labelText) }
                     )
                 }
             },

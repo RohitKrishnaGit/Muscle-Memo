@@ -8,6 +8,7 @@ import {
 import { ExerciseRef } from "./ExerciseRef";
 import { CustomExerciseRef } from "./CustomExerciseRef";
 import { Workout } from "./Workout";
+import { Template } from "./Template";
 
 @Entity()
 export class Exercise {
@@ -16,6 +17,9 @@ export class Exercise {
 
     @ManyToOne(() => Workout, (workout) => workout.exercises)
     workout: Relation<Workout>;
+
+    @ManyToOne(() => Template, (template) => template.exercises)
+    template: Relation<Workout>;
 
     @ManyToOne(() => ExerciseRef, { nullable: true })
     exerciseRef?: Relation<ExerciseRef>;

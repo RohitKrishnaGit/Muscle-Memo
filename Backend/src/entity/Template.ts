@@ -17,9 +17,9 @@ export class Template {
     @Column()
     name: string;
 
-    @ManyToOne(() => User, (user) => user.workouts)
+    @ManyToOne(() => User, (user) => user.templates)
     user: User;
 
-    @OneToMany(() => Exercise, (exercise) => exercise.workout)
+    @OneToMany(() => Exercise, (exercise) => exercise.template)
     exercises: Relation<Exercise[]>;
 }

@@ -90,7 +90,6 @@ fun WorkoutScreen() {
                     Icon(Icons.Filled.Add, contentDescription = "Add", tint = MaterialTheme.colorScheme.onSurface)
                 }
             }
-            DisplayExercises(viewModel.exercises)
         }
 
         // current workout sheet that slides up

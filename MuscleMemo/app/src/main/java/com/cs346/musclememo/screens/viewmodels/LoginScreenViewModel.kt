@@ -13,27 +13,19 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 class LoginScreenViewModel : ViewModel() {
-    fun loginAttempt(username: String, password: String): Boolean{
+    fun loginAttempt(username: String, password: String, onSuccess: () -> Unit, onFailure: () -> Unit): Unit{
         // todo: implement account login
-        var success: Boolean = false
 
         RetrofitInstance.userService.getAuthentication(user = username, password = password).enqueue(object:
             Callback<Boolean>{
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
-                if (response.isSuccessful){
-                    response.body()?.let{
-                        success = it
-                    }
-
-                }
+                onSuccess()
             }
 
             override fun onFailure(call: Call<Boolean>, t: Throwable) {
-                success = false
+                onFailure()
             }
 
         })
-
-        return success
     }
 }

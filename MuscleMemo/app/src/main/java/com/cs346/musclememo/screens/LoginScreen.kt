@@ -68,9 +68,9 @@ fun LoginScreen(
 
         Spacer (modifier = Modifier.height(16.dp))
         Button(onClick = {
-            if (viewModel.loginAttempt(username, password))
+            viewModel.loginAttempt(username, password, {
                 onClick()
-            else {
+            }) {
                 password = ""
                 loginErrorMessage = "Invalid Credentials. Please try again."
             }

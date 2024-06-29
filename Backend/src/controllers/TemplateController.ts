@@ -1,21 +1,21 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
-import { Template } from "../entity/Template";
-import { User } from "../entity/User";
+import { Template } from "../entities/Template";
+import { User } from "../entities/User";
 
 export class TemplateController {
     private templateRepository = AppDataSource.getRepository(Template);
 
     async all(request: Request, response: Response, next: NextFunction) {
-        const userId = parseInt(request.params.userId)
+        const userId = parseInt(request.params.userId);
 
         return this.templateRepository.findBy({
-            user: { id: userId }
+            user: { id: userId },
         });
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
-        const userId = parseInt(request.params.userId)
+        const userId = parseInt(request.params.userId);
         const id = parseInt(request.params.id);
 
         const template = await this.templateRepository.findOneBy({
@@ -41,7 +41,7 @@ export class TemplateController {
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
-        const userId = parseInt(request.params.userId)
+        const userId = parseInt(request.params.userId);
         const id = parseInt(request.params.id);
 
         let templateToRemove = await this.templateRepository.findOneBy({

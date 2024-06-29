@@ -1,6 +1,6 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
-import { Exercise } from "../entity/Exercise";
+import { Exercise } from "../entities/Exercise";
 
 export class ExerciseController {
     private exerciseRepository = AppDataSource.getRepository(Exercise);
@@ -9,7 +9,7 @@ export class ExerciseController {
         const workoutId = parseInt(request.params.userId);
 
         return this.exerciseRepository.findBy({
-            workout: { id: workoutId }
+            workout: { id: workoutId },
         });
     }
 
@@ -19,7 +19,7 @@ export class ExerciseController {
 
         const exercise = await this.exerciseRepository.findOneBy({
             id,
-            workout: { id: workoutId }
+            workout: { id: workoutId },
         });
 
         if (!exercise) {
@@ -29,7 +29,15 @@ export class ExerciseController {
     }
 
     async save(request: Request, response: Response, next: NextFunction) {
-        const { workoutId, exerciseRefId, customExerciseRefId, sets, reps, weight, duration } = request.body;
+        const {
+            workoutId,
+            exerciseRefId,
+            customExerciseRefId,
+            sets,
+            reps,
+            weight,
+            duration,
+        } = request.body;
 
         const exercise = Object.assign(new Exercise(), {
             workout: { id: workoutId },
@@ -50,7 +58,7 @@ export class ExerciseController {
 
         let exerciseToRemove = await this.exerciseRepository.findOneBy({
             id,
-            workout: { id: workoutId }
+            workout: { id: workoutId },
         });
 
         if (!exerciseToRemove) {

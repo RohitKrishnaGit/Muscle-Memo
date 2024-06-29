@@ -1,6 +1,12 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
-import { User } from "../entity/User";
+import { User } from "../entities/User";
+import {
+    generatePasswordHash,
+    generateRandomToken,
+    validatePassword,
+} from "../utils/password";
+import { generateTokens } from "../utils/token";
 
 export class UserController {
     private userRepository = AppDataSource.getRepository(User);
@@ -27,23 +33,53 @@ export class UserController {
 
         const user = await this.userRepository.findOneBy({
             username,
-            password,
         });
 
         if (!user) {
-            return false;
+            response.status(401);
+            return { error: true, message: "Invalid email or password" };
         }
-        return true;
+
+        const verifiedPassword = await validatePassword(
+            password,
+            user.password
+        );
+
+        if (!verifiedPassword) {
+            response.status(401);
+            return { error: true, message: "Invalid email or password" };
+        }
+
+        const { accessToken, refreshToken } = await generateTokens(user);
+
+        return {
+            error: false,
+            accessToken,
+            refreshToken,
+            message: "Logged in sucessfully",
+        };
     }
 
     async save(request: Request, response: Response, next: NextFunction) {
         const { username, fullName, email, password } = request.body;
 
+        const userExists = !!(await this.userRepository.findOneBy([
+            { username },
+            { email },
+        ]));
+
+        if (userExists) {
+            return response.status(400).json({
+                error: true,
+                message: "User with given username or email already exist",
+            });
+        }
+
         const user = Object.assign(new User(), {
             username,
             fullName,
             email,
-            password,
+            password: await generatePasswordHash(password),
         });
 
         return this.userRepository.save(user);

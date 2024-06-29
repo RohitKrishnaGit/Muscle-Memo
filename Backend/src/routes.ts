@@ -1,40 +1,46 @@
-import { UserController } from "./controller/UserController";
-import { ExerciseRefController } from "./controller/ExerciseRefController";
-import { CustomExerciseRefController } from "./controller/CustomExerciseRefController";
-import { WorkoutController } from "./controller/WorkoutController";
-import { ExerciseController } from "./controller/ExerciseController";
-import { TemplateController } from "./controller/TemplateController";
+import { UserController } from "./controllers/UserController";
+import { ExerciseRefController } from "./controllers/ExerciseRefController";
+import { CustomExerciseRefController } from "./controllers/CustomExerciseRefController";
+import { WorkoutController } from "./controllers/WorkoutController";
+import { ExerciseController } from "./controllers/ExerciseController";
+import { TemplateController } from "./controllers/TemplateController";
+import { authenticateWithToken } from "./middleware/auth";
 
 export const Routes = [
     /* User routes */
     {
         method: "post",
-        route: "/users/login/:user/:password",
+        route: "/users/login",
         controller: UserController,
+        middleware: [],
         action: "login",
-    },
-    {
-        method: "get",
-        route: "/users/:id",
-        controller: UserController,
-        action: "one",
     },
     {
         method: "get",
         route: "/users",
         controller: UserController,
+        middleware: [],
         action: "all",
     },
     {
         method: "post",
         route: "/users",
         controller: UserController,
+        middleware: [],
         action: "save",
+    },
+    {
+        method: "get",
+        route: "/users/:id",
+        controller: UserController,
+        middleware: [],
+        action: "one",
     },
     {
         method: "delete",
         route: "/users/:id",
         controller: UserController,
+        middleware: [],
         action: "remove",
     },
 
@@ -43,12 +49,14 @@ export const Routes = [
         method: "get",
         route: "/exerciseRefs/:id",
         controller: ExerciseRefController,
+        middleware: [],
         action: "one",
     },
     {
         method: "get",
         route: "/exerciseRefs",
         controller: ExerciseRefController,
+        middleware: [authenticateWithToken],
         action: "all",
     },
     /* Shouldn't need these, temporarily keeping until cleanup can be confirmed */
@@ -71,24 +79,28 @@ export const Routes = [
         method: "get",
         route: "/customExerciseRefs/:userId/:id",
         controller: CustomExerciseRefController,
+        middleware: [],
         action: "one",
     },
     {
         method: "get",
         route: "/customExerciseRefs/:userId",
         controller: CustomExerciseRefController,
+        middleware: [],
         action: "all",
     },
     {
         method: "post",
         route: "/customExerciseRefs",
         controller: CustomExerciseRefController,
+        middleware: [],
         action: "save",
     },
     {
         method: "delete",
         route: "/customExerciseRefs/:userId/:id",
         controller: CustomExerciseRefController,
+        middleware: [],
         action: "remove",
     },
 
@@ -98,24 +110,28 @@ export const Routes = [
         method: "get",
         route: "/workouts/:userId/:id",
         controller: WorkoutController,
+        middleware: [],
         action: "one",
     },
     {
         method: "get",
         route: "/workouts/:userId",
         controller: WorkoutController,
+        middleware: [],
         action: "all",
     },
     {
         method: "post",
         route: "/workouts",
         controller: WorkoutController,
+        middleware: [],
         action: "save",
     },
     {
         method: "delete",
         route: "/workouts/:userId/:id",
         controller: WorkoutController,
+        middleware: [],
         action: "remove",
     },
 
@@ -125,24 +141,28 @@ export const Routes = [
         method: "get",
         route: "/templates/:userId/:id",
         controller: TemplateController,
+        middleware: [],
         action: "one",
     },
     {
         method: "get",
         route: "/templates/:userId",
         controller: TemplateController,
+        middleware: [],
         action: "all",
     },
     {
         method: "post",
         route: "/templates",
         controller: TemplateController,
+        middleware: [],
         action: "save",
     },
     {
         method: "delete",
         route: "/templates/:userId/:id",
         controller: TemplateController,
+        middleware: [],
         action: "remove",
     },
 
@@ -152,24 +172,28 @@ export const Routes = [
         method: "get",
         route: "/exercises/:workoutId/:id",
         controller: ExerciseController,
+        middleware: [],
         action: "one",
     },
     {
         method: "get",
         route: "/exercises/:workoutId",
         controller: ExerciseController,
+        middleware: [],
         action: "all",
     },
     {
         method: "post",
         route: "/exercises",
         controller: ExerciseController,
+        middleware: [],
         action: "save",
     },
     {
         method: "delete",
         route: "/exercises/:workoutId/:id",
         controller: ExerciseController,
+        middleware: [],
         action: "remove",
     },
 ];

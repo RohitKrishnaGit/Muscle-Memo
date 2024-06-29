@@ -1,6 +1,6 @@
 import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
-import { ExerciseRef } from "../entity/ExerciseRef";
+import { ExerciseRef } from "../entities/ExerciseRef";
 
 export class ExerciseRefController {
     private exerciseRefRepository = AppDataSource.getRepository(ExerciseRef);
@@ -13,7 +13,7 @@ export class ExerciseRefController {
         const id = parseInt(request.params.id);
 
         const exerciseRef = await this.exerciseRefRepository.findOneBy({
-             id,
+            id,
         });
 
         if (!exerciseRef) {

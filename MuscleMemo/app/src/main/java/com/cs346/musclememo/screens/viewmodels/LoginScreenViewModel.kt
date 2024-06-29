@@ -4,6 +4,7 @@ import RetrofitInstance
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.classes.Users
+import com.cs346.musclememo.screens.services.LoginRequest
 import com.cs346.musclememo.screens.services.UserService
 import retrofit2.Call
 import retrofit2.Callback
@@ -16,7 +17,7 @@ class LoginScreenViewModel : ViewModel() {
     fun loginAttempt(username: String, password: String, onSuccess: () -> Unit, onFailure: () -> Unit): Unit{
         // todo: implement account login
 
-        RetrofitInstance.userService.getAuthentication(user = username, password = password).enqueue(object:
+        RetrofitInstance.userService.getAuthentication(LoginRequest(username, password)).enqueue(object:
             Callback<Boolean>{
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
                 if (!response.isSuccessful) {
@@ -33,6 +34,7 @@ class LoginScreenViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                t.printStackTrace()
                 onFailure()
             }
 

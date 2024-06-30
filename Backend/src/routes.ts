@@ -6,10 +6,9 @@ import { ExerciseController } from "./controller/ExerciseController";
 import { TemplateController } from "./controller/TemplateController";
 
 export const Routes = [
-
     /* User routes */
     {
-        method: "get",
+        method: "post",
         route: "/users/login/:user/:password",
         controller: UserController,
         action: "login",
@@ -38,7 +37,6 @@ export const Routes = [
         controller: UserController,
         action: "remove",
     },
-    
 
     /* exerciseRef routes */
     {
@@ -147,7 +145,6 @@ export const Routes = [
         controller: TemplateController,
         action: "remove",
     },
-
 
     /* Exercise routes */
     /* Shouldn't need to work with ALL exercises, just those per workout */

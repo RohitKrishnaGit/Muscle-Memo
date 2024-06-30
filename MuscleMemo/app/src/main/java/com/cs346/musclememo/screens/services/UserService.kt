@@ -4,12 +4,13 @@ import com.cs346.musclememo.classes.Users
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Headers
+import retrofit2.http.POST
 import retrofit2.http.Path
 
+data class LoginRequest(val username: String, val password: String)
 
 public interface UserService {
-    @GET("/users/login/{user}/{password}")
-    fun getAuthentication(@Path("user") user: String,
-                          @Path("password") password: String
-    ): Call<Boolean>
+    @POST("/users/login/{user}/{password}")
+    fun getAuthentication(@Body body: LoginRequest): Call<Boolean>
 }

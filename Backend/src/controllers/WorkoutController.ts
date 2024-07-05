@@ -1,7 +1,7 @@
-import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
-import { Workout } from "../entities/Workout";
+import { AppDataSource } from "../data-source";
 import { User } from "../entities/User";
+import { Workout } from "../entities/Workout";
 
 export class WorkoutController {
     private workoutRepository = AppDataSource.getRepository(Workout);
@@ -29,7 +29,7 @@ export class WorkoutController {
         return workout;
     }
 
-    async save(request: Request, response: Response, next: NextFunction) {
+    async create(request: Request, response: Response, next: NextFunction) {
         const { name, userId } = request.body;
 
         const workout = Object.assign(new Workout(), {

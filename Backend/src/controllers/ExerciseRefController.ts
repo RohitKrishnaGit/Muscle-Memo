@@ -1,5 +1,5 @@
-import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
+import { AppDataSource } from "../data-source";
 import { ExerciseRef } from "../entities/ExerciseRef";
 
 export class ExerciseRefController {
@@ -23,7 +23,7 @@ export class ExerciseRefController {
     }
 
     /* Shouldn't need these, temporarily keeping until cleanup can be confirmed */
-    // async save(request: Request, response: Response, next: NextFunction) {
+    // async create(request: Request, response: Response, next: NextFunction) {
     //     const { name } = request.body;
 
     //     const exerciseRef = Object.assign(new ExerciseRef(), {

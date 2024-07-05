@@ -6,8 +6,8 @@ import {
     PrimaryGeneratedColumn,
     Relation,
 } from "typeorm";
-import { User } from "./User";
 import { Exercise } from "./Exercise";
+import { User } from "./User";
 
 @Entity()
 export class Template {

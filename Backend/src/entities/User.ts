@@ -1,18 +1,17 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
-    OneToMany,
-    Relation,
-    ManyToMany,
+    Entity,
     JoinTable,
+    ManyToMany,
+    OneToMany,
     OneToOne,
+    PrimaryGeneratedColumn,
+    Relation,
 } from "typeorm";
-import { Workout } from "./Workout";
 import { CustomExerciseRef } from "./CustomExerciseRef";
 import { Template } from "./Template";
-import { generateRandomToken } from "../utils/password";
 import { UserToken } from "./UserToken";
+import { Workout } from "./Workout";
 
 @Entity()
 export class User {

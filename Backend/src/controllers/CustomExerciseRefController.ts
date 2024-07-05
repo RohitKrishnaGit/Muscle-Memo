@@ -1,5 +1,5 @@
-import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
+import { AppDataSource } from "../data-source";
 import { CustomExerciseRef } from "../entities/CustomExerciseRef";
 import { User } from "../entities/User";
 
@@ -31,7 +31,7 @@ export class CustomExerciseRefController {
         return customExerciseRef;
     }
 
-    async save(request: Request, response: Response, next: NextFunction) {
+    async create(request: Request, response: Response, next: NextFunction) {
         const { name, userId } = request.body;
 
         const customExerciseRef = Object.assign(new CustomExerciseRef(), {

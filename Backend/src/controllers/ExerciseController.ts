@@ -1,5 +1,5 @@
-import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
+import { AppDataSource } from "../data-source";
 import { Exercise } from "../entities/Exercise";
 
 export class ExerciseController {
@@ -28,7 +28,7 @@ export class ExerciseController {
         return exercise;
     }
 
-    async save(request: Request, response: Response, next: NextFunction) {
+    async create(request: Request, response: Response, next: NextFunction) {
         const {
             workoutId,
             exerciseRefId,

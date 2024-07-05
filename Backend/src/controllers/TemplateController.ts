@@ -1,5 +1,5 @@
-import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
+import { AppDataSource } from "../data-source";
 import { Template } from "../entities/Template";
 import { User } from "../entities/User";
 
@@ -29,7 +29,7 @@ export class TemplateController {
         return template;
     }
 
-    async save(request: Request, response: Response, next: NextFunction) {
+    async create(request: Request, response: Response, next: NextFunction) {
         const { name, userId } = request.body;
 
         const template = Object.assign(new Template(), {

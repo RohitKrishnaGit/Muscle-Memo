@@ -1,15 +1,13 @@
-import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
+import { AppDataSource } from "../data-source";
 import { User } from "../entities/User";
-import {
-    generatePasswordHash,
-    generateRandomToken,
-    validatePassword,
-} from "../utils/password";
+import { UserToken } from "../entities/UserToken";
+import { generatePasswordHash, validatePassword } from "../utils/password";
 import { generateTokens } from "../utils/token";
 
 export class UserController {
     private userRepository = AppDataSource.getRepository(User);
+    private userTokenRepository = AppDataSource.getRepository(UserToken);
 
     async all(request: Request, response: Response, next: NextFunction) {
         return this.userRepository.find();
@@ -60,7 +58,19 @@ export class UserController {
         };
     }
 
-    async save(request: Request, response: Response, next: NextFunction) {
+    async logout(request: Request, response: Response, next: NextFunction) {
+        const userToken = await this.userTokenRepository.findOneBy({
+            token: request.body.refreshToken,
+        });
+        if (!userToken)
+            return { error: false, message: "Logged Out Sucessfully" };
+
+        await this.userTokenRepository.delete(userToken);
+
+        return { error: false, message: "Logged Out Sucessfully" };
+    }
+
+    async create(request: Request, response: Response, next: NextFunction) {
         const { username, fullName, email, password } = request.body;
 
         const userExists = !!(await this.userRepository.findOneBy([

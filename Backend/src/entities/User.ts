@@ -27,7 +27,7 @@ export class User {
     @Column()
     email: string;
 
-    @Column()
+    @Column({ select: false })
     password: string;
 
     @ManyToMany(() => User)
@@ -42,12 +42,6 @@ export class User {
 
     @OneToMany(() => CustomExerciseRef, (customExercise) => customExercise.user)
     customExercises?: Relation<CustomExerciseRef[]>;
-
-    @Column({ default: Date.now })
-    createdAt: number;
-
-    @Column({ default: Date.now })
-    lastLoggedIn: number;
 
     @OneToOne(() => UserToken, (userToken) => userToken.user, {
         nullable: true,

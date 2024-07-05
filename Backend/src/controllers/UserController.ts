@@ -29,8 +29,11 @@ export class UserController {
     async login(request: Request, response: Response, next: NextFunction) {
         const { username, password } = request.body;
 
-        const user = await this.userRepository.findOneBy({
-            username,
+        const user = await this.userRepository.findOne({
+            where: {
+                username,
+            },
+            select: ["id", "password"],
         });
 
         if (!user) {
@@ -79,10 +82,11 @@ export class UserController {
         ]));
 
         if (userExists) {
-            return response.status(400).json({
+            response.status(400);
+            return {
                 error: true,
                 message: "User with given username or email already exist",
-            });
+            };
         }
 
         const user = Object.assign(new User(), {
@@ -92,7 +96,9 @@ export class UserController {
             password: await generatePasswordHash(password),
         });
 
-        return this.userRepository.save(user);
+        await this.userRepository.save(user);
+
+        return "User created";
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {

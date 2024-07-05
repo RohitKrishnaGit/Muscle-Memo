@@ -5,10 +5,10 @@ import {
     PrimaryGeneratedColumn,
     Relation,
 } from "typeorm";
-import { ExerciseRef } from "./ExerciseRef";
 import { CustomExerciseRef } from "./CustomExerciseRef";
-import { Workout } from "./Workout";
+import { ExerciseRef } from "./ExerciseRef";
 import { Template } from "./Template";
+import { Workout } from "./Workout";
 
 @Entity()
 export class Exercise {

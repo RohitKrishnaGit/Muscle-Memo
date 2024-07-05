@@ -1,15 +1,17 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
-    OneToMany,
-    Relation,
-    ManyToMany,
+    Entity,
     JoinTable,
+    ManyToMany,
+    OneToMany,
+    OneToOne,
+    PrimaryGeneratedColumn,
+    Relation,
 } from "typeorm";
-import { Workout } from "./Workout";
 import { CustomExerciseRef } from "./CustomExerciseRef";
 import { Template } from "./Template";
+import { UserToken } from "./UserToken";
+import { Workout } from "./Workout";
 
 @Entity()
 export class User {
@@ -25,12 +27,12 @@ export class User {
     @Column()
     email: string;
 
-    @Column()
+    @Column({ select: false })
     password: string;
 
     @ManyToMany(() => User)
     @JoinTable()
-    friends?: User[];
+    friends?: Relation<User[]>;
 
     @OneToMany(() => Workout, (workout) => workout.user)
     workouts?: Relation<Workout[]>;
@@ -40,4 +42,9 @@ export class User {
 
     @OneToMany(() => CustomExerciseRef, (customExercise) => customExercise.user)
     customExercises?: Relation<CustomExerciseRef[]>;
+
+    @OneToOne(() => UserToken, (userToken) => userToken.user, {
+        nullable: true,
+    })
+    token?: Relation<UserToken>;
 }

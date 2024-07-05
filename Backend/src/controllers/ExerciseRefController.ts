@@ -1,6 +1,6 @@
-import { AppDataSource } from "../data-source";
 import { NextFunction, Request, Response } from "express";
-import { ExerciseRef } from "../entity/ExerciseRef";
+import { AppDataSource } from "../data-source";
+import { ExerciseRef } from "../entities/ExerciseRef";
 
 export class ExerciseRefController {
     private exerciseRefRepository = AppDataSource.getRepository(ExerciseRef);
@@ -13,7 +13,7 @@ export class ExerciseRefController {
         const id = parseInt(request.params.id);
 
         const exerciseRef = await this.exerciseRefRepository.findOneBy({
-             id,
+            id,
         });
 
         if (!exerciseRef) {
@@ -23,7 +23,7 @@ export class ExerciseRefController {
     }
 
     /* Shouldn't need these, temporarily keeping until cleanup can be confirmed */
-    // async save(request: Request, response: Response, next: NextFunction) {
+    // async create(request: Request, response: Response, next: NextFunction) {
     //     const { name } = request.body;
 
     //     const exerciseRef = Object.assign(new ExerciseRef(), {

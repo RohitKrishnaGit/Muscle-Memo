@@ -6,20 +6,20 @@ import {
     PrimaryGeneratedColumn,
     Relation,
 } from "typeorm";
-import { User } from "./User";
 import { Exercise } from "./Exercise";
+import { User } from "./User";
 
 @Entity()
-export class Workout {
+export class Template {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
     name: string;
 
-    @ManyToOne(() => User, (user) => user.workouts)
+    @ManyToOne(() => User, (user) => user.templates)
     user: User;
 
-    @OneToMany(() => Exercise, (exercise) => exercise.workout)
+    @OneToMany(() => Exercise, (exercise) => exercise.template)
     exercises: Relation<Exercise[]>;
 }

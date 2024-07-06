@@ -22,12 +22,7 @@ export class TokenController {
                 { expiresIn: 300 }
             );
 
-            response.status(200);
-            return {
-                error: false,
-                accessToken,
-                message: "Access token created successfully",
-            };
+            return accessToken;
         } catch (err) {
             response.status(400);
             return err;

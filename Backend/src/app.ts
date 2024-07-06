@@ -33,10 +33,7 @@ AppDataSource.initialize()
                         }
                     } catch (err) {
                         console.log(err);
-                        res.status(500).json({
-                            error: true,
-                            message: "Internal Server Error",
-                        });
+                        res.status(500).json("Internal Server Error");
                     }
                 }
             );

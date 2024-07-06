@@ -38,7 +38,7 @@ export class UserController {
 
         if (!user) {
             response.status(401);
-            return { error: true, message: "Invalid email or password" };
+            return "Invalid email or password";
         }
 
         const verifiedPassword = await validatePassword(
@@ -48,29 +48,23 @@ export class UserController {
 
         if (!verifiedPassword) {
             response.status(401);
-            return { error: true, message: "Invalid email or password" };
+            return "Invalid email or password";
         }
 
-        const { accessToken, refreshToken } = await generateTokens(user);
+        // const { accessToken, refreshToken } = await ;
 
-        return {
-            error: false,
-            accessToken,
-            refreshToken,
-            message: "Logged in sucessfully",
-        };
+        return generateTokens(user);
     }
 
     async logout(request: Request, response: Response, next: NextFunction) {
         const userToken = await this.userTokenRepository.findOneBy({
             token: request.body.refreshToken,
         });
-        if (!userToken)
-            return { error: false, message: "Logged Out Sucessfully" };
+        if (!userToken) return "Logged Out Sucessfully";
 
         await this.userTokenRepository.delete(userToken);
 
-        return { error: false, message: "Logged Out Sucessfully" };
+        return "Logged Out Sucessfully";
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
@@ -83,10 +77,7 @@ export class UserController {
 
         if (userExists) {
             response.status(400);
-            return {
-                error: true,
-                message: "User with given username or email already exist",
-            };
+            return "User with given username or email already exist";
         }
 
         const user = Object.assign(new User(), {

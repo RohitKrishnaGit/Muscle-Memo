@@ -2,9 +2,9 @@
 
 | Date    | Eric C. | Matthew E. | Rohit K. | Matthew M. | Dereck T. | Jun Z. | Task                                                        |
 | ------- | ------- | ---------- | -------- | ---------- | --------- | ------ | ----------------------------------------------------------- |
-| 6/21/24 | 1       | 1          | 1        | 1          | 1         | 1      | Work on deliverable 1                                       |
-| 6/21/24 | 1       | 1          | 1        | 1          | 1         | 1      | Work on deliverable 2                                       |
-| 6/21/24 | 1       | 1          | 1        | 1          | 1         | 1      | Work on deliverable 3                                       |
+| 5/30/24 | 1       | 1          | 1        | 1          | 1         | 1      | Work on deliverable 1                                       |
+| 6/13/24 | 1       | 1          | 1        | 1          | 1         | 1      | Work on deliverable 2                                       |
+| 6/27/24 | 1       | 1          | 1        | 1          | 1         | 1      | Work on deliverable 3                                       |
 | 6/21/24 |         |            |          |            | 2         |        | Set up android and backend express server                   |
 | 6/21/24 |         |            |          |            | 2         |        | Set up android and backend express server                   |
 | 6/21/24 |         |            |          |            | 2         |        | Set up android and backend express server                   |

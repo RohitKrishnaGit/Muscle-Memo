@@ -6,9 +6,6 @@
 | 6/13/24 | 1       | 1          | 1        | 1          | 1         | 1      | Work on deliverable 2                                       |
 | 6/27/24 | 1       | 1          | 1        | 1          | 1         | 1      | Work on deliverable 3                                       |
 | 6/21/24 |         |            |          |            | 2         |        | Set up android and backend express server                   |
-| 6/21/24 |         |            |          |            | 2         |        | Set up android and backend express server                   |
-| 6/21/24 |         |            |          |            | 2         |        | Set up android and backend express server                   |
-| 6/21/24 |         |            |          |            | 2         |        | Set up android and backend express server                   |
 | 6/24/24 |         |            |          |            | 4         |        | Configure ORM and establish initial table relations         |
 | 6/26/24 |         |            |          |            | 2         |        | Update app logo, fix bugs, help with retrofit setup         |
 | 6/29/24 |         |            |          |            | 2         |        | Start work on password authentication                       |

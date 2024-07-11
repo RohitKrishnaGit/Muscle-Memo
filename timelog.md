@@ -14,3 +14,4 @@
 | 7/06/24 |         |            |          |            | 10        |        | Finish password hashing and implement authentication tokens |
 | 7/06/24 |         |            |          | 2          |           |        | Create account screen + login and account service           |
 | 7/06/24 |         |            |          |            | 1         |        | Fix up response formatting, deploy to server                |
+| 7/11/24 |         |            |          |            | 4         |        | Implement automatic token refreshing on frontend            |

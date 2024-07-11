@@ -19,13 +19,12 @@ export class TokenController {
             const accessToken = jwt.sign(
                 payload,
                 process.env.ACCESS_TOKEN_PRIVATE_KEY,
-                { expiresIn: 300 }
+                { expiresIn: 10 } // TODO: Change to 300
             );
-
-            return accessToken;
+            return { accessToken };
         } catch (err) {
             response.status(400);
-            return err;
+            return (err as any).message;
         }
     }
 }

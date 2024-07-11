@@ -1,4 +1,4 @@
-package com.cs346.musclememo.screens.services
+package com.cs346.musclememo.api.services
 
 import com.cs346.musclememo.classes.Exercise
 import retrofit2.Call

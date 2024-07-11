@@ -1,6 +1,6 @@
 package com.cs346.musclememo.screens.viewmodels
 
-import RetrofitInstance
+import com.cs346.musclememo.api.RetrofitInstance
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf

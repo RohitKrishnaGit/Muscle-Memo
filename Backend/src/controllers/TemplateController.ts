@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Template } from "../entities/Template";
 import { User } from "../entities/User";
+import { failure, success } from "../utils/responseTypes";
 
 export class TemplateController {
     private templateRepository = AppDataSource.getRepository(Template);
@@ -9,9 +10,11 @@ export class TemplateController {
     async all(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
 
-        return this.templateRepository.findBy({
-            user: { id: userId },
-        });
+        return success(
+            this.templateRepository.findBy({
+                user: { id: userId },
+            })
+        );
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
@@ -24,7 +27,7 @@ export class TemplateController {
         });
 
         if (!template) {
-            return "this template does not exist";
+            return failure("this template does not exist");
         }
         return template;
     }
@@ -37,7 +40,7 @@ export class TemplateController {
             user: { id: userId } as User,
         });
 
-        return this.templateRepository.save(template);
+        return success(this.templateRepository.save(template));
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
@@ -50,11 +53,11 @@ export class TemplateController {
         });
 
         if (!templateToRemove) {
-            return "this template does not exist";
+            return failure("this template does not exist");
         }
 
         await this.templateRepository.remove(templateToRemove);
 
-        return "template has been removed";
+        return success("template has been removed");
     }
 }

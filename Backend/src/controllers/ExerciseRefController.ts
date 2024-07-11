@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { ExerciseRef } from "../entities/ExerciseRef";
+import { failure, success } from "../utils/responseTypes";
 
 export class ExerciseRefController {
     private exerciseRefRepository = AppDataSource.getRepository(ExerciseRef);
 
     async all(request: Request, response: Response, next: NextFunction) {
-        return this.exerciseRefRepository.find();
+        return success(this.exerciseRefRepository.find());
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
@@ -17,9 +18,9 @@ export class ExerciseRefController {
         });
 
         if (!exerciseRef) {
-            return "this exerciseRef does not exist";
+            return failure("this exerciseRef does not exist");
         }
-        return exerciseRef;
+        return success(exerciseRef);
     }
 
     /* Shouldn't need these, temporarily keeping until cleanup can be confirmed */

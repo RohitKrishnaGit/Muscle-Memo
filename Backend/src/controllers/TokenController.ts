@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { failure, success } from "../utils/responseTypes";
 import { verifyRefreshToken } from "../utils/token";
 
 export class TokenController {
@@ -21,10 +22,9 @@ export class TokenController {
                 process.env.ACCESS_TOKEN_PRIVATE_KEY,
                 { expiresIn: 10 } // TODO: Change to 300
             );
-            return { accessToken };
+            return success(accessToken);
         } catch (err) {
-            response.status(400);
-            return (err as any).message;
+            return failure((err as any).message);
         }
     }
 }

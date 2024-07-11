@@ -1,16 +1,13 @@
 package com.cs346.musclememo.screens.viewmodels
 
-import RetrofitInstance
-import android.util.Log
+import com.cs346.musclememo.api.RetrofitInstance
 import androidx.lifecycle.ViewModel
-import com.cs346.musclememo.classes.Users
-import com.cs346.musclememo.screens.services.LoginRequest
-import com.cs346.musclememo.screens.services.UserService
+import com.cs346.musclememo.utils.AppPreferences
+import com.cs346.musclememo.api.services.LoginRequest
+import com.cs346.musclememo.api.services.LoginResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 
 class LoginScreenViewModel : ViewModel() {
@@ -18,22 +15,21 @@ class LoginScreenViewModel : ViewModel() {
         // todo: implement account login
 
         RetrofitInstance.userService.getAuthentication(LoginRequest(username, password)).enqueue(object:
-            Callback<Boolean>{
-            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+            Callback<LoginResponse>{
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (!response.isSuccessful) {
                     onFailure()
                     return
                 }
                 response.body()?.let {
-                    if (it) {
-                        onSuccess()
-                    } else {
-                        onFailure()
-                    }
+                    AppPreferences.accessToken = it.accessToken
+                    AppPreferences.refreshToken = it.refreshToken
+                    println(it.refreshToken)
+                    onSuccess()
                 }
             }
 
-            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 t.printStackTrace()
                 onFailure()
             }

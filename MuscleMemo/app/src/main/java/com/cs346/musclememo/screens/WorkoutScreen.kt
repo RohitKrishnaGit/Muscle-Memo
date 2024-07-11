@@ -44,6 +44,7 @@ import com.cs346.musclememo.screens.components.ExerciseSets
 import com.cs346.musclememo.screens.components.ExerciseTitle
 import com.cs346.musclememo.screens.components.WorkoutHistoryCard
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
+import com.cs346.musclememo.utils.AppPreferences
 import java.util.Random
 
 @Preview(showBackground = true)
@@ -52,9 +53,9 @@ fun WorkoutScreen() {
     val viewModel = viewModel<WorkoutScreenViewModel>()
 
     // TODO Add back later for all workouts
-//    LaunchedEffect(Unit){
-//        viewModel.getExercises()
-//    }
+    LaunchedEffect(Unit){
+        viewModel.getExercises()
+    }
 
     // main screen
     Box(modifier = Modifier.fillMaxSize()) {

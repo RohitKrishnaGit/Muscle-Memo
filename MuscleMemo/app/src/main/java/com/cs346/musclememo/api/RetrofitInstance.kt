@@ -1,14 +1,21 @@
-import com.cs346.musclememo.screens.services.ExerciseRefService
-import com.cs346.musclememo.screens.services.UserService
+package com.cs346.musclememo.api
+
+import com.cs346.musclememo.api.services.ExerciseRefService
+import com.cs346.musclememo.api.services.UserService
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object RetrofitInstance {
-    private const val BASE_URL = "http://107.172.84.88:3000"
+object RetrofitInstance: RetrofitInterface {
 
     private val retrofit: Retrofit by lazy {
+        val okHttpClient = OkHttpClient.Builder()
+            .authenticator(TokenAuthenticator())
+            .addInterceptor(TokenInterceptor())
+            .build()
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(baseUrl)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

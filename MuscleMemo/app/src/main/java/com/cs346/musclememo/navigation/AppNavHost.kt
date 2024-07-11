@@ -11,12 +11,13 @@ import com.cs346.musclememo.screens.LeaderboardScreen
 import com.cs346.musclememo.screens.LoginScreen
 import com.cs346.musclememo.screens.ProfileScreen
 import com.cs346.musclememo.screens.WorkoutScreen
+import com.cs346.musclememo.utils.AppPreferences
 
 @Composable
 fun AppNavHost (
     navController: NavHostController,
     bottomBarState: MutableState<Boolean>,
-    startDestination: String = Screen.Login.route
+    startDestination: String,
 ) {
     NavHost (
         navController = navController,

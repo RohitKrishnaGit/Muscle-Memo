@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { CustomExerciseRef } from "../entities/CustomExerciseRef";
 import { User } from "../entities/User";
+import { failure, success } from "../utils/responseTypes";
 
 export class CustomExerciseRefController {
     private customExerciseRefRepository =
@@ -10,9 +11,11 @@ export class CustomExerciseRefController {
     async all(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
 
-        return this.customExerciseRefRepository.findBy({
-            user: { id: userId },
-        });
+        return success(
+            this.customExerciseRefRepository.findBy({
+                user: { id: userId },
+            })
+        );
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
@@ -26,9 +29,9 @@ export class CustomExerciseRefController {
             });
 
         if (!customExerciseRef) {
-            return "this customExerciseRef does not exist";
+            return failure("this customExerciseRef does not exist");
         }
-        return customExerciseRef;
+        return success(customExerciseRef);
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
@@ -39,7 +42,9 @@ export class CustomExerciseRefController {
             user: { id: userId } as User,
         });
 
-        return this.customExerciseRefRepository.save(customExerciseRef);
+        return success(
+            this.customExerciseRefRepository.save(customExerciseRef)
+        );
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
@@ -53,13 +58,13 @@ export class CustomExerciseRefController {
             });
 
         if (!customExerciseRefToRemove) {
-            return "this customExerciseRef does not exist";
+            return failure("this customExerciseRef does not exist");
         }
 
         await this.customExerciseRefRepository.remove(
             customExerciseRefToRemove
         );
 
-        return "customExerciseRef has been removed";
+        return success("customExerciseRef has been removed");
     }
 }

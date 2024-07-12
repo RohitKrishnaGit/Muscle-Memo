@@ -9,6 +9,7 @@ import com.cs346.musclememo.utils.AppPreferences
 import com.cs346.musclememo.api.services.LoginRequest
 import com.cs346.musclememo.api.services.LoginResponse
 import com.cs346.musclememo.api.types.ApiResponse
+import com.cs346.musclememo.api.types.parseErrorBody
 import com.cs346.musclememo.screens.services.SignupRequest
 import retrofit2.Call
 import retrofit2.Callback
@@ -62,8 +63,8 @@ class LoginScreenViewModel : ViewModel() {
             override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
                 if (!response.isSuccessful) {
                     println(response.body())
-                    val error = response.errorBody()?.string()
-                    onFailure(error?.substring(error.indexOf("sage\":")+7, error.length-2) ?: "Something went wrong")
+                    val error = response.parseErrorBody()
+                    onFailure(error?.message ?: "Something went wrong")
                     return
                 }
                 response.body()?.let {

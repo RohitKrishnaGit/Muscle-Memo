@@ -10,7 +10,6 @@ import com.cs346.musclememo.api.services.LoginRequest
 import com.cs346.musclememo.api.services.LoginResponse
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.screens.services.SignupRequest
-import com.cs346.musclememo.screens.services.SignupResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -49,7 +48,7 @@ class LoginScreenViewModel : ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<LoginResponse>>, t: Throwable) {
                 t.printStackTrace()
                 onFailure()
             }
@@ -59,10 +58,12 @@ class LoginScreenViewModel : ViewModel() {
 
     fun createAccountAttempt(username: String, password: String, email: String, fullName: String, onSuccess: () -> Unit, onFailure: (error: String) -> Unit): Unit{
         RetrofitInstance.signupService.createAccount(SignupRequest(username, password, email, fullName)).enqueue(object:
-            Callback<SignupResponse>{
-            override fun onResponse(call: Call<SignupResponse>, response: Response<SignupResponse>) {
+            Callback<ApiResponse<String>>{
+            override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
                 if (!response.isSuccessful) {
-                    onFailure(response.errorBody()?.string() ?: "Something went wrong")
+                    println(response.body())
+                    val error = response.errorBody()?.string()
+                    onFailure(error?.substring(error.indexOf("sage\":")+7, error.length-2) ?: "Something went wrong")
                     return
                 }
                 response.body()?.let {
@@ -70,11 +71,10 @@ class LoginScreenViewModel : ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<SignupResponse>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
                 t.printStackTrace()
                 onFailure("Could not reach server")
             }
-
         })
     }
 }

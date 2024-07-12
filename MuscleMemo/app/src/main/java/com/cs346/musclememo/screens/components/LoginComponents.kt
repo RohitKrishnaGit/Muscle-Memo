@@ -45,16 +45,14 @@ fun PasswordTextField(
     onValueChange: (String) -> Unit,
     text: String = "Password",
     modifier: Modifier,
+    keyboardOptions: KeyboardOptions
 ){
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     OutlinedTextField(value = password, onValueChange = onValueChange, label = {
         Text(text = text)
     },
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done
-        ),
+        keyboardOptions = keyboardOptions,
         trailingIcon = {
             val image = if (passwordVisible)
                 Icons.Filled.Visibility

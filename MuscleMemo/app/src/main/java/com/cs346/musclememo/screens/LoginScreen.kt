@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -106,7 +107,11 @@ fun LoginAccountSheet(
     InputSheet(
         title = "Log in",
         visible = viewModel.loginVisible,
-        setVisible = { viewModel.setLoginScreenVisible(it) }
+        setVisible = {
+            viewModel.setLoginScreenVisible(it)
+            username = ""
+            password = ""
+        }
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -130,12 +135,29 @@ fun LoginAccountSheet(
 
             // Password
             Spacer(modifier = Modifier.height(16.dp))
-            PasswordTextField(password = password, onValueChange = { password = it }, modifier = Modifier.fillMaxWidth(1f))
+            PasswordTextField(
+                password = password,
+                onValueChange = { password = it },
+                modifier = Modifier.fillMaxWidth(1f),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                )
+            )
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = "Forgot Password?", modifier = Modifier.clickable {
 
             })
             // Login Button
+            if (loginErrorMessage != "") {
+                Spacer(modifier = Modifier.height(4.dp))
+                //Invalid Login
+                Row (modifier = Modifier.fillMaxWidth()) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(loginErrorMessage)
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Row (modifier = Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.weight(1f))
@@ -151,18 +173,6 @@ fun LoginAccountSheet(
                 }
                 Spacer(modifier = Modifier.weight(1f))
             }
-
-            if (loginErrorMessage != "") {
-                Spacer(modifier = Modifier.height(4.dp))
-                //Invalid Login
-                Row (modifier = Modifier.fillMaxWidth()) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(loginErrorMessage)
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-
-
         }
     }
 }
@@ -188,14 +198,22 @@ fun CreateAccountSheet(
         mutableStateOf("")
     }
 
-    var createErrorMessage by remember {
+    var errorMessage by remember {
         mutableStateOf("")
     }
 
     InputSheet(
         title = "Sign up",
         visible = viewModel.signupVisible,
-        setVisible = { viewModel.setSignupScreenVisible(it)}
+        setVisible = {
+            viewModel.setSignupScreenVisible(it)
+            username = ""
+            password = ""
+            passwordCheck = ""
+            email = ""
+            fullName = ""
+            errorMessage = ""
+        }
     ) {
             Row(
                 verticalAlignment = Alignment.Top,
@@ -203,9 +221,12 @@ fun CreateAccountSheet(
                     .fillMaxSize()
             ) {
                 Column (
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    horizontalAlignment = Alignment.Start,
                     modifier = Modifier.fillMaxSize()
                 ){
+                    Text(text = "Register", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                    //Username
+                    Spacer(modifier = Modifier.height(4.dp))
                     OutlinedTextField(
                         value = fullName,
                         onValueChange = {
@@ -214,7 +235,8 @@ fun CreateAccountSheet(
                         label = {
                             Text(text = "Full Name")
                         },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        modifier = Modifier.fillMaxWidth(1f)
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -226,7 +248,8 @@ fun CreateAccountSheet(
                         label = {
                             Text(text = "Email")
                         },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        modifier = Modifier.fillMaxWidth(1f)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     OutlinedTextField(
@@ -237,59 +260,70 @@ fun CreateAccountSheet(
                         label = {
                             Text(text = "Username")
                         },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        modifier = Modifier.fillMaxWidth(1f)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    OutlinedTextField(
-                        value = password,
+                    PasswordTextField(
+                        password = password,
                         onValueChange = {
                             password = it
                         },
-                        label = {
-                            Text(text = "Password")
-                        },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                        text = "Password",
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        modifier = Modifier.fillMaxWidth(1f)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    OutlinedTextField(
-                        value = passwordCheck,
+                    PasswordTextField(
+                        password = passwordCheck,
                         onValueChange = {
                             passwordCheck = it
                         },
-                        label = {
-                            Text(text = "Confirm Password")
-                        },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                        text = "Confirm Password",
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        modifier = Modifier.fillMaxWidth(1f)
                     )
                     Spacer(modifier = Modifier.height(20.dp))
-                    val errorMessage by remember { mutableStateOf("") }
-                    if (errorMessage != ""){
-                        Spacer(modifier = Modifier.height(5.dp))
-                        Text(text = createErrorMessage)
-                    }
-                    Button(onClick = {
-                        if (password == passwordCheck){
-                            viewModel.createAccountAttempt(username, password, email, fullName, {
-                                viewModel.setSignupScreenVisible(false)
-                                username = ""
-                                email = ""
-                                fullName = ""
-                            }){ error ->
-                                createErrorMessage = error
-                            }
-                        } else {
-                            createErrorMessage = "Passwords do not match"
+                    Column (
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ){
+                        var errorMessage by remember { mutableStateOf("") }
+                        if (errorMessage != "") {
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Text(text = errorMessage)
                         }
-                        password = ""
-                        passwordCheck = ""
-                    }) {
-                        Text(text = "Sign Up", fontSize = 20.sp)
+                        Button(onClick = {
+                            if (password == passwordCheck) {
+                                viewModel.createAccountAttempt(
+                                    username,
+                                    password,
+                                    email,
+                                    fullName,
+                                    {
+                                        viewModel.setSignupScreenVisible(false)
+                                        viewModel.setLoginScreenVisible(true)
+                                        username = ""
+                                        email = ""
+                                        fullName = ""
+                                    }) { error ->
+                                    errorMessage = error
+                                }
+                            } else {
+                                errorMessage = "Passwords do not match"
+                            }
+                            password = ""
+                            passwordCheck = ""
+                        }) {
+                            Text(text = "Sign Up", fontSize = 20.sp)
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(text = "Already have an account?", modifier = Modifier.clickable {
+                            viewModel.setSignupScreenVisible(false)
+                            viewModel.setLoginScreenVisible(true)
+                        })
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(text = "Already have an account?", modifier = Modifier.clickable {
-                        viewModel.setSignupScreenVisible(false)
-                        viewModel.setLoginScreenVisible(true)
-                    })
                 }
             }
         }

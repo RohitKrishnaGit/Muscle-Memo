@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.classes.Exercise
 import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.classes.Workout
@@ -35,13 +36,13 @@ class WorkoutScreenViewModel : ViewModel() {
         workoutVisible = visible
     }
     fun getExercises(){
-        RetrofitInstance.exerciseService.getExerciseRef().enqueue(object: Callback<List<Exercise>>{
+        RetrofitInstance.exerciseService.getExerciseRef().enqueue(object: Callback<ApiResponse<List<Exercise>>>{
             override fun onResponse(
-                call: Call<List<Exercise>>,
-                response: Response<List<Exercise>>
+                call: Call<ApiResponse<List<Exercise>>>,
+                response: Response<ApiResponse<List<Exercise>>>
             ) {
                 if (response.isSuccessful){
-                    response.body()?.let{
+                    response.body()?.data?.let{
                         for (exercise in it){
                             _exercises.add(Exercise(exercise.name, exercise.id))
                         }
@@ -49,7 +50,7 @@ class WorkoutScreenViewModel : ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<List<Exercise>>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<List<Exercise>>>, t: Throwable) {
                 TODO("Not yet implemented")
             }
 

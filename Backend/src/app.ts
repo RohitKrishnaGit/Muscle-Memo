@@ -20,7 +20,9 @@ AppDataSource.initialize()
                 route.middleware,
                 (req: Request, res: Response, next: Function) => {
                     try {
-                        const result: Promise<ApiResponse<any>> =
+                        const result:
+                            | ApiResponse<any>
+                            | Promise<ApiResponse<any>> =
                             new (route.controller as any)()[route.action](
                                 req,
                                 res,
@@ -29,11 +31,11 @@ AppDataSource.initialize()
                         if (result instanceof Promise) {
                             result.then((result) =>
                                 result !== null && result !== undefined
-                                    ? res.status(result.code).send(result)
+                                    ? res.status(result.code).json(result)
                                     : undefined
                             );
                         } else if (result !== null && result !== undefined) {
-                            res.json(result);
+                            res.status(result.code).json(result);
                         }
                     } catch (err) {
                         console.log(err);

@@ -16,3 +16,5 @@
 | 7/06/24 |         |            |          |            | 1         |        | Fix up response formatting, deploy to server                |
 | 7/11/24 |         |            |          |            | 4         |        | Implement automatic token refreshing on frontend            |
 | 7/11/24 |         |            |          |            | 2         |        | Standardize response body on backend and frontend           |
+| 7/12/24 |         |            |          |            | 3         |        | Implement schema validation on backend request              |
+| 7/12/24 |         |            |          |            | 1         |        | Work on deliverable 4                                       |

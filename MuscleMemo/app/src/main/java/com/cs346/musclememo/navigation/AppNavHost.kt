@@ -1,5 +1,6 @@
 package com.cs346.musclememo.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.navigation.NavHostController
@@ -19,6 +20,7 @@ fun AppNavHost (
     bottomBarState: MutableState<Boolean>,
     startDestination: String,
 ) {
+    BackHandler(true){} // TODO: Fix back handler
     NavHost (
         navController = navController,
         startDestination = startDestination
@@ -32,8 +34,10 @@ fun AppNavHost (
         composable(route = Screen.Profile.route) {
             ProfileScreen( onClick = {
                 navController.navigate(Screen.Login.route)
+                bottomBarState.value = false
                 AppPreferences.refreshToken = null
                 AppPreferences.accessToken = null
+
             })
         }
         composable(route = Screen.Leaderboard.route) {

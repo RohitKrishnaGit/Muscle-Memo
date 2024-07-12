@@ -24,13 +24,17 @@ fun AppNavHost (
         startDestination = startDestination
     ) {
         composable(route = Screen.Login.route) {
-            LoginScreen(onClick = {
+            LoginScreen(onSuccessLogin = {
                 navController.navigate(NavItem.Workout.screen.route)
                 bottomBarState.value = true
             })
         }
         composable(route = Screen.Profile.route) {
-            ProfileScreen()
+            ProfileScreen( onClick = {
+                navController.navigate(Screen.Login.route)
+                AppPreferences.refreshToken = null
+                AppPreferences.accessToken = null
+            })
         }
         composable(route = Screen.Leaderboard.route) {
             LeaderboardScreen()

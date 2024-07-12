@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.utils.AppPreferences
 import com.cs346.musclememo.api.services.LoginRequest
 import com.cs346.musclememo.api.services.LoginResponse
+import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.screens.services.SignupRequest
 import com.cs346.musclememo.screens.services.SignupResponse
 import retrofit2.Call
@@ -31,14 +32,16 @@ class LoginScreenViewModel : ViewModel() {
     }
 
     fun loginAttempt(username: String, password: String, onSuccess: () -> Unit, onFailure: () -> Unit): Unit{
+        // todo: implement account login
+
         RetrofitInstance.userService.getAuthentication(LoginRequest(username, password)).enqueue(object:
-            Callback<LoginResponse>{
-            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+            Callback<ApiResponse<LoginResponse>>{
+            override fun onResponse(call: Call<ApiResponse<LoginResponse>>, response: Response<ApiResponse<LoginResponse>>) {
                 if (!response.isSuccessful) {
                     onFailure()
                     return
                 }
-                response.body()?.let {
+                response.body()?.data?.let {
                     AppPreferences.accessToken = it.accessToken
                     AppPreferences.refreshToken = it.refreshToken
                     println(it.refreshToken)

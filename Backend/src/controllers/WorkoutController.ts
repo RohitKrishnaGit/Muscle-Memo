@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entities/User";
 import { Workout } from "../entities/Workout";
+import { failure, success } from "../utils/responseTypes";
 
 export class WorkoutController {
     private workoutRepository = AppDataSource.getRepository(Workout);
@@ -9,9 +10,11 @@ export class WorkoutController {
     async all(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
 
-        return this.workoutRepository.findBy({
-            user: { id: userId },
-        });
+        return success(
+            this.workoutRepository.findBy({
+                user: { id: userId },
+            })
+        );
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
@@ -24,9 +27,9 @@ export class WorkoutController {
         });
 
         if (!workout) {
-            return "this workout does not exist";
+            return failure("this workout does not exist");
         }
-        return workout;
+        return success(workout);
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
@@ -37,7 +40,7 @@ export class WorkoutController {
             user: { id: userId } as User,
         });
 
-        return this.workoutRepository.save(workout);
+        return success(this.workoutRepository.save(workout));
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
@@ -50,11 +53,11 @@ export class WorkoutController {
         });
 
         if (!workoutToRemove) {
-            return "this workout does not exist";
+            return failure("this workout does not exist");
         }
 
         await this.workoutRepository.remove(workoutToRemove);
 
-        return "workout has been removed";
+        return success("workout has been removed");
     }
 }

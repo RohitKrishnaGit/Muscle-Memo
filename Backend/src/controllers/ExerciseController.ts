@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Exercise } from "../entities/Exercise";
+import { failure, success } from "../utils/responseTypes";
 
 export class ExerciseController {
     private exerciseRepository = AppDataSource.getRepository(Exercise);
@@ -8,9 +9,11 @@ export class ExerciseController {
     async all(request: Request, response: Response, next: NextFunction) {
         const workoutId = parseInt(request.params.userId);
 
-        return this.exerciseRepository.findBy({
-            workout: { id: workoutId },
-        });
+        return success(
+            this.exerciseRepository.findBy({
+                workout: { id: workoutId },
+            })
+        );
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
@@ -23,9 +26,9 @@ export class ExerciseController {
         });
 
         if (!exercise) {
-            return "this exercise does not exist";
+            return failure("this exercise does not exist");
         }
-        return exercise;
+        return success(exercise);
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
@@ -49,7 +52,7 @@ export class ExerciseController {
             duration,
         });
 
-        return this.exerciseRepository.save(exercise);
+        return success(this.exerciseRepository.save(exercise));
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
@@ -62,11 +65,11 @@ export class ExerciseController {
         });
 
         if (!exerciseToRemove) {
-            return "this exercise does not exist";
+            return failure("this exercise does not exist");
         }
 
         await this.exerciseRepository.remove(exerciseToRemove);
 
-        return "exercise has been removed";
+        return success("exercise has been removed");
     }
 }

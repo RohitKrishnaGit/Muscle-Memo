@@ -53,7 +53,7 @@ class TokenAuthenticator: Authenticator {
             try {
                 val response = TokenService.instance.getAuthentication(TokenRequest(AppPreferences.refreshToken!!)).execute()
                 if(response.isSuccessful) {
-                    AppPreferences.accessToken = response.body()?.let { it.accessToken }
+                    AppPreferences.accessToken = response.body()?.data
                     return@withContext true
                 } else {
                     // Invalid refresh token

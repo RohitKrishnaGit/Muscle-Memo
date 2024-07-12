@@ -14,7 +14,7 @@ data class SignupRequest (
 
 
 
-public interface SignupService{
+interface SignupService{
     @POST("/users/register")
     fun createAccount(@Body createAccount: SignupRequest): Call<ApiResponse<String>>
 }

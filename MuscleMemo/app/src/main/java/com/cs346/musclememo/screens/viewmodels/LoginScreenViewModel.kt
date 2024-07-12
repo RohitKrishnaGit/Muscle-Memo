@@ -30,7 +30,7 @@ class LoginScreenViewModel : ViewModel() {
         loginVisible = visible
     }
 
-    fun loginAttempt(username: String, password: String, onSuccess: () -> Unit, onFailure: () -> Unit): Unit{
+    fun loginAttempt(username: String, password: String, onSuccess: () -> Unit, onFailure: () -> Unit){
         // todo: implement account login
 
         RetrofitInstance.userService.getAuthentication(LoginRequest(username, password)).enqueue(object:
@@ -56,7 +56,7 @@ class LoginScreenViewModel : ViewModel() {
         })
     }
 
-    fun createAccountAttempt(username: String, password: String, email: String, fullName: String, onSuccess: () -> Unit, onFailure: (error: String) -> Unit): Unit{
+    fun createAccountAttempt(username: String, password: String, email: String, fullName: String, onSuccess: () -> Unit, onFailure: (error: String) -> Unit){
         RetrofitInstance.signupService.createAccount(SignupRequest(username, password, email, fullName)).enqueue(object:
             Callback<ApiResponse<String>>{
             override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {

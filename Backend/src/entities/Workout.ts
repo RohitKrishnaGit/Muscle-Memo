@@ -17,6 +17,9 @@ export class Workout {
     @Column()
     name: string;
 
+    @Column()
+    isFinished: number;
+
     @ManyToOne(() => User, (user) => user.workouts)
     user: User;
 

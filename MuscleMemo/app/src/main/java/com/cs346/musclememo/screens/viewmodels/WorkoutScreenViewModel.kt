@@ -35,6 +35,56 @@ class WorkoutScreenViewModel : ViewModel() {
     fun setWorkoutScreenVisible(visible: Boolean) {
         workoutVisible = visible
     }
+
+
+    //TODO discuss workoutData
+    fun createWorkout(workout: Workout){
+        val apiService = RetrofitInstance.workoutService
+        val call = apiService.createWorkout(workout)
+
+        call.enqueue(object : Callback<Boolean> {
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if (response.isSuccessful) {
+                    // Handle successful response
+                    val createdWorkout = response.body()
+                    println("Workout created successfully" )
+                } else {
+                    // Handle error response
+                    println("Error: ${response.errorBody()?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                // Handle failure
+                println("Failure: ${t.message}")
+            }
+
+        })
+    }
+
+    fun createExercises(exercise: Exercise){
+        val apiService = RetrofitInstance.exerciseService
+        val call = apiService.createExercise(exercise)
+        call.enqueue(object: Callback<Boolean>{
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if (response.isSuccessful) {
+                    // Handle successful response
+                    val createdWorkout = response.body()
+                    println("Workout created successfully" )
+                } else {
+                    // Handle error response
+                    println("Error: ${response.errorBody()?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                println("Failure: ${t.message}")
+            }
+
+        })
+    }
+
+
     fun getExercises(){
         RetrofitInstance.exerciseService.getExerciseRef().enqueue(object: Callback<ApiResponse<List<Exercise>>>{
             override fun onResponse(
@@ -56,6 +106,8 @@ class WorkoutScreenViewModel : ViewModel() {
 
         })
     }
+
+
 
 
 

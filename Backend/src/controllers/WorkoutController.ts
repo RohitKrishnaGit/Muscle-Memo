@@ -33,14 +33,21 @@ export class WorkoutController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { name, userId } = request.body;
+        const { name, userId, isFinished } = request.body;
 
         const workout = Object.assign(new Workout(), {
             name,
+            isFinished,
             user: { id: userId } as User,
         });
+        
+        await this.workoutRepository.save(workout)
 
+<<<<<<< HEAD
         return success(this.workoutRepository.save(workout));
+=======
+        return true;
+>>>>>>> b56cf95 (WIP workout endpoints)
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {

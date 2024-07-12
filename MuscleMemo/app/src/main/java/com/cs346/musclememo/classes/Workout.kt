@@ -6,11 +6,15 @@ import androidx.compose.runtime.mutableStateListOf
 // each element is a map where the key is the exerciseId and the value is a list of sets of
 data class Workout(
     var name: String = "New Workout",
-    var exercises: MutableList<ExerciseIteration> = mutableStateListOf<ExerciseIteration>()
+    var exercises: MutableList<ExerciseIteration> = mutableStateListOf<ExerciseIteration>(),
+    var userId: Int = 0,
+    var isFinished: Int = 0
 ) {
     fun setWorkout(workout: Workout = Workout()) {
         name = workout.name
         exercises = workout.exercises
+        userId = workout.userId
+        isFinished = workout.isFinished
     }
 
     fun addNewExercise(exercise: Exercise) {

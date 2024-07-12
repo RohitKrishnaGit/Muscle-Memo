@@ -43,11 +43,8 @@ export class WorkoutController {
         
         await this.workoutRepository.save(workout)
 
-<<<<<<< HEAD
-        return success(this.workoutRepository.save(workout));
-=======
-        return true;
->>>>>>> b56cf95 (WIP workout endpoints)
+        return success(true);
+
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {

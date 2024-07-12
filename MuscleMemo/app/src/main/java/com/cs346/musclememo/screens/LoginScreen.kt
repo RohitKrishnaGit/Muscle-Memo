@@ -272,10 +272,10 @@ fun CreateAccountSheet(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ){
-                        var errorMessage by remember { mutableStateOf("") }
-                        if (errorMessage != "") {
+                        var createErrorMessage by remember { mutableStateOf("") }
+                        if (createErrorMessage != "") {
                             Spacer(modifier = Modifier.height(5.dp))
-                            Text(text = errorMessage)
+                            Text(text = createErrorMessage)
                         }
                         Button(onClick = {
                             if (password == passwordCheck) {
@@ -291,10 +291,10 @@ fun CreateAccountSheet(
                                         email = ""
                                         fullName = ""
                                     }) { error ->
-                                    errorMessage = error
+                                    createErrorMessage = error
                                 }
                             } else {
-                                errorMessage = "Passwords do not match"
+                                createErrorMessage = "Passwords do not match"
                             }
                             password = ""
                             passwordCheck = ""

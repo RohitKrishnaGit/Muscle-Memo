@@ -7,8 +7,11 @@ export class ExerciseController {
     private exerciseRepository = AppDataSource.getRepository(Exercise);
 
     async all(request: Request, response: Response, next: NextFunction) {
-        const workoutId = parseInt(request.params.userId);
-
+        const workoutId = parseInt(request.params.workoutId);
+        console.log(request.params.userId);
+        console.log(await this.exerciseRepository.findBy({
+            workout: { id: workoutId },
+        }))
         return success(
             this.exerciseRepository.findBy({
                 workout: { id: workoutId },
@@ -17,7 +20,7 @@ export class ExerciseController {
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
-        const workoutId = parseInt(request.params.userId);
+        const workoutId = parseInt(request.params.workoutId);
         const id = parseInt(request.params.id);
 
         const exercise = await this.exerciseRepository.findOneBy({
@@ -32,27 +35,30 @@ export class ExerciseController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const {
+        let {
             workoutId,
             exerciseRefId,
             customExerciseRefId,
-            sets,
-            reps,
-            weight,
-            duration,
+            exerciseSet,
+            templateId,
+
         } = request.body;
+
+
+        console.log(request.body);
+        const strExerciseSet = JSON.stringify(exerciseSet);
+        console.log(strExerciseSet);
+        //Check for the references
 
         const exercise = Object.assign(new Exercise(), {
             workout: { id: workoutId },
-            exerciseRef: { id: exerciseRefId },
-            customExerciseRef: { id: customExerciseRefId },
-            sets,
-            reps,
-            weight,
-            duration,
+            exerciseRef: { id: exerciseRefId?? null },
+            customExerciseRef: { id: customExerciseRefId?? null },
+            exerciseSet: strExerciseSet,
+            template: {id: templateId?? null }
         });
-
-        return success(this.exerciseRepository.save(exercise));
+        await this.exerciseRepository.save(exercise)
+        return success(true);
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {

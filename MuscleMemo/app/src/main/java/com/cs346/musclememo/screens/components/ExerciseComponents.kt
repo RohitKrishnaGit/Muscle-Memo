@@ -35,12 +35,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cs346.musclememo.classes.Exercise
+import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet
 
 @Composable
 fun ExerciseTitle(
-    exercise: Exercise,
+    exerciseRef: ExerciseRef,
     onClick: () -> Unit
 ) {
     Row(
@@ -52,7 +52,7 @@ fun ExerciseTitle(
             .padding(start = 16.dp, end = 8.dp)
     ) {
         Text(
-            text = exercise.name,
+            text = exerciseRef.name,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
@@ -178,7 +178,7 @@ fun ExerciseSets(
 
 @Composable
 fun DisplayExercises(
-    exercises : List<Exercise>
+    exerciseRefs : List<ExerciseRef>
 ){
     val listState = rememberLazyListState()
     LazyColumn (
@@ -186,7 +186,7 @@ fun DisplayExercises(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(items = exercises){
+        items(items = exerciseRefs){
             Row{
                 Text(text = it.id.toString() + " ")
                 Text(text = it.name)

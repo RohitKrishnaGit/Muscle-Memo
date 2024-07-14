@@ -9,12 +9,20 @@ export class WorkoutController {
 
     async all(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
-
-        return success(
-            this.workoutRepository.findBy({
-                user: { id: userId },
+        console.log("make it here");
+        const data = (
+            await this.workoutRepository.find({
+                where: { user: { id: userId } },
+                relations: { exercises: { exerciseRef: true } },
             })
-        );
+        ).map((workout) => ({
+            ...workout,
+            exercises: workout.exercises.map((exercise) => ({
+                ...exercise,
+                exerciseSet: JSON.parse(exercise.exerciseSet),
+            })),
+        }));
+        return success(data);
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
@@ -33,7 +41,7 @@ export class WorkoutController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { name, userId } = request.body;
+        const { name, userId} = request.body;
 
         const workout = Object.assign(new Workout(), {
             name,
@@ -41,6 +49,7 @@ export class WorkoutController {
         });
 
         return success(this.workoutRepository.save(workout));
+
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {

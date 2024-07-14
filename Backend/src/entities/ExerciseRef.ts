@@ -7,4 +7,10 @@ export class ExerciseRef {
 
     @Column()
     name: string;
+
+    @Column({ nullable: true })
+    description?: string;
+
+    @Column({ nullable: true })
+    imagePath?: string;
 }

@@ -1,7 +1,11 @@
 package com.cs346.musclememo.classes
 
+import androidx.compose.runtime.mutableStateListOf
 
 data class Exercise(
-    val name: String = "Unknown Exercise",
-    val id : Int = -1
+    val exerciseSet: MutableList<ExerciseSet> = mutableStateListOf<ExerciseSet>(ExerciseSet()),
+    val workoutId: Int,
+    val templateId: Int? = null,
+    val exerciseRefId: Int? = null,
+    val customExerciseRefId: Int? = null
 )

@@ -37,14 +37,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.cs346.musclememo.screens.components.DisplayExercises
 import com.cs346.musclememo.screens.components.MMButton
 import com.cs346.musclememo.screens.components.MMDialog
 import com.cs346.musclememo.screens.components.ExerciseSets
 import com.cs346.musclememo.screens.components.ExerciseTitle
 import com.cs346.musclememo.screens.components.WorkoutHistoryCard
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
-import com.cs346.musclememo.utils.AppPreferences
 import java.util.Random
 
 @Preview(showBackground = true)
@@ -209,14 +207,14 @@ fun WorkoutSheet(
                     itemsIndexed(items = viewModel.currentWorkout.exercises) { index, exerciseIt ->
                         Column {
                             ExerciseTitle(
-                                exercise = exerciseIt.exercise,
+                                exerciseRef = exerciseIt.exerciseRef,
                                 onClick = {
                                     showDeleteExerciseDialog = true
                                     selectedExerciseIndex = index
                                 }
                             )
                             ExerciseSets(
-                                sets = exerciseIt.sets,
+                                sets = exerciseIt.exerciseSet,
                                 deleteSet = { setIndex ->
                                     viewModel.removeSet(index, setIndex)
                                 },
@@ -236,8 +234,8 @@ fun WorkoutSheet(
                                 onClick = {
                                     // todo: select a specific exercise
 
-                                    val selectedExerciseId = Random().nextInt(viewModel.exercises.size)
-                                    viewModel.addNewExercise(exercise = viewModel.exercises[selectedExerciseId])
+                                    val selectedExerciseId = Random().nextInt(viewModel.exerciseRefs.size)
+                                    viewModel.addNewExercise(exerciseRef = viewModel.exerciseRefs[selectedExerciseId])
                                 },
                                 text = "Add New Exercise",
                                 maxWidth = true,

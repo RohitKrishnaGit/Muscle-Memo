@@ -36,8 +36,8 @@ fun WorkoutHistoryCard (
                 Spacer(modifier = Modifier.height(5.dp))
                 workout.exercises.forEach { exercise ->
                     Column {
-                        Text(text = exercise.exercise.name, fontWeight = FontWeight.Bold)
-                        exercise.sets.forEach { set ->
+                        Text(text = exercise.exerciseRef.name, fontWeight = FontWeight.Bold)
+                        exercise.exerciseSet.forEach { set ->
                             Text(text = set.reps.toString() + " x " + set.weight.toString() + " kg")
                         }
                         Spacer(modifier = Modifier.height(5.dp))

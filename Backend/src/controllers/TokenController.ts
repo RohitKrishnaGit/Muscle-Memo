@@ -20,7 +20,7 @@ export class TokenController {
             const accessToken = jwt.sign(
                 payload,
                 process.env.ACCESS_TOKEN_PRIVATE_KEY,
-                { expiresIn: 10 } // TODO: Change to 300
+                { expiresIn: 3000 } // TODO: Change to 300
             );
             return success(accessToken);
         } catch (err) {

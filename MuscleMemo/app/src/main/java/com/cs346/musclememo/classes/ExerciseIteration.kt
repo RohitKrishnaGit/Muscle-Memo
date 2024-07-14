@@ -3,6 +3,8 @@ package com.cs346.musclememo.classes
 import androidx.compose.runtime.mutableStateListOf
 
 data class ExerciseIteration (
-    val exercise : Exercise,
-    var sets : MutableList<ExerciseSet> = mutableStateListOf<ExerciseSet>(ExerciseSet())
+    val exerciseRef : ExerciseRef,
+    val customExerciseRef: CustomExerciseRef? = null, //TODO need to think about this
+    val templateId: Int? = null, //TODO need to think about this
+    var exerciseSet : MutableList<ExerciseSet> = mutableStateListOf<ExerciseSet>(ExerciseSet())
 )

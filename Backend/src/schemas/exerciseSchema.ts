@@ -1,4 +1,4 @@
-import { number, object, string } from "zod";
+import { number, object, string, array } from "zod";
 
 export const allExerciseSchema = object({
     params: object({
@@ -24,15 +24,14 @@ export const createExerciseSchema = object({
         workoutId: number({
             required_error: "workoutId is required",
         }),
-        exerciseRefId: number().nullable(),
-        customExerciseRefId: number().nullable(),
-        userId: number({
-            required_error: "userId is required",
-        }),
-        sets: number().nullable(),
-        reps: number().nullable(),
-        weight: number().nullable(),
-        duration: number().nullable(),
+        exerciseRefId: number().optional(),
+        customExerciseRefId: number().optional(),
+        templateId: number().optional(),
+        exerciseSet: array(object({
+            reps: number().optional(),
+            weight: number().optional(),
+            duration: number().optional()
+          }))
     }),
 });
 

@@ -45,11 +45,10 @@ import com.cs346.musclememo.screens.components.WorkoutHistoryCard
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 import java.util.Random
 
-@Preview(showBackground = true)
 @Composable
-fun WorkoutScreen() {
-    val viewModel = viewModel<WorkoutScreenViewModel>()
-
+fun WorkoutScreen(
+    viewModel :WorkoutScreenViewModel
+) {
     // TODO Add back later for all workouts
     LaunchedEffect(Unit){
         viewModel.getExercises()

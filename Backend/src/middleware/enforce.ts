@@ -5,14 +5,20 @@ export const enforce = (
     ...rules: ((
         inputId?: number,
         tokenId?: number
-    ) => {
-        error: boolean;
-        code: number;
-        message?: string;
-    })[]
+    ) =>
+        | Promise<{
+              error: boolean;
+              code: number;
+              message?: string;
+          }>
+        | {
+              error: boolean;
+              code: number;
+              message?: string;
+          })[]
 ) => {
     return (path: string[]) => {
-        return (req: Request, res: Response, next: NextFunction) => {
+        return async (req: Request, res: Response, next: NextFunction) => {
             if (!req.user) {
                 return res.status(401).json({
                     error: true,
@@ -24,14 +30,19 @@ export const enforce = (
             try {
                 let messages: string[] = [];
                 let code = 200;
-                const passessAll = rules.every((rule) => {
-                    const test = rule(parseInt(get(req, path)), req.user?.id);
-                    if (test.error) {
-                        if (test.message)
-                            messages = [...messages, test.message];
-                        code = test.code;
+
+                const resolvedRules = await Promise.all(
+                    rules.map((rule) =>
+                        rule(parseInt(get(req, path)), req.user?.id)
+                    )
+                );
+                const passessAll = resolvedRules.every((rule) => {
+                    if (rule.error) {
+                        if (rule.message)
+                            messages = [...messages, rule.message];
+                        code = rule.code;
                     }
-                    return !test.error;
+                    return !rule.error;
                 });
                 if (!passessAll) {
                     return res.status(code).json({
@@ -60,22 +71,32 @@ export const or = (
     ...rules: ((
         inputId?: number,
         tokenId?: number
-    ) => {
-        error: boolean;
-        code: number;
-        message?: string;
-    })[]
+    ) =>
+        | Promise<{
+              error: boolean;
+              code: number;
+              message?: string;
+          }>
+        | {
+              error: boolean;
+              code: number;
+              message?: string;
+          })[]
 ) => {
-    return (inputId?: number, tokenId?: number) => {
+    return async (inputId?: number, tokenId?: number) => {
         let messages: string[] = [];
         let code = 200;
-        const passessSome = rules.some((rule) => {
-            const test = rule(inputId, tokenId);
-            if (test.error) {
-                if (test.message) messages = [...messages, test.message];
-                code = test.code;
+
+        const resolvedRules = await Promise.all(
+            rules.map((rule) => rule(inputId, tokenId))
+        );
+
+        const passessSome = resolvedRules.some((rule) => {
+            if (rule.error) {
+                if (rule.message) messages = [...messages, rule.message];
+                code = rule.code;
             }
-            return !test.error;
+            return !rule.error;
         });
         if (!passessSome) {
             return {
@@ -100,22 +121,32 @@ export const and = (
     ...rules: ((
         inputId?: number,
         tokenId?: number
-    ) => {
-        error: boolean;
-        code: number;
-        message?: string;
-    })[]
+    ) =>
+        | Promise<{
+              error: boolean;
+              code: number;
+              message?: string;
+          }>
+        | {
+              error: boolean;
+              code: number;
+              message?: string;
+          })[]
 ) => {
-    return (inputId?: number, tokenId?: number) => {
+    return async (inputId?: number, tokenId?: number) => {
         let messages: string[] = [];
         let code = 200;
-        const passessAll = rules.every((rule) => {
-            const test = rule(inputId, tokenId);
-            if (test.error) {
-                if (test.message) messages = [...messages, test.message];
-                code = test.code;
+
+        const resolvedRules = await Promise.all(
+            rules.map((rule) => rule(inputId, tokenId))
+        );
+
+        const passessAll = resolvedRules.every((rule) => {
+            if (rule.error) {
+                if (rule.message) messages = [...messages, rule.message];
+                code = rule.code;
             }
-            return !test.error;
+            return !rule.error;
         });
         if (!passessAll) {
             return {

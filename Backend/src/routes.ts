@@ -9,9 +9,10 @@ import {
     applyUser,
     authenticateWithToken,
     convertMe,
+    isAdmin,
     sameUser,
 } from "./middleware/auth";
-import { enforce } from "./middleware/enforce";
+import { enforce, or } from "./middleware/enforce";
 import { validateSchema } from "./middleware/validation";
 import {
     allCustomExerciseRefSchema,
@@ -123,7 +124,11 @@ export const Routes = [
         middleware: [
             validateSchema(removeUserSchema),
             authenticateWithToken,
-            ...applyUser(["params", "id"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["params", "id"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "remove",
     },
@@ -179,7 +184,11 @@ export const Routes = [
         middleware: [
             validateSchema(oneCustomExerciseRefSchema),
             authenticateWithToken,
-            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "one",
     },
@@ -190,7 +199,11 @@ export const Routes = [
         middleware: [
             validateSchema(allCustomExerciseRefSchema),
             authenticateWithToken,
-            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "all",
     },
@@ -201,7 +214,11 @@ export const Routes = [
         middleware: [
             validateSchema(createCustomExerciseRefSchema),
             authenticateWithToken,
-            ...applyUser(["body", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["body", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "create",
     },
@@ -212,7 +229,11 @@ export const Routes = [
         middleware: [
             validateSchema(removeCustomExerciseRefSchema),
             authenticateWithToken,
-            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "remove",
     },
@@ -226,7 +247,11 @@ export const Routes = [
         middleware: [
             validateSchema(oneWorkoutSchema),
             authenticateWithToken,
-            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "one",
     },
@@ -237,7 +262,11 @@ export const Routes = [
         middleware: [
             validateSchema(allWorkoutSchema),
             authenticateWithToken,
-            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "all",
     },
@@ -248,7 +277,11 @@ export const Routes = [
         middleware: [
             validateSchema(createWorkoutSchema),
             authenticateWithToken,
-            ...applyUser(["body", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["body", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "create",
     },
@@ -259,7 +292,11 @@ export const Routes = [
         middleware: [
             validateSchema(removeWorkoutSchema),
             authenticateWithToken,
-            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "remove",
     },
@@ -273,7 +310,11 @@ export const Routes = [
         middleware: [
             validateSchema(oneTemplateSchema),
             authenticateWithToken,
-            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "one",
     },
@@ -284,7 +325,11 @@ export const Routes = [
         middleware: [
             validateSchema(allTemplateSchema),
             authenticateWithToken,
-            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "all",
     },
@@ -295,7 +340,11 @@ export const Routes = [
         middleware: [
             validateSchema(createTemplateSchema),
             authenticateWithToken,
-            ...applyUser(["body", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["body", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "create",
     },
@@ -306,7 +355,11 @@ export const Routes = [
         middleware: [
             validateSchema(removeTemplateSchema),
             authenticateWithToken,
-            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "remove",
     },

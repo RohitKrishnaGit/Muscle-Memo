@@ -13,6 +13,11 @@ import { Template } from "./Template";
 import { UserToken } from "./UserToken";
 import { Workout } from "./Workout";
 
+export enum Role {
+    ADMIN,
+    USER,
+}
+
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
@@ -47,4 +52,7 @@ export class User {
         nullable: true,
     })
     token?: Relation<UserToken>;
+
+    @Column({ select: false, default: Role.USER })
+    role: Role;
 }

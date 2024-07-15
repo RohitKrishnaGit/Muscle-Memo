@@ -24,3 +24,6 @@
 | 7/12/24 |         |            |          |            | 3         |        | Implement schema validation on backend request              |
 | 7/12/24 | 3       | 3          | 3        | 3          | 2         | 3      | Work on deliverable 4                                       |
 | 7/15/24 |         |            | 10       |            |           |        | Continue work on leaderboard API, friends API & chat        |
+| 7/14/24 |         |            |          |            | 2         |        | Help with workout history feature                           |
+| 7/15/24 |         |            |          |            | 2         |        | Expose endpoints for users to get information about self    |
+| 7/15/24 |         |            |          |            | 6         |        | Add role column to users, added middleware for admins       |

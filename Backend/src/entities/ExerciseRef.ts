@@ -8,6 +8,15 @@ export class ExerciseRef {
     @Column()
     name: string;
 
+    @Column()
+    durationVSReps: number;
+
+    @Column()
+    weight: number;
+
+    @Column()
+    distance: number;
+
     @Column({ nullable: true })
     description?: string;
 

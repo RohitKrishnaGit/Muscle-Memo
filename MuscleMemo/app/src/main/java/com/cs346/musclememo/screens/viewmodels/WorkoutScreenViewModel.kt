@@ -108,7 +108,7 @@ class WorkoutScreenViewModel : ViewModel() {
                 if (response.isSuccessful){
                     response.body()?.data?.let{
                         for (exercise in it){
-                            _exerciseRefs.add(ExerciseRef(exercise.name, exercise.id))
+                            _exerciseRefs.add(ExerciseRef(exercise.name, exercise.id, exercise.durationVSReps, exercise.weight, exercise.distance))
                         }
                     }
                 }

@@ -109,6 +109,7 @@ class WorkoutScreenViewModel : ViewModel() {
                         for (exercise in it){
                             _exerciseRefs.add(ExerciseRef(exercise.name, exercise.id, exercise.durationVSReps, exercise.weight, exercise.distance))
                         }
+                        println("These are the exercises:${_exerciseRefs.toList()}")
                     }
                 }
             }

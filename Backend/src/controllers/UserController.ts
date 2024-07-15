@@ -34,7 +34,7 @@ export class UserController {
             where: { id },
             relations: {
                 friends: true,
-            }
+            },
         });
 
         if (!user) {
@@ -43,14 +43,18 @@ export class UserController {
         return user.friends;
     }
 
-    async getIncomingFriendRequests(request: Request, response: Response, next: NextFunction) {
+    async getIncomingFriendRequests(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
         const id = parseInt(request.params.id);
 
         const user = await this.userRepository.findOne({
             where: { id },
             relations: {
                 incomingFriendRequests: true,
-            }
+            },
         });
 
         if (!user) {
@@ -59,14 +63,18 @@ export class UserController {
         return user.incomingFriendRequests;
     }
 
-    async getOutgoingFriendRequests(request: Request, response: Response, next: NextFunction) {
+    async getOutgoingFriendRequests(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
         const id = parseInt(request.params.id);
 
         const user = await this.userRepository.findOne({
             where: { id },
             relations: {
                 outgoingFriendRequests: true,
-            }
+            },
         });
 
         if (!user) {
@@ -75,7 +83,11 @@ export class UserController {
         return user.outgoingFriendRequests;
     }
 
-    async sendFriendRequest(request: Request, response: Response, next: NextFunction) {
+    async sendFriendRequest(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
         const id = parseInt(request.params.id);
         const { friendId } = request.body;
 
@@ -83,7 +95,7 @@ export class UserController {
             where: { id },
             relations: {
                 outgoingFriendRequests: true,
-            }
+            },
         });
 
         const friend = await this.userRepository.findOneBy({
@@ -99,31 +111,38 @@ export class UserController {
         }
 
         if (friend.id === user.id) {
-            return "cannot send friend request to self"
+            return "cannot send friend request to self";
         }
 
-        user.outgoingFriendRequests = [...user.outgoingFriendRequests ?? [], friend]
+        user.outgoingFriendRequests = [
+            ...(user.outgoingFriendRequests ?? []),
+            friend,
+        ];
 
-        return this.userRepository.save(user)
+        return this.userRepository.save(user);
     }
 
-    async acceptFriendRequest(request: Request, response: Response, next: NextFunction) {
+    async acceptFriendRequest(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
         const id = parseInt(request.params.id);
         const { friendId } = request.body;
 
         const user = await this.userRepository.findOne({
             where: { id },
             relations: {
-                friends: true
-            }
+                friends: true,
+            },
         });
 
         const friend = await this.userRepository.findOne({
             where: { id: friendId },
             relations: {
                 outgoingFriendRequests: true,
-                friends: true
-            }
+                friends: true,
+            },
         });
 
         if (!user) {
@@ -133,40 +152,46 @@ export class UserController {
             return "target user does not exist";
         }
 
-        const len = friend.outgoingFriendRequests.length
-        friend.outgoingFriendRequests = friend.outgoingFriendRequests?.filter((friendReq) => {
-            return friendReq.id !== user.id
-        })
+        const len = friend.outgoingFriendRequests.length;
+        friend.outgoingFriendRequests = friend.outgoingFriendRequests?.filter(
+            (friendReq) => {
+                return friendReq.id !== user.id;
+            }
+        );
 
         if (friend.outgoingFriendRequests.length === len) {
-            return "this friend request does not exist"
+            return "this friend request does not exist";
         }
 
-        user.friends = [...user.friends ?? [], friend]
-        friend.friends = [...friend.friends ?? [], user]
-        
-        await this.userRepository.save(user)
-        await this.userRepository.save(friend)
+        user.friends = [...(user.friends ?? []), friend];
+        friend.friends = [...(friend.friends ?? []), user];
 
-        return "friend request accept successs"
+        await this.userRepository.save(user);
+        await this.userRepository.save(friend);
+
+        return "friend request accept successs";
     }
 
-    async removeFriend(request: Request, response: Response, next: NextFunction) {
+    async removeFriend(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
         const id = parseInt(request.params.id);
         const { friendId } = request.body;
 
         const user = await this.userRepository.findOne({
             where: { id },
             relations: {
-                friends: true
-            }
+                friends: true,
+            },
         });
 
         const friend = await this.userRepository.findOne({
             where: { id: friendId },
             relations: {
-                friends: true
-            }
+                friends: true,
+            },
         });
 
         if (!user) {
@@ -176,35 +201,32 @@ export class UserController {
             return "target user does not exist";
         }
 
-        const len1 = user.friends.length
+        const len1 = user.friends.length;
         user.friends = user.friends?.filter((friend) => {
-            return friend.id !== user.id
-        })
+            return friend.id !== user.id;
+        });
 
-        const len2 = friend.friends.length
+        const len2 = friend.friends.length;
         friend.friends = friend.friends?.filter((friend) => {
-            return friend.id !== user.id
-        })
+            return friend.id !== user.id;
+        });
 
-        if (
-            user.friends.length === len1 ||
-            friend.friends.length === len2
-        ) {
-            return "this friend does not exist"
+        if (user.friends.length === len1 || friend.friends.length === len2) {
+            return "this friend does not exist";
         }
-        
-        await this.userRepository.save(user)
-        await this.userRepository.save(friend)
 
-        return "friend removed"
+        await this.userRepository.save(user);
+        await this.userRepository.save(friend);
+
+        return "friend removed";
     }
 
     async login(request: Request, response: Response, next: NextFunction) {
-        const { username, password } = request.body;
+        const { email, password } = request.body;
 
         const user = await this.userRepository.findOne({
             where: {
-                username,
+                email,
             },
             select: ["id", "password"],
         });
@@ -221,8 +243,6 @@ export class UserController {
         if (!verifiedPassword) {
             return failure("Invalid email or password", 401);
         }
-
-        // const { accessToken, refreshToken } = await ;
 
         return success(generateTokens(user));
     }
@@ -241,13 +261,10 @@ export class UserController {
     async create(request: Request, response: Response, next: NextFunction) {
         const { username, fullName, email, password } = request.body;
 
-        const userExists = !!(await this.userRepository.findOneBy([
-            { username },
-            { email },
-        ]));
+        const userExists = !!(await this.userRepository.findOneBy({ email }));
 
         if (userExists) {
-            return failure("User with given username or email already exist");
+            return failure("User with given email already exist");
         }
 
         const user = Object.assign(new User(), {

@@ -10,7 +10,8 @@
       "test": "echo \"Error: no test specified\" && exit 1",
       "typeorm": "npx typeorm-ts-node-esm",
       "typeorm:migrate": "npx typeorm-ts-node-commonjs migration:run -d ./src/data-source.ts",
-      "typeorm:migrate:revert": "npx typeorm-ts-node-esm migration:revert -d ./src/data-source.ts"
+      "typeorm:migrate:revert": "npx typeorm-ts-node-esm migration:revert -d ./src/data-source.ts",
+      "restartdb": "rimraf database.sqlite && ts-node scripts/initDB.ts && npm run typeorm:migrate"
    },
    "author": "",
    "license": "ISC",

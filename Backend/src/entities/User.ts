@@ -30,9 +30,20 @@ export class User {
     @Column({ select: false })
     password: string;
 
-    @ManyToMany(() => User)
+    @ManyToMany(() => User, (user) => user.outgoingFriendRequests)
+    incomingFriendRequests: Relation<User[]>;
+
+    @ManyToMany(() => User, (user) => user.incomingFriendRequests, {
+        cascade: true,
+    })
     @JoinTable()
-    friends?: Relation<User[]>;
+    outgoingFriendRequests: Relation<User[]>;
+
+    @ManyToMany(() => User, {
+        cascade: true
+    })
+    @JoinTable()
+    friends: Relation<User[]>;
 
     @OneToMany(() => Workout, (workout) => workout.user)
     workouts?: Relation<Workout[]>;

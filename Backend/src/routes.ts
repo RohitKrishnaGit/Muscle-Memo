@@ -28,18 +28,46 @@ export const Routes = [
         action: "logout",
     },
     {
-        method: "get",
-        route: "/users",
-        controller: UserController,
-        middleware: [authenticateWithToken],
-        action: "all",
-    },
-    {
         method: "post",
         route: "/users/register",
         controller: UserController,
         middleware: [],
         action: "create",
+    },
+    {
+        method: "get",
+        route: "/users/:id/friends",
+        controller: UserController,
+        middleware: [authenticateWithToken],
+        action: "getFriends",
+    },
+    {
+        method: "get",
+        route: "/users/:id/incomingFriendRequests",
+        controller: UserController,
+        middleware: [authenticateWithToken],
+        action: "getIncomingFriendRequests",
+    },
+    {
+        method: "get",
+        route: "/users/:id/outgoingFriendRequests",
+        controller: UserController,
+        middleware: [authenticateWithToken],
+        action: "getOutgoingFriendRequests",
+    },
+    {
+        method: "post",
+        route: "/users/:id/sendFriendRequest",
+        controller: UserController,
+        middleware: [authenticateWithToken],
+        action: "sendFriendRequest",
+    },
+    {
+        method: "post",
+        route: "/users/:id/acceptFriendRequest",
+        controller: UserController,
+        middleware: [authenticateWithToken],
+        action: "acceptFriendRequest",
     },
     {
         method: "get",
@@ -54,6 +82,13 @@ export const Routes = [
         controller: UserController,
         middleware: [authenticateWithToken, validateUserParam("id")],
         action: "remove",
+    },
+    {
+        method: "get",
+        route: "/users",
+        controller: UserController,
+        middleware: [authenticateWithToken],
+        action: "all",
     },
 
     /* exerciseRef routes */

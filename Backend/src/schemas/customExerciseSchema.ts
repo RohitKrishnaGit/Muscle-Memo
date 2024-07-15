@@ -4,7 +4,7 @@ export const allCustomExerciseRefSchema = object({
     params: object({
         userId: string({
             required_error: "userId is required",
-        }).regex(/^\d+$/),
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
     }),
 });
 
@@ -12,7 +12,7 @@ export const oneCustomExerciseRefSchema = object({
     params: object({
         userId: string({
             required_error: "userId is required",
-        }).regex(/^\d+$/),
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
         id: string({
             required_error: "id is required",
         }).regex(/^\d+$/),
@@ -26,7 +26,9 @@ export const createCustomExerciseRefSchema = object({
         }),
         userId: number({
             required_error: "userId is required",
-        }),
+        }).or(
+            string().regex(/^me$/, "userId should be either numerical or me")
+        ),
     }),
 });
 
@@ -34,7 +36,7 @@ export const removeCustomExerciseRefSchema = object({
     params: object({
         userId: string({
             required_error: "userId is required",
-        }).regex(/^\d+$/),
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
         id: string({
             required_error: "id is required",
         }).regex(/^\d+$/),

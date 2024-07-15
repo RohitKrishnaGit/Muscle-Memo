@@ -8,10 +8,7 @@ export class ExerciseController {
 
     async all(request: Request, response: Response, next: NextFunction) {
         const workoutId = parseInt(request.params.workoutId);
-        console.log(request.params.userId);
-        console.log(await this.exerciseRepository.findBy({
-            workout: { id: workoutId },
-        }))
+
         return success(
             this.exerciseRepository.findBy({
                 workout: { id: workoutId },
@@ -41,9 +38,7 @@ export class ExerciseController {
             customExerciseRefId,
             exerciseSet,
             templateId,
-
         } = request.body;
-
 
         console.log(request.body);
         const strExerciseSet = JSON.stringify(exerciseSet);
@@ -52,12 +47,12 @@ export class ExerciseController {
 
         const exercise = Object.assign(new Exercise(), {
             workout: { id: workoutId },
-            exerciseRef: { id: exerciseRefId?? null },
-            customExerciseRef: { id: customExerciseRefId?? null },
+            exerciseRef: { id: exerciseRefId ?? null },
+            customExerciseRef: { id: customExerciseRefId ?? null },
             exerciseSet: strExerciseSet,
-            template: {id: templateId?? null }
+            template: { id: templateId ?? null },
         });
-        await this.exerciseRepository.save(exercise)
+        await this.exerciseRepository.save(exercise);
         return success(true);
     }
 

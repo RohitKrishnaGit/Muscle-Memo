@@ -44,6 +44,6 @@ export const removeUserSchema = object({
     params: object({
         id: string({
             required_error: "id is required",
-        }).regex(/^\d+$/),
+        }).regex(/(^\d+$)|(^me$)/, "id should be either numerical or me"),
     }),
 });

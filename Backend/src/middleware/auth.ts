@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { get } from "lodash";
 
 // Middleware to make sure that the request is from an authenticated user
 export const authenticateWithToken = (
@@ -8,7 +9,12 @@ export const authenticateWithToken = (
     next: NextFunction
 ) => {
     const token = req.header("x-access-token");
-    if (!token) return res.status(401).json("Access Denied: No token provided");
+    if (!token)
+        return res.status(401).json({
+            error: true,
+            code: 401,
+            message: "Access Denied: No token provided",
+        });
 
     try {
         const tokenDetails = jwt.verify(
@@ -23,42 +29,53 @@ export const authenticateWithToken = (
         next();
     } catch (err) {
         console.log(err);
-        res.status(401).json("Access Denied: Invalid token");
+        res.status(401).json({
+            error: true,
+            code: 401,
+            message: "Access Denied: Invalid token",
+        });
     }
 };
 
-export const validateUserParam = (paramName: string) => {
+export const convertMe = (path: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         if (!req.user)
-            return res.status(401).json("Access Denied: User Unknown");
+            return res.status(401).json({
+                error: true,
+                code: 401,
+                message: "Access Denied: User Unknown",
+            });
 
         try {
-            if (parseInt(req.params[paramName]) !== req.user["id"]) {
-                return res.status(401).json("Access Denied: No Permission");
+            const [last, ...first] = path.slice().reverse();
+            if (get(req, path) == "me") {
+                get(req, first.reverse())[last] = req.user.id;
             }
 
             next();
         } catch (err) {
             console.log(err);
-            return res.status(401).json("Access Denied: Invalid token");
+            return res.status(401).json({
+                error: true,
+                code: 401,
+                message: "Access Denied: Invalid token",
+            });
         }
     };
 };
+export const applyUser = (
+    path: string[],
+    ...functions: ((path: string[]) => any)[]
+) => {
+    return functions.map((fn) => fn(path));
+};
 
-export const validateUserBody = (bodyParam: string) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        if (!req.user)
-            return res.status(401).json("Access Denied: User Unknown");
+export const sameUser = (inputId?: number, tokenId?: number) => {
+    const idMatches = inputId === tokenId;
 
-        try {
-            if (parseInt(req.body[bodyParam]) !== req.user["id"]) {
-                return res.status(401).json("Access Denied: No Permission");
-            }
-
-            next();
-        } catch (err) {
-            console.log(err);
-            return res.status(401).json("Access Denied: Invalid token");
-        }
+    return {
+        error: !idMatches,
+        code: idMatches ? 200 : 403,
+        message: idMatches ? "" : "input user id does not match with token id",
     };
 };

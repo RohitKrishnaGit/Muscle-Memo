@@ -3,6 +3,7 @@ import { AppDataSource } from "../data-source";
 import { User } from "../entities/User";
 import { UserToken } from "../entities/UserToken";
 import { generatePasswordHash, validatePassword } from "../utils/password";
+import { failure, success } from "../utils/responseTypes";
 import { generateTokens } from "../utils/token";
 
 export class UserController {
@@ -10,7 +11,7 @@ export class UserController {
     private userTokenRepository = AppDataSource.getRepository(UserToken);
 
     async all(request: Request, response: Response, next: NextFunction) {
-        return this.userRepository.find();
+        return success(this.userRepository.find());
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
@@ -21,9 +22,9 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
-        return user;
+        return success(user);
     }
 
     async getFriends(request: Request, response: Response, next: NextFunction) {
@@ -209,8 +210,7 @@ export class UserController {
         });
 
         if (!user) {
-            response.status(401);
-            return "Invalid email or password";
+            return failure("Invalid email or password", 401);
         }
 
         const verifiedPassword = await validatePassword(
@@ -219,24 +219,23 @@ export class UserController {
         );
 
         if (!verifiedPassword) {
-            response.status(401);
-            return "Invalid email or password";
+            return failure("Invalid email or password", 401);
         }
 
         // const { accessToken, refreshToken } = await ;
 
-        return generateTokens(user);
+        return success(generateTokens(user));
     }
 
     async logout(request: Request, response: Response, next: NextFunction) {
         const userToken = await this.userTokenRepository.findOneBy({
             token: request.body.refreshToken,
         });
-        if (!userToken) return "Logged Out Sucessfully";
+        if (!userToken) return success("Logged Out Sucessfully");
 
         await this.userTokenRepository.delete(userToken);
 
-        return "Logged Out Sucessfully";
+        return success("Logged Out Sucessfully");
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
@@ -248,8 +247,7 @@ export class UserController {
         ]));
 
         if (userExists) {
-            response.status(400);
-            return "User with given username or email already exist";
+            return failure("User with given username or email already exist");
         }
 
         const user = Object.assign(new User(), {
@@ -261,7 +259,7 @@ export class UserController {
 
         await this.userRepository.save(user);
 
-        return "User created";
+        return success("User created");
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
@@ -272,11 +270,11 @@ export class UserController {
         });
 
         if (!userToRemove) {
-            return "this user not exist";
+            return failure("this user not exist");
         }
 
         await this.userRepository.remove(userToRemove);
 
-        return "user has been removed";
+        return success("user has been removed");
     }
 }

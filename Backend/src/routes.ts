@@ -6,10 +6,50 @@ import { TokenController } from "./controllers/TokenController";
 import { UserController } from "./controllers/UserController";
 import { WorkoutController } from "./controllers/WorkoutController";
 import {
+    applyUser,
     authenticateWithToken,
-    validateUserBody,
-    validateUserParam,
+    convertMe,
+    sameUser,
 } from "./middleware/auth";
+import { enforce } from "./middleware/enforce";
+import { validateSchema } from "./middleware/validation";
+import {
+    allCustomExerciseRefSchema,
+    createCustomExerciseRefSchema,
+    oneCustomExerciseRefSchema,
+    removeCustomExerciseRefSchema,
+} from "./schemas/customExerciseSchema";
+import {
+    allExerciseRefSchema,
+    oneExerciseRefSchema,
+} from "./schemas/exerciseRefSchema";
+import {
+    allExerciseSchema,
+    createExerciseSchema,
+    oneExerciseSchema,
+    removeExerciseSchema,
+} from "./schemas/exerciseSchema";
+import {
+    allTemplateSchema,
+    createTemplateSchema,
+    oneTemplateSchema,
+    removeTemplateSchema,
+} from "./schemas/templateSchema";
+import { newTokenSchema } from "./schemas/tokenSchema";
+import {
+    allUserSchema,
+    createUserSchema,
+    loginUserSchema,
+    logoutUserSchema,
+    oneUserSchema,
+    removeUserSchema,
+} from "./schemas/userSchema";
+import {
+    allWorkoutSchema,
+    createWorkoutSchema,
+    oneWorkoutSchema,
+    removeWorkoutSchema,
+} from "./schemas/workoutSchema";
 
 export const Routes = [
     /* User routes */
@@ -17,21 +57,21 @@ export const Routes = [
         method: "post",
         route: "/users/login",
         controller: UserController,
-        middleware: [],
+        middleware: [validateSchema(loginUserSchema)],
         action: "login",
     },
     {
         method: "delete",
         route: "/users/logout",
         controller: UserController,
-        middleware: [],
+        middleware: [validateSchema(logoutUserSchema)],
         action: "logout",
     },
     {
         method: "post",
         route: "/users/register",
         controller: UserController,
-        middleware: [],
+        middleware: [validateSchema(createUserSchema)],
         action: "create",
     },
     {
@@ -73,21 +113,25 @@ export const Routes = [
         method: "get",
         route: "/users/:id",
         controller: UserController,
-        middleware: [authenticateWithToken],
+        middleware: [validateSchema(oneUserSchema), authenticateWithToken],
         action: "one",
     },
     {
         method: "delete",
         route: "/users/:id",
         controller: UserController,
-        middleware: [authenticateWithToken, validateUserParam("id")],
+        middleware: [
+            validateSchema(removeUserSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "id"], convertMe, enforce(sameUser)),
+        ],
         action: "remove",
     },
     {
         method: "get",
         route: "/users",
         controller: UserController,
-        middleware: [authenticateWithToken],
+        middleware: [validateSchema(allUserSchema), authenticateWithToken],
         action: "all",
     },
 
@@ -96,14 +140,20 @@ export const Routes = [
         method: "get",
         route: "/exerciseRefs/:id",
         controller: ExerciseRefController,
-        middleware: [authenticateWithToken],
+        middleware: [
+            validateSchema(oneExerciseRefSchema),
+            authenticateWithToken,
+        ],
         action: "one",
     },
     {
         method: "get",
         route: "/exerciseRefs",
         controller: ExerciseRefController,
-        middleware: [authenticateWithToken],
+        middleware: [
+            validateSchema(allExerciseRefSchema),
+            authenticateWithToken,
+        ],
         action: "all",
     },
     /* Shouldn't need these, temporarily keeping until cleanup can be confirmed */
@@ -126,28 +176,44 @@ export const Routes = [
         method: "get",
         route: "/customExerciseRefs/:userId/:id",
         controller: CustomExerciseRefController,
-        middleware: [authenticateWithToken, validateUserParam("userId")],
+        middleware: [
+            validateSchema(oneCustomExerciseRefSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "one",
     },
     {
         method: "get",
         route: "/customExerciseRefs/:userId",
         controller: CustomExerciseRefController,
-        middleware: [authenticateWithToken, validateUserParam("userId")],
+        middleware: [
+            validateSchema(allCustomExerciseRefSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "all",
     },
     {
         method: "post",
         route: "/customExerciseRefs",
         controller: CustomExerciseRefController,
-        middleware: [authenticateWithToken, validateUserBody("userId")],
+        middleware: [
+            validateSchema(createCustomExerciseRefSchema),
+            authenticateWithToken,
+            ...applyUser(["body", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "create",
     },
     {
         method: "delete",
         route: "/customExerciseRefs/:userId/:id",
         controller: CustomExerciseRefController,
-        middleware: [authenticateWithToken, validateUserParam("userId")],
+        middleware: [
+            validateSchema(removeCustomExerciseRefSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "remove",
     },
 
@@ -157,28 +223,44 @@ export const Routes = [
         method: "get",
         route: "/workouts/:userId/:id",
         controller: WorkoutController,
-        middleware: [authenticateWithToken, validateUserParam("userId")],
+        middleware: [
+            validateSchema(oneWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "one",
     },
     {
         method: "get",
         route: "/workouts/:userId",
         controller: WorkoutController,
-        middleware: [authenticateWithToken, validateUserParam("userId")],
+        middleware: [
+            validateSchema(allWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "all",
     },
     {
         method: "post",
         route: "/workouts",
         controller: WorkoutController,
-        middleware: [authenticateWithToken, validateUserBody("userId")],
+        middleware: [
+            validateSchema(createWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(["body", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "create",
     },
     {
         method: "delete",
         route: "/workouts/:userId/:id",
         controller: WorkoutController,
-        middleware: [authenticateWithToken, validateUserParam("userId")],
+        middleware: [
+            validateSchema(removeWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "remove",
     },
 
@@ -188,28 +270,44 @@ export const Routes = [
         method: "get",
         route: "/templates/:userId/:id",
         controller: TemplateController,
-        middleware: [authenticateWithToken, validateUserParam("userId")],
+        middleware: [
+            validateSchema(oneTemplateSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "one",
     },
     {
         method: "get",
         route: "/templates/:userId",
         controller: TemplateController,
-        middleware: [authenticateWithToken, validateUserParam("userId")],
+        middleware: [
+            validateSchema(allTemplateSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "all",
     },
     {
         method: "post",
         route: "/templates",
         controller: TemplateController,
-        middleware: [authenticateWithToken, validateUserBody("userId")],
+        middleware: [
+            validateSchema(createTemplateSchema),
+            authenticateWithToken,
+            ...applyUser(["body", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "create",
     },
     {
         method: "delete",
         route: "/templates/:userId/:id",
         controller: TemplateController,
-        middleware: [authenticateWithToken, validateUserParam("userId")],
+        middleware: [
+            validateSchema(removeTemplateSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "userId"], convertMe, enforce(sameUser)),
+        ],
         action: "remove",
     },
 
@@ -219,28 +317,34 @@ export const Routes = [
         method: "get",
         route: "/exercises/:workoutId/:id",
         controller: ExerciseController,
-        middleware: [authenticateWithToken],
+        middleware: [validateSchema(oneExerciseSchema), authenticateWithToken],
         action: "one",
     },
     {
         method: "get",
         route: "/exercises/:workoutId",
         controller: ExerciseController,
-        middleware: [authenticateWithToken],
+        middleware: [validateSchema(allExerciseSchema), authenticateWithToken],
         action: "all",
     },
     {
         method: "post",
         route: "/exercises",
         controller: ExerciseController,
-        middleware: [authenticateWithToken],
+        middleware: [
+            validateSchema(createExerciseSchema),
+            authenticateWithToken,
+        ],
         action: "create",
     },
     {
         method: "delete",
         route: "/exercises/:workoutId/:id",
         controller: ExerciseController,
-        middleware: [authenticateWithToken],
+        middleware: [
+            validateSchema(removeExerciseSchema),
+            authenticateWithToken,
+        ],
         action: "remove",
     },
 
@@ -249,7 +353,7 @@ export const Routes = [
         method: "post",
         route: "/token",
         controller: TokenController,
-        middleware: [],
+        middleware: [validateSchema(newTokenSchema)],
         action: "newToken",
     },
 ];

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { failure, success } from "../utils/responseTypes";
 import { verifyRefreshToken } from "../utils/token";
 
 export class TokenController {
@@ -19,13 +20,11 @@ export class TokenController {
             const accessToken = jwt.sign(
                 payload,
                 process.env.ACCESS_TOKEN_PRIVATE_KEY,
-                { expiresIn: 300 }
+                { expiresIn: 3000 } // TODO: Change to 300
             );
-
-            return accessToken;
+            return success(accessToken);
         } catch (err) {
-            response.status(400);
-            return err;
+            return failure((err as any).message);
         }
     }
 }

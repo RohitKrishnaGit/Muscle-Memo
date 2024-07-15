@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { get } from "lodash";
+import { AppDataSource } from "../data-source";
+import { Role, User } from "../entities/User";
 
 // Middleware to make sure that the request is from an authenticated user
 export const authenticateWithToken = (
@@ -77,5 +79,40 @@ export const sameUser = (inputId?: number, tokenId?: number) => {
         error: !idMatches,
         code: idMatches ? 200 : 403,
         message: idMatches ? "" : "input user id does not match with token id",
+    };
+};
+
+export const isAdmin = async (_?: number, tokenId?: number) => {
+    if (!tokenId) {
+        return {
+            error: true,
+            code: 403,
+            message: "token id not valid",
+        };
+    }
+    const user = await AppDataSource.getRepository(User).findOne({
+        where: {
+            id: tokenId,
+        },
+        select: { role: true },
+    });
+    if (!user) {
+        return {
+            error: true,
+            code: 403,
+            message: "user does not exist",
+        };
+    }
+
+    if (user.role !== Role.ADMIN) {
+        return {
+            error: true,
+            code: 403,
+        };
+    }
+
+    return {
+        error: false,
+        code: 200,
     };
 };

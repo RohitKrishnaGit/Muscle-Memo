@@ -9,7 +9,7 @@
 | 6/24/24 |         |            |          |            | 4         |        | Configure ORM and establish initial table relations         |
 | 6/24/24 |         |            |          |            |           | 10     | Build basic workout screen UI for demo                      |
 | 6/25/24 |         |            | 3        |            |           |        | Add API controllers and entities (dbs) for most data fields |
-| 6/25/24 | 7       |            |          |            |           |        | Initial investigation into retrofit                         |
+| 6/25/24 | 5       |            |          |            |           |        | Initial investigation into retrofit                         |
 | 6/26/24 |         |            | 1        |            |           |        | Add template table to DB with API controllers               |
 | 6/26/24 |         |            |          |            | 2         |        | Update app logo, fix bugs, help with retrofit setup         |
 | 6/27/24 | 3       | 1          | 3        | 1          | 1         |        | Work on deliverable 3                                       |

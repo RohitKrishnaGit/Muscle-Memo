@@ -6,6 +6,6 @@ export const oneExerciseRefSchema = object({
     params: object({
         id: string({
             required_error: "id is required",
-        }).regex(/^\d+$/),
+        }).regex(/^\d+$/, "id should be numerical"),
     }),
 });

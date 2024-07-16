@@ -1,6 +1,5 @@
 package com.cs346.musclememo.navigation
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner

@@ -15,7 +15,7 @@ export const oneTemplateSchema = object({
         }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
         id: string({
             required_error: "id is required",
-        }).regex(/^\d+$/),
+        }).regex(/^\d+$/, "id should be numerical"),
     }),
 });
 
@@ -39,6 +39,6 @@ export const removeTemplateSchema = object({
         }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
         id: string({
             required_error: "id is required",
-        }).regex(/^\d+$/),
+        }).regex(/^\d+$/, "id should be numerical"),
     }),
 });

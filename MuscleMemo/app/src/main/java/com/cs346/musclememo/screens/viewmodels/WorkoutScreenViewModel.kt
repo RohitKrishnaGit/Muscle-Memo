@@ -25,7 +25,6 @@ class WorkoutScreenViewModel : ViewModel() {
     var workoutVisible by mutableStateOf(false)
         private set
 
-
     var summaryVisible by mutableStateOf(false)
         private set
 
@@ -120,10 +119,6 @@ class WorkoutScreenViewModel : ViewModel() {
 
         })
     }
-
-
-
-
 
     fun setWorkoutName(name : String){
         currentWorkout.setWorkoutName(name)

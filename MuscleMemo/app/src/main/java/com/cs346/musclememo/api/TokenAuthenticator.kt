@@ -32,7 +32,7 @@ class TokenAuthenticator: Authenticator {
                     tokenRefreshInProgress.set(false)
                     return@runBlocking null
                 }
-                request = buildRequest(response.request().newBuilder())
+                request = buildRequest(response.request.newBuilder())
                 tokenRefreshInProgress.set(false)
             } else {
                 // Waiting for the ongoing request to finish
@@ -74,12 +74,12 @@ class TokenAuthenticator: Authenticator {
         while (tokenRefreshInProgress.get()) {
             delay(100)
         }
-        request = buildRequest(response.request().newBuilder())
+        request = buildRequest(response.request.newBuilder())
     }
 
     private fun responseCount(response: Response?): Int {
         var result = 1
-        while (response?.priorResponse() != null && result <= 3) {
+        while (response?.priorResponse != null && result <= 3) {
             result++
         }
         return result

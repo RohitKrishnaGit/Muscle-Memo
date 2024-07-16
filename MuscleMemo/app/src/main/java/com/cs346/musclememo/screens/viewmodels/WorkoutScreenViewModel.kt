@@ -157,6 +157,5 @@ class WorkoutScreenViewModel : ViewModel() {
         _exerciseRefs.add(ExerciseRef("Bench", 0))
         _exerciseRefs.add(ExerciseRef("Squat", 1))
         _exerciseRefs.add(ExerciseRef("Deadlift", 2))
-        println("Hi")
     }
 }

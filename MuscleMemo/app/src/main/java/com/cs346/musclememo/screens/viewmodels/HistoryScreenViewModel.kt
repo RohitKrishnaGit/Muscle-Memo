@@ -40,7 +40,6 @@ class HistoryScreenViewModel : ViewModel() {
                             println(workout)
                             _workouts.add(workout)
                         }
-                        println("hi starfy${_workouts.toList()}")
                     }
                 }
             }

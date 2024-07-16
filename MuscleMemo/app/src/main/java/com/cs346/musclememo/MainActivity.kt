@@ -1,5 +1,6 @@
 package com.cs346.musclememo
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.compose.material3.Surface
 import androidx.activity.ComponentActivity
@@ -12,7 +13,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,12 +48,23 @@ fun MainScreen() {
     val bottomBarState = rememberSaveable { (mutableStateOf(AppPreferences.refreshToken != null)) }
     val startRoute = rememberSaveable {(mutableStateOf(if (AppPreferences.refreshToken==null) Screen.Login.route else Screen.Workout.route))}
 
-    MuscleMemoTheme {
-        LaunchedEffect(Unit) {
-            AppPreferences.listen{
-                navController.navigate(Screen.Login.route)
+    val returnToLogin by rememberUpdatedState (
+        SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, _ ->
+            val refreshToken = sharedPreferences.getString("REFRESH_TOKEN", "")
+            if (refreshToken == null) {
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
                 bottomBarState.value = false
             }
+        }
+    )
+
+    MuscleMemoTheme {
+        LaunchedEffect(Unit) {
+            AppPreferences.listen(returnToLogin)
         }
         Scaffold(
             bottomBar = { BottomNavigationBar(bottomBarState = bottomBarState, navHostController = navController) }

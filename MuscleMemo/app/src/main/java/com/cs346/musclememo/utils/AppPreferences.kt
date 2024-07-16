@@ -13,13 +13,8 @@ object AppPreferences {
         sharedPreferences = context.getSharedPreferences("MuscleMemo.sharedprefs", MODE_PRIVATE)
     }
 
-    fun listen(cb: () -> Unit){
-        sharedPreferences?.registerOnSharedPreferenceChangeListener{ sharedPreferences, _ ->
-            val refreshToken = if (sharedPreferences!!.contains("REFRESH_TOKEN")) sharedPreferences!!.getString("REFRESH_TOKEN", "") else null
-            if(refreshToken == null) {
-                cb()
-            }
-        }
+    fun listen(listener: SharedPreferences. OnSharedPreferenceChangeListener){
+        sharedPreferences?.registerOnSharedPreferenceChangeListener(listener)
     }
 
     var accessToken: String?

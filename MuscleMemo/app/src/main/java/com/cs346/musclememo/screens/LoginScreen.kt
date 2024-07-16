@@ -127,15 +127,15 @@ fun LoginAccountSheet(
                 verticalArrangement = Arrangement.Top
             ) {
                 Text(text = "Welcome Back", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                //Username
+                // Email
                 Spacer(modifier = Modifier.height(20.dp))
                 OutlinedTextField(
-                    value = viewModel.username,
+                    value = viewModel.email,
                     onValueChange = {
-                        viewModel.updateUsername(it)
+                        viewModel.updateEmail(it)
                     },
                     label = {
-                        Text(text = "Username")
+                        Text(text = "Email")
                     },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth(1f)

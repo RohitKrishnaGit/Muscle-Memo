@@ -1,8 +1,7 @@
 import {
     Column,
     Entity,
-    JoinColumn,
-    OneToOne,
+    ManyToOne,
     PrimaryGeneratedColumn,
     Relation,
 } from "typeorm";
@@ -13,8 +12,7 @@ export class UserToken {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => User, (user) => user.token)
-    @JoinColumn()
+    @ManyToOne(() => User, (user) => user.tokens)
     user: Relation<User>;
 
     @Column({ default: Date.now })

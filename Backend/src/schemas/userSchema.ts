@@ -21,7 +21,7 @@ export const loginUserSchema = object({
     }),
 });
 
-export const logoutUserSchema = object({});
+export const logoutAllUserSchema = object({});
 
 export const createUserSchema = object({
     body: object({

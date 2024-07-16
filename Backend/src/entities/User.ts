@@ -4,7 +4,6 @@ import {
     JoinTable,
     ManyToMany,
     OneToMany,
-    OneToOne,
     PrimaryGeneratedColumn,
     Relation,
 } from "typeorm";
@@ -45,7 +44,7 @@ export class User {
     outgoingFriendRequests: Relation<User[]>;
 
     @ManyToMany(() => User, {
-        cascade: true
+        cascade: true,
     })
     @JoinTable()
     friends: Relation<User[]>;
@@ -59,10 +58,8 @@ export class User {
     @OneToMany(() => CustomExerciseRef, (customExercise) => customExercise.user)
     customExercises?: Relation<CustomExerciseRef[]>;
 
-    @OneToOne(() => UserToken, (userToken) => userToken.user, {
-        nullable: true,
-    })
-    token?: Relation<UserToken>;
+    @OneToMany(() => UserToken, (userToken) => userToken.user)
+    tokens: Relation<UserToken[]>;
 
     @Column({ select: false, default: Role.USER })
     role: Role;

@@ -41,7 +41,7 @@ import {
     allUserSchema,
     createUserSchema,
     loginUserSchema,
-    logoutUserSchema,
+    logoutAllUserSchema,
     oneUserSchema,
     removeUserSchema,
 } from "./schemas/userSchema";
@@ -63,10 +63,13 @@ export const Routes = [
     },
     {
         method: "delete",
-        route: "/users/logout",
+        route: "/users/logoutAll",
         controller: UserController,
-        middleware: [validateSchema(logoutUserSchema)],
-        action: "logout",
+        middleware: [
+            validateSchema(logoutAllUserSchema),
+            authenticateWithToken,
+        ],
+        action: "logoutAll",
     },
     {
         method: "post",

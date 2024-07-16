@@ -18,16 +18,6 @@ export const generateTokens = async (user: User) => {
             process.env.REFRESH_TOKEN_PRIVATE_KEY
         );
 
-        const userToken = await userTokenRepository.findOne({
-            where: {
-                user: { id: user.id },
-            },
-            relations: {
-                user: true,
-            },
-        });
-        if (userToken) await userTokenRepository.remove(userToken);
-
         const newToken = Object.assign(new UserToken(), {
             user: user,
             token: refreshToken,

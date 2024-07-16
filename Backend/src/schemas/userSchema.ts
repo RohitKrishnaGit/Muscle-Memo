@@ -37,6 +37,12 @@ export const createUserSchema = object({
         password: string({
             required_error: "password is required",
         }),
+        gender: string({
+            required_error: "gender is required",
+        }),
+        experience: string({
+            required_error: "experience level is required",
+        }),
     }),
 });
 

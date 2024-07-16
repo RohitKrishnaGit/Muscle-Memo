@@ -142,6 +142,42 @@ export const Routes = [
         middleware: [validateSchema(allUserSchema), authenticateWithToken],
         action: "all",
     },
+    {
+        method: "put",
+        route: "/users/gender/:id",
+        controller: UserController,
+        middleware: [validateSchema(oneUserSchema), 
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "id"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "changeGender",
+    },
+    {
+        method: "put",
+        route: "/users/experience/:id",
+        controller: UserController,
+        middleware: [validateSchema(oneUserSchema), 
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "id"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "changeExperienceLevel",
+    },
+    {
+        method: "post",
+        route: "/users/findEmail",
+        controller: UserController,
+        middleware: [validateSchema(allUserSchema), authenticateWithToken,],
+        action: "findEmail",
+    },
+
 
     /* exerciseRef routes */
     {

@@ -30,6 +30,12 @@ export class User {
 
     @Column()
     email: string;
+    
+    @Column()
+    gender: string;
+
+    @Column()
+    experience: string;
 
     @Column({ select: false })
     password: string;

@@ -247,15 +247,12 @@ export class UserController {
         return success(generateTokens(user));
     }
 
-    async logout(request: Request, response: Response, next: NextFunction) {
-        const userToken = await this.userTokenRepository.findOneBy({
-            token: request.body.refreshToken,
+    async logoutAll(request: Request, response: Response, next: NextFunction) {
+        const userTokens = await this.userTokenRepository.findBy({
+            user: { id: request.user?.id },
         });
-        if (!userToken) return success("Logged Out Sucessfully");
-
-        await this.userTokenRepository.delete(userToken);
-
-        return success("Logged Out Sucessfully");
+        await this.userTokenRepository.remove(userTokens);
+        return success("Successfully logged out");
     }
 
     async create(request: Request, response: Response, next: NextFunction) {

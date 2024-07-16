@@ -315,7 +315,8 @@ fun PasswordSignup(
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
-            )
+            ),
+            text = "Confirm Password"
         )
 
         if (viewModel.errorMessage != ""){

@@ -27,3 +27,5 @@
 | 7/14/24 |         |            |          |            | 2         |        | Help with workout history feature                           |
 | 7/15/24 |         |            |          |            | 2         |        | Expose endpoints for users to get information about self    |
 | 7/15/24 |         |            |          |            | 6         |        | Add role column to users, added middleware for admins       |
+| 7/15/24 |         |            |          |            | 1         |        | Encrypt role into JWT token for faster access               |
+| 7/15/24 |         |            |          |            | 1         |        | Investigate into firebase for push notifs and image storage |

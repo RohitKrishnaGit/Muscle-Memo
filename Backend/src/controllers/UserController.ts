@@ -228,7 +228,7 @@ export class UserController {
             where: {
                 email,
             },
-            select: ["id", "password"],
+            select: ["id", "password", "role"],
         });
 
         if (!user) {

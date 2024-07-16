@@ -33,13 +33,14 @@ fun AppNavHost (
     ) {
         composable(route = Screen.Login.route) {
             LoginScreen(onSuccessLogin = {
-                navController.navigate(NavItem.Workout.screen.route)
+                navController.navigate(NavItem.Workout.screen.route) { popUpTo(navController.graph.id) {inclusive = true} }
                 bottomBarState.value = true
-            })
+            }
+            )
         }
         composable(route = Screen.Profile.route) {
             ProfileScreen( onClick = {
-                navController.navigate(Screen.Login.route)
+                navController.navigate(Screen.Login.route) { popUpTo(navController.graph.id) {inclusive = true} }
                 bottomBarState.value = false
                 AppPreferences.refreshToken = null
                 AppPreferences.accessToken = null

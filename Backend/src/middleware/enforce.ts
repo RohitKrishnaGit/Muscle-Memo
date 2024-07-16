@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response, request } from "express";
 import { get } from "lodash";
 
 export const enforce = (
     ...rules: ((
         inputId?: number,
-        tokenId?: number
+        token?: typeof request.user
     ) =>
         | Promise<{
               error: boolean;
@@ -33,7 +33,7 @@ export const enforce = (
 
                 const resolvedRules = await Promise.all(
                     rules.map((rule) =>
-                        rule(parseInt(get(req, path)), req.user?.id)
+                        rule(parseInt(get(req, path)), req.user)
                     )
                 );
                 const passessAll = resolvedRules.every((rule) => {
@@ -70,7 +70,7 @@ export const enforce = (
 export const or = (
     ...rules: ((
         inputId?: number,
-        tokenId?: number
+        token?: typeof request.user
     ) =>
         | Promise<{
               error: boolean;
@@ -83,12 +83,12 @@ export const or = (
               message?: string;
           })[]
 ) => {
-    return async (inputId?: number, tokenId?: number) => {
+    return async (inputId?: number, token?: typeof request.user) => {
         let messages: string[] = [];
         let code = 200;
 
         const resolvedRules = await Promise.all(
-            rules.map((rule) => rule(inputId, tokenId))
+            rules.map((rule) => rule(inputId, token))
         );
 
         const passessSome = resolvedRules.some((rule) => {
@@ -120,7 +120,7 @@ export const or = (
 export const and = (
     ...rules: ((
         inputId?: number,
-        tokenId?: number
+        token?: typeof request.user
     ) =>
         | Promise<{
               error: boolean;
@@ -133,12 +133,12 @@ export const and = (
               message?: string;
           })[]
 ) => {
-    return async (inputId?: number, tokenId?: number) => {
+    return async (inputId?: number, token?: typeof request.user) => {
         let messages: string[] = [];
         let code = 200;
 
         const resolvedRules = await Promise.all(
-            rules.map((rule) => rule(inputId, tokenId))
+            rules.map((rule) => rule(inputId, token))
         );
 
         const passessAll = resolvedRules.every((rule) => {

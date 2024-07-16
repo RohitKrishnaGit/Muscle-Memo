@@ -14,9 +14,9 @@ export class TokenController {
             if (error) throw new Error(message);
 
             if (typeof tokenDetails === "string") {
-                tokenDetails = { id: tokenDetails };
+                tokenDetails = { id: tokenDetails, role: undefined };
             }
-            const payload = { id: tokenDetails.id };
+            const payload = { id: tokenDetails.id, role: tokenDetails.role };
             const accessToken = jwt.sign(
                 payload,
                 process.env.ACCESS_TOKEN_PRIVATE_KEY,

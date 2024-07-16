@@ -1,8 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response, request } from "express";
 import jwt from "jsonwebtoken";
 import { get } from "lodash";
-import { AppDataSource } from "../data-source";
-import { Role, User } from "../entities/User";
+import { Role } from "../entities/User";
 
 // Middleware to make sure that the request is from an authenticated user
 export const authenticateWithToken = (
@@ -25,7 +24,7 @@ export const authenticateWithToken = (
         );
         req.user = (
             typeof tokenDetails === "string"
-                ? { id: tokenDetails }
+                ? { id: tokenDetails, role: undefined }
                 : tokenDetails
         ) as jwt.JwtPayload;
         next();
@@ -72,8 +71,8 @@ export const applyUser = (
     return functions.map((fn) => fn(path));
 };
 
-export const sameUser = (inputId?: number, tokenId?: number) => {
-    const idMatches = inputId === tokenId;
+export const sameUser = (inputId?: number, token?: typeof request.user) => {
+    const idMatches = inputId === token?.id;
 
     return {
         error: !idMatches,
@@ -82,35 +81,21 @@ export const sameUser = (inputId?: number, tokenId?: number) => {
     };
 };
 
-export const isAdmin = async (_?: number, tokenId?: number) => {
-    if (!tokenId) {
+export const isAdmin = (_?: number, token?: typeof request.user) => {
+    if (!token) {
         return {
             error: true,
             code: 403,
-            message: "token id not valid",
-        };
-    }
-    const user = await AppDataSource.getRepository(User).findOne({
-        where: {
-            id: tokenId,
-        },
-        select: { role: true },
-    });
-    if (!user) {
-        return {
-            error: true,
-            code: 403,
-            message: "user does not exist",
+            message: "token not valid",
         };
     }
 
-    if (user.role !== Role.ADMIN) {
+    if (token.role !== Role.ADMIN) {
         return {
             error: true,
             code: 403,
         };
     }
-
     return {
         error: false,
         code: 200,

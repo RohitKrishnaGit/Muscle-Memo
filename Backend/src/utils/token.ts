@@ -7,7 +7,7 @@ const userTokenRepository = AppDataSource.getRepository(UserToken);
 
 export const generateTokens = async (user: User) => {
     try {
-        const payload = { id: user.id };
+        const payload = { id: user.id, role: user.role };
         const accessToken = jwt.sign(
             payload,
             process.env.ACCESS_TOKEN_PRIVATE_KEY,

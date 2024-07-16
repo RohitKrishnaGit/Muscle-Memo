@@ -100,7 +100,7 @@ class LoginScreenViewModel : ViewModel() {
         errorMessage = ""
         if (loginVisible) {
             loginVisible = false
-            username = ""
+            email = ""
             password = ""
         }
         else if (signupVisible) {
@@ -209,10 +209,11 @@ class LoginScreenViewModel : ViewModel() {
     }
 
     fun loginAttempt(onSuccess: () -> Unit, onFailure: () -> Unit = {}){
-        RetrofitInstance.userService.getAuthentication(LoginRequest(username, password)).enqueue(object:
+        RetrofitInstance.userService.getAuthentication(LoginRequest(email, password)).enqueue(object:
             Callback<ApiResponse<LoginResponse>>{
             override fun onResponse(call: Call<ApiResponse<LoginResponse>>, response: Response<ApiResponse<LoginResponse>>) {
                 if (!response.isSuccessful) {
+                    println(response.parseErrorBody())
                     password = ""
                     errorMessage = "Invalid Credentials. Please try again."
                     onFailure()
@@ -221,7 +222,6 @@ class LoginScreenViewModel : ViewModel() {
                 response.body()?.data?.let {
                     AppPreferences.accessToken = it.accessToken
                     AppPreferences.refreshToken = it.refreshToken
-                    println(it.refreshToken)
                     onSuccess()
                 }
             }

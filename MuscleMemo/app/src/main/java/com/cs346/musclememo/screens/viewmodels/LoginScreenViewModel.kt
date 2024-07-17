@@ -154,8 +154,9 @@ class LoginScreenViewModel : ViewModel() {
                 } else if (email == ""){
                     errorMessage = "Please enter an email."
                 } else {
-                    //TODO: Check email validity
-                    loginIndex++
+                    //TODO email
+                    checkEmailExistence(email)
+
                 }
             }
             else if (loginScreenData.question == LoginState.PASSWORD){
@@ -265,6 +266,31 @@ class LoginScreenViewModel : ViewModel() {
                 onFailure()
             }
         })
+    }
+
+    private fun checkEmailExistence (email: String){
+
+        RetrofitInstance.signupService.checkEmail(email).enqueue(object: Callback<ApiResponse<Boolean>>{
+            override fun onResponse(
+                call: Call<ApiResponse<Boolean>>,
+                response: Response<ApiResponse<Boolean>>
+            ) {
+                if (response.body()?.data == true){
+                    errorMessage = "email already exists";
+                }
+                else{
+                    loginIndex++
+                }
+
+            }
+
+            override fun onFailure(call: Call<ApiResponse<Boolean>>, t: Throwable) {
+                t.printStackTrace()
+                errorMessage = "Failed to reach network";
+            }
+
+        })
+
     }
 
     enum class LoginState {

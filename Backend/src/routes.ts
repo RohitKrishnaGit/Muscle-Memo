@@ -44,6 +44,8 @@ import {
     logoutAllUserSchema,
     oneUserSchema,
     removeUserSchema,
+    updateExperienceUserSchema,
+    updateGenderUserSchema,
 } from "./schemas/userSchema";
 import {
     allWorkoutSchema,
@@ -144,12 +146,13 @@ export const Routes = [
     },
     {
         method: "put",
-        route: "/users/gender/:id",
+        route: "/users/gender/:userId",
         controller: UserController,
-        middleware: [validateSchema(oneUserSchema), 
+        middleware: [
+            validateSchema(updateGenderUserSchema),
             authenticateWithToken,
             ...applyUser(
-                ["params", "id"],
+                ["params", "userId"],
                 convertMe,
                 enforce(or(sameUser, isAdmin))
             ),
@@ -158,12 +161,13 @@ export const Routes = [
     },
     {
         method: "put",
-        route: "/users/experience/:id",
+        route: "/users/experience/:userId",
         controller: UserController,
-        middleware: [validateSchema(oneUserSchema), 
+        middleware: [
+            validateSchema(updateExperienceUserSchema),
             authenticateWithToken,
             ...applyUser(
-                ["params", "id"],
+                ["params", "userId"],
                 convertMe,
                 enforce(or(sameUser, isAdmin))
             ),
@@ -171,10 +175,10 @@ export const Routes = [
         action: "changeExperienceLevel",
     },
     {
-        method: "post",
-        route: "/users/findEmail",
+        method: "get",
+        route: "/users/email/:email",
         controller: UserController,
-        middleware: [validateSchema(allUserSchema), authenticateWithToken,],
+        middleware: [validateSchema(allUserSchema),],
         action: "findEmail",
     },
 

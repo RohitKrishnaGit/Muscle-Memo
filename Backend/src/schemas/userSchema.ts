@@ -37,12 +37,22 @@ export const createUserSchema = object({
         password: string({
             required_error: "password is required",
         }),
-        gender: string({
-            required_error: "gender is required",
-        }),
-        experience: string({
-            required_error: "experience level is required",
-        }),
+    }),
+});
+
+export const updateGenderUserSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+});
+
+export const updateExperienceUserSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
     }),
 });
 

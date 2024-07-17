@@ -296,9 +296,9 @@ export class UserController {
     }
     async changeGender (request: Request, response: Response, next: NextFunction) {
         const gender = request.body.gender;
-        const id = parseInt(request.params.id);
+        const id = parseInt(request.params.userId);
         let user = await this.userRepository.findOneBy({
-            id,
+            id: id,
         });
         if (!user){
             return failure ("unregistered user");
@@ -309,9 +309,9 @@ export class UserController {
     }
     async changeExperienceLevel (request: Request, response: Response, next: NextFunction) {
         const experience = request.body.experience;
-        const id = parseInt(request.params.id);
+        const id = parseInt(request.params.userId);
         let user = await this.userRepository.findOneBy({
-            id,
+            id: id,
         });
         if (!user){
             return failure ("unregistered user");
@@ -323,7 +323,7 @@ export class UserController {
         
     }
     async findEmail (request: Request, response: Response, next: NextFunction) {
-        const email = request.body.email
+        const email = request.params.email
         let users = await this.userRepository.find({
             where: {
                 email: email

@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.classes.User
-import com.cs346.musclememo.classes.Workout
 import com.cs346.musclememo.utils.AppPreferences
 
 class ProfileScreenViewModel : ViewModel() {
@@ -13,12 +12,8 @@ class ProfileScreenViewModel : ViewModel() {
         private set
     var showSettings by mutableStateOf(false)
         private set
-    var systemOfMeasurementWeight by mutableStateOf(AppPreferences.systemOfMeasurementWeight ?: "kg")
-        private set
     val listOfMeasurementWeight = listOf("kg", "lb")
     var showWeightOptions by mutableStateOf(false)
-    var systemOfMeasurementDistance by mutableStateOf(AppPreferences.systemOfMeasurementDistance ?: "km")
-        private set
     val listOfMeasurementDistance = listOf("km", "miles")
     var showDistanceOptions by mutableStateOf(false)
         private set

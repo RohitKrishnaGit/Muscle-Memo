@@ -2,13 +2,11 @@ package com.cs346.musclememo.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.cs346.musclememo.MainScreen
 import com.cs346.musclememo.screens.FriendsScreen
 import com.cs346.musclememo.screens.HistoryScreen
 import com.cs346.musclememo.screens.LeaderboardScreen
@@ -17,7 +15,6 @@ import com.cs346.musclememo.screens.ProfileScreen
 import com.cs346.musclememo.screens.WorkoutScreen
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 import com.cs346.musclememo.utils.AppPreferences
-import com.example.compose.MuscleMemoTheme
 
 @Composable
 fun AppNavHost (

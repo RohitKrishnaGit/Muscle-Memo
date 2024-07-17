@@ -11,10 +11,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -41,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cs346.musclememo.classes.User
+import kotlin.math.exp
 
 
 @Composable
@@ -72,8 +76,17 @@ fun DisplayProfilePicture(
 @Composable
 fun DisplayProfile (
     user: User,
-    me: Boolean
+    me: Boolean,
+
+    edit: Boolean? = null,
+    editProfilePicture: @Composable () -> Unit = {},
+    editUsername: @Composable () -> Unit = {},
+    editExperience: @Composable () -> Unit = {},
+    editGender: @Composable () -> Unit = {}
 ){
+    LazyColumn {
+
+    }
 
     Column (
         modifier = Modifier.fillMaxSize(),
@@ -82,9 +95,35 @@ fun DisplayProfile (
     ) {
         if (!me)
             Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+
         DisplayProfilePicture(model = user.profilePicture, size = 150.dp)
-        Spacer(modifier = Modifier.height(20.dp))
+        if (edit != null && edit)
+                editProfilePicture()
+        else
+            Spacer(modifier = Modifier.height(20.dp))
+
         Text(user.username, fontSize = 25.sp)
+        if (edit != null && edit)
+                editUsername()
+        else
+            Spacer(modifier = Modifier.height(10.dp))
+        Text(text = user.gender)
+        if (edit != null && edit)
+                editGender()
+        else
+        Spacer(modifier = Modifier.height(10.dp))
+        DisplayExperience(experience = user.experience, size = 250.dp)
+        if (edit != null && edit)
+                editExperience()
+        else
+            Spacer(modifier = Modifier.height(30.dp))
+        Column (
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(text = "Personal Bests", fontSize = 30.sp)
+        }
     }
 }
 
@@ -92,10 +131,61 @@ fun DisplayProfile (
 fun ConfirmationDialog(
 
 ){
-
+    //TODO: confirmation for exiting without saving changes, signing out of all devices
 }
 
+@Composable
+fun EditSurface(
+    content: @Composable () -> Unit
+){
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ){
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .padding(20.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                content()
+            }
+        }
+    }
+}
 
+@Composable
+fun DisplayExperience(
+    experience: String,
+    size: Dp
+){
+    val containerColor = if (experience == "Professional") MaterialTheme.colorScheme.tertiaryContainer else if (experience == "Intermediate") MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.primaryContainer
+    val textColor = if (experience == "Professional") MaterialTheme.colorScheme.onTertiaryContainer else if (experience == "Intermediate") MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onPrimaryContainer
+    Box(
+        modifier = Modifier
+            .width(size)
+            .height(size / 6)
+            .clip(RoundedCornerShape(16.dp))
+            .background(containerColor)
+    ){
+        Column (
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.Center
+        ){
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = experience, color = textColor)
+            }
+        }
+    }
+}
 
 @Composable
 fun SignoutButton(

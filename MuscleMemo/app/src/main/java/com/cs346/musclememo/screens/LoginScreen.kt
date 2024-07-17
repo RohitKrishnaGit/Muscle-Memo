@@ -1,9 +1,6 @@
 package com.cs346.musclememo.screens
 
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.TweenSpec
@@ -21,11 +18,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -33,10 +26,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -46,13 +37,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.R
+import com.cs346.musclememo.screens.components.ChooseProfilePicture
 import com.cs346.musclememo.screens.components.DisplayProfilePicture
+import com.cs346.musclememo.screens.components.ChooseExperience
+import com.cs346.musclememo.screens.components.ChooseGender
 import com.cs346.musclememo.screens.components.InputSheet
 import com.cs346.musclememo.screens.components.PasswordTextField
 import com.cs346.musclememo.screens.components.SignupSheet
@@ -225,7 +218,7 @@ fun CreateAccountSheet(
                 }
                 
                 LoginScreenViewModel.LoginState.PFP -> {
-                    ChoosePFPSignup(viewModel)
+                    ChooseProfilePictureSignup(viewModel)
                 }
             }
         }
@@ -340,92 +333,21 @@ fun BasicInformationSignup(
     ) {
         Text("What is your gender?")
         Spacer(modifier = Modifier.height(15.dp))
-        ExposedDropdownMenuBox(
+        ChooseGender(
+            gender = viewModel.gender,
+            customGender = viewModel.customGender,
             expanded = viewModel.genderExpanded,
-            onExpandedChange = {viewModel.updateGenderExpanded(it)}
-        ) {
-            TextField(
-                value = viewModel.gender,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = viewModel.genderExpanded) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor()
-            )
-            DropdownMenu(
-                expanded = viewModel.genderExpanded,
-                onDismissRequest = { viewModel.updateGenderExpanded(false) },
-                modifier = Modifier.exposedDropdownSize()
-            ) {
-                viewModel.genders.forEach{ gender ->
-                    DropdownMenuItem(
-                        text = { Text(text = gender) },
-                        onClick = {
-                            viewModel.updateGender(gender)
-                            viewModel.updateGenderExpanded(false)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-        }
-        if (viewModel.gender == "Custom"){
-            Spacer(modifier = Modifier.height(20.dp))
-            OutlinedTextField(
-                value = viewModel.customGender,
-                onValueChange = {
-                    viewModel.updateCustomGender(it)
-                },
-                label = {
-                    Text(text = "What's your gender?")
-                },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                modifier = Modifier.fillMaxWidth(1f)
-            )
-        }
+            onExpandedChange = viewModel::updateGenderExpanded,
+            updateGender = viewModel::updateGender,
+            updateCustomGender = viewModel::updateCustomGender
+        )
         Spacer(modifier = Modifier.height(20.dp))
         Text("How experienced are you going to the gym?")
         Spacer(modifier = Modifier.height(15.dp))
-        Row {
-            Slider(
-                value = viewModel.sliderPosition,
-                onValueChange = {
-                    viewModel.updateSliderPosition(it)
-                },
-                valueRange = 0f..1f,
-                steps = 1,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
-            )
-        }
-        Row {
-            Text(
-                text = "Novice",
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Start,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1.8f)
-            )
-            Text(
-                text = "Intermediate",
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1.8f)
-            )
-            Text(
-                text = "Professional",
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.End,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1.8f)
-            )
-        }
+        ChooseExperience(
+            sliderPosition = viewModel.sliderPosition,
+            updateSliderPosition = viewModel::updateSliderPosition
+        )
         Spacer(modifier = Modifier.height(20.dp))
         Text(text = "Don't worry you can change these preferences anytime!", fontSize = 15.sp)
         if (viewModel.errorMessage != ""){
@@ -436,14 +358,9 @@ fun BasicInformationSignup(
 }
 
 @Composable
-fun ChoosePFPSignup(
+fun ChooseProfilePictureSignup(
     viewModel: LoginScreenViewModel
 ){
-    val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()) {
-            viewModel.updateProfilePicture(it)
-    }
-
     SignupSheet(
         title = "Express Yourself (Optional)",
         setVisible = viewModel::onBackPressed ,
@@ -459,21 +376,7 @@ fun ChoosePFPSignup(
                 DisplayProfilePicture(model = viewModel.profilePicture)
                 Spacer(modifier = Modifier.weight(1f))
             }
-        Spacer(modifier = Modifier.height(40.dp))
-            Button(
-                onClick = { photoPickerLauncher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                ) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row (
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(Icons.Outlined.AddAPhoto, "Add a photo")
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "Add a picture")
-                }
-            }
+            Spacer(modifier = Modifier.height(40.dp))
+            ChooseProfilePicture (viewModel::updateProfilePicture)
     }
 }

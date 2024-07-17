@@ -5,5 +5,7 @@ data class User (
     val username : String,
     val email : String,
     val workouts: MutableList<Workout>?,
-    val profilePicture: Any?
+    val profilePicture: Any?,
+    val gender: String,
+    val experience: String
 )

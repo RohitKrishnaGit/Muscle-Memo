@@ -6,7 +6,7 @@ export const oneUserSchema = object({
     params: object({
         id: string({
             required_error: "id is required",
-        }).regex(/^\d+$/, "id should be numerical"),
+        }).regex(/(^\d+$)|(^me$)/, "id should be either numerical or me"),
     }),
 });
 

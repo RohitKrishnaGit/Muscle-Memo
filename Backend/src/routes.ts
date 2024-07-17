@@ -117,7 +117,11 @@ export const Routes = [
         method: "get",
         route: "/users/:id",
         controller: UserController,
-        middleware: [validateSchema(oneUserSchema), authenticateWithToken],
+        middleware: [
+            validateSchema(oneUserSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "id"], convertMe),
+        ],
         action: "one",
     },
     {

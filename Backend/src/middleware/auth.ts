@@ -52,6 +52,7 @@ export const convertMe = (path: string[]) => {
             if (get(req, path) == "me") {
                 get(req, first.reverse())[last] = req.user.id;
             }
+            req.isMe = parseInt(get(req, path)) === req.user.id;
 
             next();
         } catch (err) {

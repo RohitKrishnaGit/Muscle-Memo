@@ -1,5 +1,8 @@
 package com.cs346.musclememo.screens.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -78,51 +82,43 @@ fun DisplayProfile (
     user: User,
     me: Boolean,
 
-    edit: Boolean? = null,
     editProfilePicture: @Composable () -> Unit = {},
     editUsername: @Composable () -> Unit = {},
     editExperience: @Composable () -> Unit = {},
     editGender: @Composable () -> Unit = {}
 ){
-    LazyColumn {
-
-    }
-
-    Column (
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Top,
+    val listState = rememberLazyListState()
+    LazyColumn (
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (!me)
-            Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+        item{
+            Column (
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (!me)
+                    Spacer(modifier = Modifier.fillMaxHeight(0.1f))
 
-        DisplayProfilePicture(model = user.profilePicture, size = 150.dp)
-        if (edit != null && edit)
+                DisplayProfilePicture(model = user.profilePicture, size = 150.dp)
                 editProfilePicture()
-        else
-            Spacer(modifier = Modifier.height(20.dp))
-
-        Text(user.username, fontSize = 25.sp)
-        if (edit != null && edit)
+                Text(user.username, fontSize = 25.sp)
                 editUsername()
-        else
-            Spacer(modifier = Modifier.height(10.dp))
-        Text(text = user.gender)
-        if (edit != null && edit)
+                if (user.gender != "Rather Not Say")
+                    Text(text = user.gender)
                 editGender()
-        else
-        Spacer(modifier = Modifier.height(10.dp))
-        DisplayExperience(experience = user.experience, size = 250.dp)
-        if (edit != null && edit)
+                DisplayExperience(experience = user.experience, size = 250.dp)
                 editExperience()
-        else
-            Spacer(modifier = Modifier.height(30.dp))
-        Column (
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
-        ) {
-            Text(text = "Personal Bests", fontSize = 30.sp)
+                Column (
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(text = "Personal Bests", fontSize = 30.sp)
+                }
+            }
         }
     }
 }
@@ -136,27 +132,39 @@ fun ConfirmationDialog(
 
 @Composable
 fun EditSurface(
+    edit: Boolean?,
+    spacerSize: Dp = 10.dp,
+    showBackground: Boolean = true,
     content: @Composable () -> Unit
 ){
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
-    ){
-        Box(
+    AnimatedVisibility(
+        visible = edit ?: false,
+//        enter = slideInVertically(initialOffsetY = {it}),
+//        exit = slideOutVertically(targetOffsetY = {it})
+    ) {
+
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-                .padding(20.dp)
+                .padding(10.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(if (showBackground) MaterialTheme.colorScheme.surfaceContainerLowest else MaterialTheme.colorScheme.background)
+                    .padding(20.dp)
             ) {
-                content()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    content()
+                }
             }
         }
     }
+    if (edit != null && !edit)
+        Spacer(modifier = Modifier.height(spacerSize))
 }
 
 @Composable
@@ -192,12 +200,17 @@ fun SignoutButton(
     onClick: () -> Unit,
     content: @Composable () -> Unit
 ){
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-        modifier = Modifier.fillMaxWidth(0.8f)
-    ) {
-        content()
+    Row (
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ){
+        Button(
+            onClick = onClick,
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+            modifier = Modifier.fillMaxWidth(0.8f)
+        ) {
+            content()
+        }
     }
 }
 
@@ -214,12 +227,11 @@ fun DropdownSetting(
     Box(modifier = Modifier.fillMaxWidth()) {
         Row (
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = title)
+            Text(text = title, fontSize = 20.sp)
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = onExpandedChange,

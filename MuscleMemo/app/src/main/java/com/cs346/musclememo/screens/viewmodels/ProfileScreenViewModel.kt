@@ -6,11 +6,16 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.cs346.musclememo.api.RetrofitInstance
+import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.utils.AppPreferences
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ProfileScreenViewModel : ViewModel() {
-    var user by mutableStateOf(User(0, "Blazefire878", "blazefire878@gmail.com", null, null, "Male", "Novice"))
+    var user by mutableStateOf(User(0, "Blazefire878", "blazefire878@gmail.com", null, null, "Male", "Intermediate"))
         private set
     var showSettings by mutableStateOf(false)
         private set
@@ -34,9 +39,53 @@ class ProfileScreenViewModel : ViewModel() {
         private set
     var newExperience by mutableFloatStateOf(0.0f)
         private set
-
     var editEnabled by mutableStateOf(false)
         private set
+
+    private fun getExperience(value: Float): String{
+        return if (value == 1.0f)
+            "Professional"
+        else if (value == 0.5f)
+            "Intermediate"
+        else
+            "Novice"
+    }
+
+    fun getSliderPos(experience: String): Float {
+        return if (experience == "Professional")
+            1.0f
+        else if (experience == "Intermediate")
+            0.5f
+        else
+            0.0f
+    }
+
+    private fun customGender(): String{
+        if (user.gender != "Male" && user.gender != "Female" && user.gender != "Rather Not Say")
+            return "Custom"
+        else
+            return user.gender
+    }
+
+    fun refreshNewUser(){
+        newUsername = user.username
+        newGender = customGender()
+        newCustomGender = if (customGender() == "Custom") user.gender else ""
+        newProfilePicture = user.profilePicture
+        newExperience = getSliderPos(user.experience)
+    }
+
+    fun getNewUser(): User {
+        return User(
+            id = user.id,
+            username = newUsername,
+            email = user.email,
+            workouts = user.workouts,
+            profilePicture = newProfilePicture,
+            gender = if (newGender == "Custom") newCustomGender else newGender,
+            experience = getExperience(newExperience)
+        )
+    }
 
     fun updateEditEnabled (state: Boolean){
         editEnabled = state
@@ -109,10 +158,26 @@ class ProfileScreenViewModel : ViewModel() {
         showSettings = show
     }
 
+    fun updateUser(){
+        user = getNewUser()
+        refreshNewUser()
+        //TODO: call endpoints from here with attributes in user
+    }
 
+    fun signoutAllDevices (){
+        RetrofitInstance.userService.signoutAllDevices().enqueue(object:
+        Callback<ApiResponse<String>>{
+            override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
+                return
+            }
 
+            override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
+                return
+            }
+        })
+    }
 
     init {
-        // todo: get user's name and details
+        //TODO: get user's name and details
     }
 }

@@ -1,18 +1,28 @@
 package com.cs346.musclememo.screens
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
@@ -28,6 +38,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.screens.components.ChooseExperience
 import com.cs346.musclememo.screens.components.ChooseGender
@@ -45,23 +56,25 @@ fun ProfileScreen(
 ) {
     val viewModel = viewModel<ProfileScreenViewModel>()
 
+    BackHandler (viewModel.showSettings) {
+        viewModel.updateShowSettings(false)
+    }
+
     DisplayMe(
-        viewModel = viewModel,
-        signOut = signOut
+        viewModel = viewModel
+    )
+
+    SettingsScreen(
+        show = viewModel.showSettings,
+        signOut = signOut,
+        viewModel = viewModel
     )
 }
 
 @Composable
 fun DisplayMe(
-    viewModel: ProfileScreenViewModel,
-    signOut: () -> Unit
+    viewModel: ProfileScreenViewModel
 ){
-    SettingsDialog(
-        show = viewModel.showSettings,
-        signOut = signOut,
-        viewModel = viewModel
-    )
-
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -71,18 +84,19 @@ fun DisplayMe(
     ) {
         UserSettings(viewModel = viewModel)
         DisplayProfile(
-            user = viewModel.user,
+            user = if (viewModel.editEnabled) viewModel.getNewUser() else viewModel.user,
             me = true,
-            edit = viewModel.editEnabled,
             editProfilePicture = {
-                EditSurface {
-                    ChooseProfilePicture (
+                EditSurface(edit = viewModel.editEnabled, spacerSize = 20.dp, showBackground = false){
+                    ChooseProfilePicture(
                         viewModel::updateNewProfilePicture
                     )
                 }
             },
             editUsername = {
-                EditSurface {
+                EditSurface (
+                    edit = viewModel.editEnabled
+                ) {
                     OutlinedTextField(
                         value = viewModel.newUsername,
                         onValueChange = viewModel::updateNewUsername,
@@ -95,7 +109,9 @@ fun DisplayMe(
                 }
             },
             editGender = {
-                EditSurface {
+                EditSurface (
+                    edit = viewModel.editEnabled
+                ) {
                     ChooseGender(
                         gender = viewModel.newGender,
                         customGender = viewModel.newCustomGender,
@@ -107,7 +123,10 @@ fun DisplayMe(
                 }
             },
             editExperience = {
-                EditSurface {
+                EditSurface (
+                    edit = viewModel.editEnabled,
+                    spacerSize = 30.dp
+                ){
                     ChooseExperience(
                         sliderPosition = viewModel.newExperience,
                         updateSliderPosition = viewModel::updateNewExperience
@@ -119,28 +138,44 @@ fun DisplayMe(
 }
 
 @Composable
-fun SettingsDialog(
+fun SettingsScreen(
     show: Boolean,
     signOut: () -> Unit,
     viewModel: ProfileScreenViewModel
 ){
-    if (show){
-        Dialog(onDismissRequest = {viewModel.updateShowSettings(false)}) {
-            Card(
+        AnimatedVisibility(
+            visible = show,
+            enter = slideInHorizontally(initialOffsetX = { it }),
+            exit = slideOutHorizontally(targetOffsetX = { it })
+        ) {
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.7f)
-                    .padding(24.dp),
-                shape = RoundedCornerShape(16.dp)
+                    .fillMaxSize()
+                    .padding(24.dp)
+                    .background(MaterialTheme.colorScheme.background)
             ) {
                 Column (
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Top
                 ){
-                    Text(text = "Settings", fontSize = 30.sp)
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.1f),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ){
+                        IconButton(
+                            onClick = { viewModel.updateShowSettings(false) }
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to previous screen")
+                        }
+                        Text(text = "Settings")
+                        Spacer(modifier = Modifier.size(48.dp))
+                    }
                     DropdownSetting(
                         title = "Unit of Distance",
                         text = AppPreferences.systemOfMeasurementDistance ?: "km",
@@ -149,7 +184,7 @@ fun SettingsDialog(
                         options = viewModel.listOfMeasurementDistance,
                         onExpandedChange = viewModel::updateShowDistanceOptions
                     )
-
+                    Spacer(modifier = Modifier.height(20.dp))
                     DropdownSetting(
                         title = "Unit of Weight",
                         text = AppPreferences.systemOfMeasurementWeight ?: "kg",
@@ -158,7 +193,7 @@ fun SettingsDialog(
                         options = viewModel.listOfMeasurementWeight,
                         onExpandedChange = viewModel::updateShowWeightOptions
                     )
-
+                    Spacer(modifier = Modifier.height(20.dp))
                     DropdownSetting(
                         title = "App Theme",
                         text = viewModel.getTheme(),
@@ -167,7 +202,7 @@ fun SettingsDialog(
                         options = viewModel.listOfTheme,
                         onExpandedChange = viewModel::updateShowThemeOptions
                     )
-
+                    Spacer(modifier = Modifier.height(20.dp))
                     SignoutButton(
                         onClick = {
                             viewModel.updateShowSettings(false)
@@ -179,11 +214,12 @@ fun SettingsDialog(
                             color = MaterialTheme.colorScheme.onErrorContainer
                         )
                     }
+                    Spacer(modifier = Modifier.height(20.dp))
                     SignoutButton(
                         onClick = {
-                            // TODO: Add sign out call
                             viewModel.updateShowSettings(false)
                             signOut()
+                            viewModel.signoutAllDevices()
                         }
                     ) {
                         Text(
@@ -195,7 +231,7 @@ fun SettingsDialog(
             }
         }
     }
-}
+
 
 
 @Composable
@@ -207,14 +243,28 @@ fun UserSettings(
             .fillMaxWidth()
             .fillMaxHeight(0.1f)
     ) {
-        IconButton(onClick = { viewModel.updateEditEnabled(!viewModel.editEnabled) }) {
-            Icon(imageVector = if (!viewModel.editEnabled) Icons.Default.Edit else Icons.Default.Close, "Edit Profile", modifier = Modifier.size(40.dp))
+        IconButton(onClick = {
+            if (!viewModel.editEnabled)
+                viewModel.refreshNewUser()
+            if (viewModel.editEnabled)
+                viewModel.updateUser()
+            viewModel.updateEditEnabled(!viewModel.editEnabled)
+        }) {
+            Icon(imageVector = if (!viewModel.editEnabled) Icons.Default.Edit else Icons.Default.Done, "Edit Profile")
+        }
+        if (viewModel.editEnabled){
+            Spacer(modifier = Modifier.width(5.dp))
+            IconButton(onClick = { 
+                viewModel.updateEditEnabled(false)
+            }){
+                Icon(Icons.Default.Close, "Discard Changes")
+            }
         }
         Spacer(modifier = Modifier.weight(1f))
         IconButton(onClick = {
             viewModel.updateShowSettings(true)
         }) {
-            Icon(imageVector = Icons.Default.Settings, "Settings", modifier = Modifier.size(40.dp))
+            Icon(imageVector = Icons.Default.Settings, "Settings")
         }
     }
 }

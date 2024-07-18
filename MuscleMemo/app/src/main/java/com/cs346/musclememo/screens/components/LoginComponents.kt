@@ -184,50 +184,54 @@ fun ChooseGender(
         "Custom"
     )
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = onExpandedChange
-    ) {
-        TextField(
-            value = gender,
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor()
-        )
-        DropdownMenu(
+    Column (
+        modifier = Modifier.fillMaxSize()
+    ){
+        ExposedDropdownMenuBox(
             expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) },
-            modifier = Modifier.exposedDropdownSize()
+            onExpandedChange = onExpandedChange
         ) {
-            genders.forEach{ gender ->
-                DropdownMenuItem(
-                    text = { Text(text = gender) },
-                    onClick = {
-                        updateGender(gender)
-                        onExpandedChange(false)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
+            TextField(
+                value = gender,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor()
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { onExpandedChange(false) },
+                modifier = Modifier.exposedDropdownSize()
+            ) {
+                genders.forEach { gender ->
+                    DropdownMenuItem(
+                        text = { Text(text = gender) },
+                        onClick = {
+                            updateGender(gender)
+                            onExpandedChange(false)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
+        if (gender == "Custom") {
+            Spacer(modifier = Modifier.height(20.dp))
+            OutlinedTextField(
+                value = customGender,
+                onValueChange = {
+                    updateCustomGender(it)
+                },
+                label = {
+                    Text(text = "What's your gender?")
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                modifier = Modifier.fillMaxWidth(1f)
+            )
+        }
     }
-    if (gender == "Custom"){
-        Spacer(modifier = Modifier.height(20.dp))
-        OutlinedTextField(
-            value = customGender,
-            onValueChange = {
-                updateCustomGender(it)
-            },
-            label = {
-                Text(text = "What's your gender?")
-            },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            modifier = Modifier.fillMaxWidth(1f)
-        )
-    }    
 }
 
 @Composable
@@ -235,42 +239,46 @@ fun ChooseExperience(
     sliderPosition: Float,
     updateSliderPosition: (Float) -> Unit
 ){
-    Row {
-        Slider(
-            value = sliderPosition,
-            onValueChange = updateSliderPosition,
-            valueRange = 0f..1f,
-            steps = 1,
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth()
-        )
-    }
-    Row {
-        Text(
-            text = "Novice",
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Start,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1.8f)
-        )
-        Text(
-            text = "Intermediate",
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1.8f)
-        )
-        Text(
-            text = "Professional",
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.End,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1.8f)
-        )
+    Column (
+        modifier = Modifier.fillMaxSize()
+    ){
+        Row {
+            Slider(
+                value = sliderPosition,
+                onValueChange = updateSliderPosition,
+                valueRange = 0f..1f,
+                steps = 1,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+            )
+        }
+        Row {
+            Text(
+                text = "Novice",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1.8f)
+            )
+            Text(
+                text = "Intermediate",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1.8f)
+            )
+            Text(
+                text = "Professional",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.End,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1.8f)
+            )
+        }
     }
 }
 

@@ -6,20 +6,20 @@ import androidx.compose.material3.Surface
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.cs346.musclememo.navigation.AppNavHost
 import com.cs346.musclememo.navigation.BottomNavigationBar
@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
         AppPreferences.setup(applicationContext)
         enableEdgeToEdge()
         setContent {
-            MuscleMemoTheme {
+            MuscleMemoTheme  {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     MainScreen()
                 }
@@ -46,7 +46,8 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val navController = rememberNavController()
     val bottomBarState = rememberSaveable { (mutableStateOf(AppPreferences.refreshToken != null)) }
-    val startRoute = rememberSaveable {(mutableStateOf(if (AppPreferences.refreshToken==null) Screen.Login.route else Screen.Workout.route))}
+    val startRoute = rememberSaveable {(mutableStateOf(if (AppPreferences.refreshToken==null) Screen.Login.route else Screen.Profile.route))}
+    val isDarkTheme = remember { mutableStateOf(AppPreferences.darkMode) }
 
     val returnToLogin by rememberUpdatedState (
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, _ ->
@@ -62,9 +63,22 @@ fun MainScreen() {
         }
     )
 
-    MuscleMemoTheme {
+    val themeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == "DARKMODE") {
+            isDarkTheme.value = AppPreferences.darkMode
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        AppPreferences.listen(themeListener)
+    }
+
+    MuscleMemoTheme (
+        darkTheme = isDarkTheme.value ?: isSystemInDarkTheme()
+    ) {
         LaunchedEffect(Unit) {
             AppPreferences.listen(returnToLogin)
+            AppPreferences.unListen(returnToLogin)
         }
         Scaffold(
             bottomBar = { BottomNavigationBar(bottomBarState = bottomBarState, navHostController = navController) }

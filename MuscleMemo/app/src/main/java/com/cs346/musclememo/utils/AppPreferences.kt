@@ -11,10 +11,18 @@ object AppPreferences {
 
     fun setup(context: Context) {
         sharedPreferences = context.getSharedPreferences("MuscleMemo.sharedprefs", MODE_PRIVATE)
+        if (systemOfMeasurementDistance == "")
+            systemOfMeasurementDistance = "km"
+        if (systemOfMeasurementWeight == "")
+            systemOfMeasurementWeight = "kg"
     }
 
     fun listen(listener: SharedPreferences. OnSharedPreferenceChangeListener){
         sharedPreferences?.registerOnSharedPreferenceChangeListener(listener)
+    }
+
+    fun unListen(listener: SharedPreferences.OnSharedPreferenceChangeListener){
+        sharedPreferences?.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
     var accessToken: String?
@@ -25,9 +33,20 @@ object AppPreferences {
         get() = Key.REFRESH_TOKEN.getString()
         set(value) = Key.REFRESH_TOKEN.setString(value)
 
+    var systemOfMeasurementDistance: String?
+        get() = Key.SYSTEMMEASUREMENTDISTANCE.getString()
+        set(value) = Key.SYSTEMMEASUREMENTDISTANCE.setString(value)
+
+    var systemOfMeasurementWeight: String?
+        get() = Key.SYSTEMMEASUREMENTWEIGHT.getString()
+        set(value) = Key.SYSTEMMEASUREMENTWEIGHT.setString(value)
+
+    var darkMode: Boolean?
+        get() = Key.DARKMODE.getBoolean()
+        set(value) = Key.DARKMODE.setBoolean(value)
 
     private enum class Key {
-        ACCESS_TOKEN, REFRESH_TOKEN;
+        ACCESS_TOKEN, REFRESH_TOKEN, SYSTEMMEASUREMENTDISTANCE, SYSTEMMEASUREMENTWEIGHT, DARKMODE;
 
         fun getBoolean(): Boolean? = if (sharedPreferences!!.contains(name)) sharedPreferences!!.getBoolean(name, false) else null
         fun getFloat(): Float? = if (sharedPreferences!!.contains(name)) sharedPreferences!!.getFloat(name, 0f) else null

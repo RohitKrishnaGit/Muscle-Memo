@@ -38,12 +38,11 @@ fun AppNavHost (
             )
         }
         composable(route = Screen.Profile.route) {
-            ProfileScreen( onClick = {
-                navController.navigate(Screen.Login.route) { popUpTo(navController.graph.id) {inclusive = true} }
+            ProfileScreen( signOut = {
                 bottomBarState.value = false
+                navController.navigate(Screen.Login.route) { popUpTo(navController.graph.id) {inclusive = true} }
                 AppPreferences.refreshToken = null
                 AppPreferences.accessToken = null
-
             })
         }
         composable(route = Screen.Leaderboard.route) {
@@ -60,3 +59,4 @@ fun AppNavHost (
         }
     }
 }
+

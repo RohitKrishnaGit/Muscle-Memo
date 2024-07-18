@@ -50,12 +50,6 @@ class LoginScreenViewModel : ViewModel() {
 
     var gender by mutableStateOf("")
         private set
-    val genders: List<String> = listOf(
-        "Male",
-        "Female",
-        "Rather Not Say",
-        "Custom"
-    )
 
     var customGender by mutableStateOf("")
 

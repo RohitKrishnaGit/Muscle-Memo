@@ -1,5 +1,9 @@
 package com.cs346.musclememo.screens.components
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,12 +25,20 @@ import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,8 +47,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -153,6 +167,145 @@ fun ValidPasswordRequirement(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChooseGender(
+    gender: String,
+    customGender: String,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    updateGender: (String) -> Unit,
+    updateCustomGender: (String) -> Unit
+){
+    val genders: List<String> = listOf(
+        "Male",
+        "Female",
+        "Rather Not Say",
+        "Custom"
+    )
+
+    Column (
+        modifier = Modifier.fillMaxSize()
+    ){
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = onExpandedChange
+        ) {
+            TextField(
+                value = gender,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor()
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { onExpandedChange(false) },
+                modifier = Modifier.exposedDropdownSize()
+            ) {
+                genders.forEach { gender ->
+                    DropdownMenuItem(
+                        text = { Text(text = gender) },
+                        onClick = {
+                            updateGender(gender)
+                            onExpandedChange(false)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+        if (gender == "Custom") {
+            Spacer(modifier = Modifier.height(20.dp))
+            OutlinedTextField(
+                value = customGender,
+                onValueChange = {
+                    updateCustomGender(it)
+                },
+                label = {
+                    Text(text = "What's your gender?")
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                modifier = Modifier.fillMaxWidth(1f)
+            )
+        }
+    }
+}
+
+@Composable
+fun ChooseExperience(
+    sliderPosition: Float,
+    updateSliderPosition: (Float) -> Unit
+){
+    Column (
+        modifier = Modifier.fillMaxSize()
+    ){
+        Row {
+            Slider(
+                value = sliderPosition,
+                onValueChange = updateSliderPosition,
+                valueRange = 0f..1f,
+                steps = 1,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+            )
+        }
+        Row {
+            Text(
+                text = "Novice",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1.8f)
+            )
+            Text(
+                text = "Intermediate",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1.8f)
+            )
+            Text(
+                text = "Professional",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.End,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1.8f)
+            )
+        }
+    }
+}
+
+@Composable
+fun ChooseProfilePicture(
+    updateProfilePicture: (Uri?) -> Unit
+){
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()) {
+        updateProfilePicture(it)
+    }
+    Button(
+        onClick = { photoPickerLauncher.launch(
+            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+        ) },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(Icons.Outlined.AddAPhoto, "Add a photo")
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(text = "Add a picture")
+        }
+    }
+}
 
 // Source: compose-examples/jetsurvey
 fun getTransitionDirection(

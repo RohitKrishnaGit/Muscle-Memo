@@ -114,6 +114,13 @@ export const Routes = [
         action: "acceptFriendRequest",
     },
     {
+        method: "post",
+        route: "/users/:id/removeFriend",
+        controller: UserController,
+        middleware: [authenticateWithToken],
+        action: "removeFriend",
+    },
+    {
         method: "get",
         route: "/users/:id",
         controller: UserController,

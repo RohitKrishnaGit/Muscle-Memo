@@ -28,6 +28,8 @@ export class UserController {
     }
 
     async getFriends(request: Request, response: Response, next: NextFunction) {
+        console.log("get friedns");
+
         const id = parseInt(request.params.id);
 
         const user = await this.userRepository.findOne({
@@ -38,9 +40,9 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
-        return user.friends;
+        return success(user.friends);
     }
 
     async getIncomingFriendRequests(
@@ -58,9 +60,9 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
-        return user.incomingFriendRequests;
+        return success(user.incomingFriendRequests);
     }
 
     async getOutgoingFriendRequests(
@@ -78,9 +80,9 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
-        return user.outgoingFriendRequests;
+        return success(user.outgoingFriendRequests);
     }
 
     async sendFriendRequest(
@@ -91,6 +93,10 @@ export class UserController {
         const id = parseInt(request.params.id);
         const { friendId } = request.body;
 
+        console.log({ friendId });
+
+        console.log(request.body);
+
         const user = await this.userRepository.findOne({
             where: { id },
             relations: {
@@ -98,9 +104,13 @@ export class UserController {
             },
         });
 
+        console.log({ user });
+
         const friend = await this.userRepository.findOneBy({
             id: friendId,
         });
+
+        console.log({ friend });
 
         if (!user) {
             return "unregistered user";
@@ -119,7 +129,11 @@ export class UserController {
             friend,
         ];
 
-        return this.userRepository.save(user);
+        console.log("lol");
+
+        await this.userRepository.save(user);
+
+        return success("friend request sent successfgully");
     }
 
     async acceptFriendRequest(
@@ -146,10 +160,10 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
         if (!friend) {
-            return "target user does not exist";
+            return failure("target user does not exist");
         }
 
         const len = friend.outgoingFriendRequests.length;
@@ -160,7 +174,7 @@ export class UserController {
         );
 
         if (friend.outgoingFriendRequests.length === len) {
-            return "this friend request does not exist";
+            return failure("this friend request does not exist");
         }
 
         user.friends = [...(user.friends ?? []), friend];
@@ -169,7 +183,7 @@ export class UserController {
         await this.userRepository.save(user);
         await this.userRepository.save(friend);
 
-        return "friend request accept successs";
+        return success("friend request accept successs");
     }
 
     async removeFriend(
@@ -195,10 +209,10 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
         if (!friend) {
-            return "target user does not exist";
+            return failure("target user does not exist");
         }
 
         const len1 = user.friends.length;
@@ -212,17 +226,20 @@ export class UserController {
         });
 
         if (user.friends.length === len1 || friend.friends.length === len2) {
-            return "this friend does not exist";
+            return failure("this friend does not exist");
         }
 
         await this.userRepository.save(user);
         await this.userRepository.save(friend);
 
-        return "friend removed";
+        return success("friend removed");
     }
 
     async login(request: Request, response: Response, next: NextFunction) {
         const { email, password } = request.body;
+
+        console.log("jdiowajdiowa");
+        console.log({ email, password });
 
         const user = await this.userRepository.findOne({
             where: {
@@ -230,6 +247,8 @@ export class UserController {
             },
             select: ["id", "password", "role"],
         });
+
+        console.log({ user });
 
         if (!user) {
             return failure("Invalid email or password", 401);
@@ -239,6 +258,8 @@ export class UserController {
             password,
             user.password
         );
+
+        console.log(verifiedPassword);
 
         if (!verifiedPassword) {
             return failure("Invalid email or password", 401);

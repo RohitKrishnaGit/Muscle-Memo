@@ -44,6 +44,7 @@ import {
     logoutAllUserSchema,
     oneUserSchema,
     removeUserSchema,
+    updateUserParametersSchema,
 } from "./schemas/userSchema";
 import {
     allWorkoutSchema,
@@ -145,6 +146,29 @@ export const Routes = [
         controller: UserController,
         middleware: [validateSchema(allUserSchema), authenticateWithToken],
         action: "all",
+    },
+    {
+        method: "put",
+        route: "/users/update/:userId",
+        controller: UserController,
+        middleware: [
+            validateSchema(updateUserParametersSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "update",
+    },
+
+    {
+        method: "get",
+        route: "/users/email/:email",
+        controller: UserController,
+        middleware: [validateSchema(allUserSchema),],
+        action: "findEmail",
     },
 
     /* exerciseRef routes */

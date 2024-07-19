@@ -256,7 +256,7 @@ export class UserController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { username, fullName, email, password } = request.body;
+        const { username, fullName, email, password, gender, experience} = request.body;
 
         const userExists = !!(await this.userRepository.findOneBy({ email }));
 
@@ -269,6 +269,8 @@ export class UserController {
             fullName,
             email,
             password: await generatePasswordHash(password),
+            gender,
+            experience
         });
 
         await this.userRepository.save(user);
@@ -290,5 +292,37 @@ export class UserController {
         await this.userRepository.remove(userToRemove);
 
         return success("user has been removed");
+    }
+
+    async update(request: Request, response: Response, next: NextFunction) {
+        const { username, gender, experience} = request.body;
+        const id = parseInt(request.params.userId)
+        let userToUpdate = await this.userRepository.findOneBy({
+            id,
+        });
+        if (userToUpdate){
+            if (username != null)
+                userToUpdate.username = username
+            if (gender != null)
+                userToUpdate.gender = gender
+            if (experience != null)
+                userToUpdate.experience = experience
+            return await success(this.userRepository.save(userToUpdate))
+        }
+        return failure("Update failed");
+    }
+
+    async findEmail (request: Request, response: Response, next: NextFunction) {
+        const email = request.params.email
+        let users = await this.userRepository.find({
+            where: {
+                email: email
+            }
+        })
+        if (users.length != 0){
+            return success(true)
+        }
+        return success(false)
+
     }
 }

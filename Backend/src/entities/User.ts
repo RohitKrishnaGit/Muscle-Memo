@@ -34,6 +34,12 @@ export class User {
     @Column({ select: false })
     password: string;
 
+    @Column()
+    gender: string;
+
+    @Column()
+    experience: string;
+
     @ManyToMany(() => User, (user) => user.outgoingFriendRequests)
     incomingFriendRequests: Relation<User[]>;
 

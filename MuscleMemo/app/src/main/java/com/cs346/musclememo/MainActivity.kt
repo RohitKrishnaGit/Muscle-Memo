@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val navController = rememberNavController()
     val bottomBarState = rememberSaveable { (mutableStateOf(AppPreferences.refreshToken != null)) }
-    val startRoute = rememberSaveable {(mutableStateOf(if (AppPreferences.refreshToken==null) Screen.Login.route else Screen.Profile.route))}
+    val startRoute = rememberSaveable {(mutableStateOf(if (AppPreferences.refreshToken==null) Screen.Login.route else Screen.Workout.route))}
     val isDarkTheme = remember { mutableStateOf(AppPreferences.darkMode) }
 
     val returnToLogin by rememberUpdatedState (

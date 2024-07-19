@@ -24,12 +24,12 @@ class HistoryScreenViewModel : ViewModel() {
     val workouts : List<Workout> = _workouts
 
     init {
-        getWorkoutsByUserId(1)
+        getWorkoutsByUserId()
     }
 
-    fun getWorkoutsByUserId(userId: Int){
+    private fun getWorkoutsByUserId(){
         val apiService = RetrofitInstance.workoutService
-        val call = apiService.getWorkoutByUserId(userId)
+        val call = apiService.getWorkoutByUserId()
 
         call.enqueue(object : Callback<ApiResponse<List<Workout>>> {
             override fun onResponse(call: Call<ApiResponse<List<Workout>>>, response: Response<ApiResponse<List<Workout>>>) {

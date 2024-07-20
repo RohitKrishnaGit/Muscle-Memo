@@ -4,6 +4,7 @@ import {
     JoinTable,
     ManyToMany,
     OneToMany,
+    OneToOne,
     PrimaryGeneratedColumn,
     Relation,
 } from "typeorm";
@@ -11,6 +12,8 @@ import { CustomExerciseRef } from "./CustomExerciseRef";
 import { Template } from "./Template";
 import { UserToken } from "./UserToken";
 import { Workout } from "./Workout";
+import { UserPRs } from "./UserPRs";
+import { AllowedStatistics } from "./AllowedStatistics"
 
 export enum Role {
     ADMIN,
@@ -63,6 +66,16 @@ export class User {
 
     @OneToMany(() => UserToken, (userToken) => userToken.user)
     tokens: Relation<UserToken[]>;
+
+    @OneToOne(() => UserPRs, (UserPRs => UserPRs.user), {
+        cascade: true
+    })
+    userPRs: Relation<UserPRs>;
+
+    @OneToOne(() => AllowedStatistics, (AllowedStatistics => AllowedStatistics.user), {
+        cascade: true
+    })
+    allowedStatistics: Relation<AllowedStatistics>;
 
     @Column({ select: false, default: Role.USER })
     role: Role;

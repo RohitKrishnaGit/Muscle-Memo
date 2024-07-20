@@ -1,11 +1,15 @@
+
 import { CombinedExerciseRefController } from "./controllers/CombinedExerciseRefController";
+import { AllowedStatisticsController } from "./controllers/AllowedStatsisticsController";
 import { CustomExerciseRefController } from "./controllers/CustomExerciseRefController";
 import { ExerciseController } from "./controllers/ExerciseController";
 import { ExerciseRefController } from "./controllers/ExerciseRefController";
 import { TemplateController } from "./controllers/TemplateController";
 import { TokenController } from "./controllers/TokenController";
 import { UserController } from "./controllers/UserController";
+import { UserPRsController } from "./controllers/UserPRsController";
 import { WorkoutController } from "./controllers/WorkoutController";
+import { UserPRs } from "./entities/UserPRs";
 import {
     applyUser,
     authenticateWithToken,
@@ -473,5 +477,49 @@ export const Routes = [
         controller: TokenController,
         middleware: [validateSchema(newTokenSchema)],
         action: "newToken",
+    },
+
+    /* PR & leaderboard routes */
+    {
+        method: "get",
+        route: "/PR/:id/:exerciseRefId",
+        controller: UserPRsController,
+        middleware: [authenticateWithToken],
+        action: "getUserPR",
+    },
+    {
+        method: "post",
+        route: "/PR/:id/:exerciseRefId",
+        controller: UserPRsController,
+        middleware: [authenticateWithToken],
+        action: "updateUserPR",
+    },
+    {
+        method: "get",
+        route: "/leaderboard/:exerciseRefId/:count",
+        controller: UserPRsController,
+        middleware: [authenticateWithToken],
+        action: "getTopN",
+    },
+    {
+        method: "get",
+        route: "/PR/visibility/:id/:exerciseRefId",
+        controller: AllowedStatisticsController,
+        middleware: [authenticateWithToken],
+        action: "getAllowedStatistics",
+    },
+    {
+        method: "post",
+        route: "/PR/visibility/:id/:exerciseRefId",
+        controller: AllowedStatisticsController,
+        middleware: [authenticateWithToken],
+        action: "updateAllowedStatistics",
+    },
+    {
+        method: "get",
+        route: "/PR/:id/",
+        controller: UserPRsController,
+        middleware: [authenticateWithToken],
+        action: "getAllUserPRs",
     },
 ];

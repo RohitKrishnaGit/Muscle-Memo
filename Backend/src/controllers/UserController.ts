@@ -5,6 +5,8 @@ import { UserToken } from "../entities/UserToken";
 import { generatePasswordHash, validatePassword } from "../utils/password";
 import { failure, success } from "../utils/responseTypes";
 import { generateTokens } from "../utils/token";
+import { AllowedStatistics } from "../entities/AllowedStatistics";
+import { UserPRs } from "../entities/UserPRs";
 
 export class UserController {
     private userRepository = AppDataSource.getRepository(User);
@@ -38,9 +40,9 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
-        return user.friends;
+        return success(user.friends);
     }
 
     async getIncomingFriendRequests(
@@ -58,9 +60,9 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
-        return user.incomingFriendRequests;
+        return success(user.incomingFriendRequests);
     }
 
     async getOutgoingFriendRequests(
@@ -78,9 +80,9 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
-        return user.outgoingFriendRequests;
+        return success(user.outgoingFriendRequests);
     }
 
     async sendFriendRequest(
@@ -103,15 +105,19 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
 
         if (!friend) {
-            return "target user does not exist";
+            return failure("target user does not exist");
         }
 
         if (friend.id === user.id) {
-            return "cannot send friend request to self";
+            return failure("cannot send friend request to self");
+        }
+
+        if (user.outgoingFriendRequests.includes(friend)) {
+            return failure("friend request already sent to this user");
         }
 
         user.outgoingFriendRequests = [
@@ -119,7 +125,7 @@ export class UserController {
             friend,
         ];
 
-        return this.userRepository.save(user);
+        return success(this.userRepository.save(user));
     }
 
     async acceptFriendRequest(
@@ -146,10 +152,10 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
         if (!friend) {
-            return "target user does not exist";
+            return failure("target user does not exist");
         }
 
         const len = friend.outgoingFriendRequests.length;
@@ -160,7 +166,7 @@ export class UserController {
         );
 
         if (friend.outgoingFriendRequests.length === len) {
-            return "this friend request does not exist";
+            return failure("this friend request does not exist");
         }
 
         user.friends = [...(user.friends ?? []), friend];
@@ -169,7 +175,7 @@ export class UserController {
         await this.userRepository.save(user);
         await this.userRepository.save(friend);
 
-        return "friend request accept successs";
+        return success("friend request accept successs");
     }
 
     async removeFriend(
@@ -195,10 +201,10 @@ export class UserController {
         });
 
         if (!user) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
         if (!friend) {
-            return "target user does not exist";
+            return failure("target user does not exist");
         }
 
         const len1 = user.friends.length;
@@ -212,13 +218,13 @@ export class UserController {
         });
 
         if (user.friends.length === len1 || friend.friends.length === len2) {
-            return "this friend does not exist";
+            return failure("this friend does not exist");
         }
 
         await this.userRepository.save(user);
         await this.userRepository.save(friend);
 
-        return "friend removed";
+        return success("friend removed");
     }
 
     async login(request: Request, response: Response, next: NextFunction) {
@@ -270,6 +276,8 @@ export class UserController {
             password: await generatePasswordHash(password),
             gender,
             experience,
+            userPRs: new UserPRs(),
+            allowedStatistics: new AllowedStatistics(),
         });
 
         await this.userRepository.save(user);

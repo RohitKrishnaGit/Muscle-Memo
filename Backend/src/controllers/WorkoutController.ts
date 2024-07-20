@@ -41,10 +41,12 @@ export class WorkoutController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { name, userId } = request.body;
+        const { name, userId, date, duration } = request.body;
 
         const workout = Object.assign(new Workout(), {
             name,
+            date,
+            duration,
             user: { id: userId } as User,
         });
 

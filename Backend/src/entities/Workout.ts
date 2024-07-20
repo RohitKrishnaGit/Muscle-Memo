@@ -17,6 +17,12 @@ export class Workout {
     @Column()
     name: string;
 
+    @Column()
+    date: string;
+
+    @Column()
+    duration: number;
+
     @ManyToOne(() => User, (user) => user.workouts)
     user: User;
 

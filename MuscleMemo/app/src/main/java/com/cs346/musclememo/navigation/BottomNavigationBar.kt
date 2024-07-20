@@ -6,6 +6,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -56,8 +57,10 @@ fun BottomNavigationBar (
                 Row {
                     items.forEachIndexed { index, item ->
                         NavBarItem(value = item, highlighted = (index == selected.value), modifier = Modifier.weight(1f)) {
-                            selected.value = index
-                            navHostController.navigate(item.screen.route)
+                            if (index != selected.value) {
+                                selected.value = index
+                                navHostController.navigate(item.screen.route)
+                            }
                         }
                         }
                     }
@@ -73,12 +76,13 @@ fun NavBarItem (
     modifier: Modifier,
     onClick: () -> Unit
 ){
+    val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier
             .background(
-                color =  MaterialTheme.colorScheme.surfaceContainer
+                color = MaterialTheme.colorScheme.surfaceContainer
             )
-            .clickable { onClick() }
+            .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
     ) {
         Row (
             verticalAlignment = Alignment.CenterVertically,

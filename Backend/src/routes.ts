@@ -1,3 +1,4 @@
+import { CombinedExerciseRefController } from "./controllers/CombinedExerciseRefController";
 import { CustomExerciseRefController } from "./controllers/CustomExerciseRefController";
 import { ExerciseController } from "./controllers/ExerciseController";
 import { ExerciseRefController } from "./controllers/ExerciseRefController";
@@ -14,6 +15,7 @@ import {
 } from "./middleware/auth";
 import { enforce, or } from "./middleware/enforce";
 import { validateSchema } from "./middleware/validation";
+import { allCombinedExerciseRefSchema } from "./schemas/combinedExerciseRefSchema";
 import {
     allCustomExerciseRefSchema,
     createCustomExerciseRefSchema,
@@ -283,6 +285,22 @@ export const Routes = [
             ),
         ],
         action: "remove",
+    },
+
+    {
+        method: "get",
+        route: "/combinedExerciseRefs/:userId",
+        controller: CombinedExerciseRefController,
+        middleware: [
+            validateSchema(allCombinedExerciseRefSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "all",
     },
 
     /* Workout routes */

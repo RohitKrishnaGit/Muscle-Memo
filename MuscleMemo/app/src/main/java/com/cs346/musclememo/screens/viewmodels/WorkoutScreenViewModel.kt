@@ -18,15 +18,25 @@ import retrofit2.Response
 class WorkoutScreenViewModel : ViewModel() {
     var currentWorkout by mutableStateOf(Workout())
         private set
-
     private val _exerciseRefs = mutableStateListOf<ExerciseRef>()
     val exerciseRefs : List<ExerciseRef>  = _exerciseRefs
-
     var workoutVisible by mutableStateOf(false)
         private set
-
     var summaryVisible by mutableStateOf(false)
         private set
+
+    var chooseWorkoutVisible by mutableStateOf(false)
+        private set
+
+    fun onBackPressed(){
+        if (chooseWorkoutVisible){
+            chooseWorkoutVisible = false
+        }
+    }
+
+    fun updateChooseWorkoutVisible (visible: Boolean){
+        chooseWorkoutVisible = visible
+    }
 
     fun setSummaryScreenVisible (visible: Boolean){
         summaryVisible = visible
@@ -114,7 +124,7 @@ class WorkoutScreenViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<ApiResponse<List<ExerciseRef>>>, t: Throwable) {
-                TODO("Not yet implemented")
+                println("Exercise Ref failed")
             }
 
         })
@@ -149,13 +159,32 @@ class WorkoutScreenViewModel : ViewModel() {
     }
 
     fun finishWorkout(){
-        // todo: send data to backend
+        createWorkout(currentWorkout)
     }
 
     init {
-        // todo: get all normal and custom exercises from backend
-        _exerciseRefs.add(ExerciseRef("Bench", 0))
-        _exerciseRefs.add(ExerciseRef("Squat", 1))
-        _exerciseRefs.add(ExerciseRef("Deadlift", 2))
+        getExercises()
     }
+
+
+    private var workoutIndex = 0
+    private val workoutOrder: List<WorkoutState> = listOf(
+        WorkoutState.NEW_WORKOUT,
+        WorkoutState.CURRENT_WORKOUT
+    )
+    var workoutScreenData by mutableStateOf(createWorkoutScreenData())
+
+    private fun createWorkoutScreenData(): WorkoutScreenData {
+        return WorkoutScreenData(workoutIndex, workoutOrder[workoutIndex])
+    }
+
+    enum class WorkoutState {
+        NEW_WORKOUT,
+        CURRENT_WORKOUT
+    }
+
+    data class WorkoutScreenData (
+        val screenIndex: Int,
+        val screen: WorkoutState
+    )
 }

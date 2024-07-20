@@ -1,8 +1,15 @@
 package com.cs346.musclememo.screens
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,15 +40,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.screens.components.MMButton
 import com.cs346.musclememo.screens.components.MMDialog
 import com.cs346.musclememo.screens.components.ExerciseSets
 import com.cs346.musclememo.screens.components.ExerciseTitle
+import com.cs346.musclememo.screens.components.TopAppBar
 import com.cs346.musclememo.screens.components.WorkoutHistoryCard
+import com.cs346.musclememo.screens.components.WorkoutHistorySheet
+import com.cs346.musclememo.screens.components.getTransitionDirection
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 import java.util.Random
 
@@ -49,11 +58,6 @@ import java.util.Random
 fun WorkoutScreen(
     viewModel :WorkoutScreenViewModel
 ) {
-    // TODO Add back later for all workouts
-    LaunchedEffect(Unit){
-        viewModel.getExercises()
-    }
-
     // main screen
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -101,6 +105,155 @@ fun WorkoutScreen(
             viewModel = viewModel
         )
     }
+}
+
+// TODO: switch with WorkoutScreen when changes are ready
+@Composable
+fun NewWorkoutScreen (
+    viewModel :WorkoutScreenViewModel
+){
+    LaunchedEffect(Unit){
+        viewModel.getExercises()
+    }
+
+    BackHandler (viewModel.chooseWorkoutVisible) {
+        viewModel.onBackPressed()
+    }
+
+    // main screen
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+        ) {
+            Text(
+                text = "Workout",
+                fontSize = 40.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            MMButton(
+                onClick = {
+                    viewModel.resetWorkout()
+                    viewModel.setWorkoutScreenVisible(true)
+                },
+                text = "Start A New Workout",
+                maxWidth = true
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "History", fontSize = 24.sp)
+            // DisplayHistory(viewModel)
+        }
+    }
+    newWorkoutSheet(
+        viewModel = viewModel
+    )
+//    WorkoutHistorySheet(
+//        workout = viewModel.currentWorkout,
+//        visible = viewModel.showCurrentWorkout,
+//        onBackPressed = viewModel::onBackPressed
+//    )
+}
+
+@Composable
+fun newWorkoutSheet(
+    viewModel: WorkoutScreenViewModel
+){
+    AnimatedVisibility(
+        visible = viewModel.workoutVisible,
+        enter = slideInHorizontally(initialOffsetX = { it }),
+        exit = slideOutHorizontally(targetOffsetX = { it })
+    ) {
+        AnimatedContent(
+            targetState = viewModel.workoutScreenData,
+            transitionSpec = {
+                val animationSpec: TweenSpec<IntOffset> = tween(300)
+
+                val direction = getTransitionDirection(
+                    initialIndex = initialState.screenIndex,
+                    targetIndex = targetState.screenIndex,
+                )
+
+                slideIntoContainer(
+                    towards = direction,
+                    animationSpec = animationSpec,
+                ) togetherWith slideOutOfContainer(
+                    towards = direction,
+                    animationSpec = animationSpec
+                )
+            },
+            label = "surveyScreenDataAnimation"
+        ) { targetState ->
+            when (targetState.screen){
+                WorkoutScreenViewModel.WorkoutState.NEW_WORKOUT -> {
+                    NewWorkout(viewModel = viewModel)
+                }
+                WorkoutScreenViewModel.WorkoutState.CURRENT_WORKOUT -> {
+                    CurrentWorkout(viewModel = viewModel)
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
+fun NewWorkout(viewModel: WorkoutScreenViewModel){
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colorScheme.background)
+    ){
+        Column (
+            Modifier.fillMaxSize()
+        ){
+            TopAppBar(text = "New Workout") {
+                viewModel.onBackPressed()
+            }
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                MMButton(
+                    onClick = {
+                        viewModel.resetWorkout()
+                        viewModel.setWorkoutScreenVisible(true)
+                    },
+                    text = "Start A New Workout",
+                    maxWidth = true
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Templates",
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    IconButton(onClick = {
+                        // todo: add a new template
+                    }) {
+                        Icon(
+                            Icons.Filled.Add,
+                            contentDescription = "Add",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CurrentWorkout(
+    viewModel: WorkoutScreenViewModel
+){
+    // TODO: add WorkoutSheet contents in here
 }
 
 @Composable

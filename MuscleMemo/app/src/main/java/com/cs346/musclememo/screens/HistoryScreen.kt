@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.classes.Workout
+import com.cs346.musclememo.screens.components.DisplayHistory
 import com.cs346.musclememo.screens.components.WorkoutHistoryCard
 import com.cs346.musclememo.screens.components.WorkoutHistorySheet
 import com.cs346.musclememo.screens.viewmodels.HistoryScreenViewModel
@@ -37,24 +38,12 @@ fun HistoryScreen() {
             viewModel.onBackPressed()
         }
         Text(text = "History", fontSize = 40.sp)
-        Spacer(modifier = Modifier.height(8.dp))
-        val listState = rememberLazyListState()
-        LazyColumn (
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(5.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(items = viewModel.workouts){ workout ->
-                WorkoutHistoryCard(
-                    workout = workout,
-                    onClick = {}
-                    )
-            }
-        }
-        WorkoutHistorySheet(
-            workout = viewModel.currentWorkout,
-            visible = viewModel.showCurrentWorkout,
-            onBackPressed = viewModel::onBackPressed
-        )
+        Spacer(modifier = Modifier.height(20.dp))
+        DisplayHistory(viewModel = viewModel)
     }
+    WorkoutHistorySheet(
+        workout = viewModel.currentWorkout,
+        visible = viewModel.showCurrentWorkout,
+        onBackPressed = viewModel::onBackPressed
+    )
 }

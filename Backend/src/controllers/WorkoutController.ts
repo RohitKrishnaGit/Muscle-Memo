@@ -41,7 +41,7 @@ export class WorkoutController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { name, userId} = request.body;
+        const { name, userId } = request.body;
 
         const workout = Object.assign(new Workout(), {
             name,
@@ -49,7 +49,6 @@ export class WorkoutController {
         });
 
         return success(this.workoutRepository.save(workout));
-
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {

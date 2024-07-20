@@ -250,8 +250,8 @@ export class BaseExercises1719275414952 implements MigrationInterface {
                 ('Wrist Roller', 0, 0, 0),
                 ('Yoga', 1, 0, 0),
                 ('Zercher Squat (Barbell)', 0, 1, 0);
-        `);
-        
+        `
+        );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

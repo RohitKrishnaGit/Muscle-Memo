@@ -98,20 +98,8 @@ fun InputSheet (
         Column (
             modifier = Modifier.fillMaxSize()
         ) {
-            Row (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.1f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                IconButton(
-                    onClick = { setVisible() }
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to previous screen")
-                }
-                Text(text = title)
-                Spacer(modifier = Modifier.size(48.dp))
+            TopAppBar(icon = Icons.AutoMirrored.Filled.ArrowBack, text = title) {
+                setVisible()
             }
             Box(modifier = Modifier
                 .fillMaxSize()

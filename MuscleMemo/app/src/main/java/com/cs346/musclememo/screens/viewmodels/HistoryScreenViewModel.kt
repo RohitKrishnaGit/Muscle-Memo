@@ -18,10 +18,32 @@ import retrofit2.Response
 
 class HistoryScreenViewModel : ViewModel() {
 
-    var user by mutableStateOf<User?>(null)
-
     private val _workouts = mutableStateListOf<Workout>()
     val workouts : List<Workout> = _workouts
+    var currentWorkout: Workout? = null
+        private set
+    var showCurrentWorkout by mutableStateOf(false)
+        private set
+
+    fun updateShowCurrentWorkout(state: Boolean){
+        showCurrentWorkout = state
+    }
+
+    fun updateCurrentWorkout(workout: Workout){
+        currentWorkout = workout
+    }
+
+    fun onBackPressed(){
+        if (showCurrentWorkout) {
+            showCurrentWorkout = false
+            currentWorkout = null
+        }
+    }
+
+    fun convertDate(date: String): String {
+        //TODO: proper conversion
+        return "Saturday, July 20th"
+    }
 
     init {
         getWorkoutsByUserId()

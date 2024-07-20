@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.cs346.musclememo.screens.FindBuddyScreen
 import com.cs346.musclememo.screens.FriendsScreen
 import com.cs346.musclememo.screens.HistoryScreen
 import com.cs346.musclememo.screens.LeaderboardScreen
@@ -54,8 +55,8 @@ fun AppNavHost (
         composable(route = Screen.Workout.route) {
             WorkoutScreen(viewModel = viewModel<WorkoutScreenViewModel>(viewModelStoreOwner))
         }
-        composable(route = Screen.History.route) {
-            HistoryScreen()
+        composable(route = Screen.FindBuddy.route) {
+            FindBuddyScreen()
         }
     }
 }

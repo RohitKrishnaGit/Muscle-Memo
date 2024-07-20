@@ -185,7 +185,7 @@ fun ChooseGender(
     )
 
     Column (
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxWidth()
     ){
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -240,7 +240,7 @@ fun ChooseExperience(
     updateSliderPosition: (Float) -> Unit
 ){
     Column (
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxWidth()
     ){
         Row {
             Slider(

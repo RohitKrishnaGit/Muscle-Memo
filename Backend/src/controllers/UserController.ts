@@ -301,13 +301,15 @@ export class UserController {
         let userToUpdate = await this.userRepository.findOneBy({
             id,
         });
-        if (userToUpdate) {
-            if (username != null) userToUpdate.username = username;
-            if (gender != null) userToUpdate.gender = gender;
-            if (experience != null) userToUpdate.experience = experience;
-            return await success(this.userRepository.save(userToUpdate));
-        }
-        return failure("Update failed");
+        if (!userToUpdate) return failure("Update failed");
+        return success(
+            this.userRepository.save({
+                ...userToUpdate,
+                username,
+                gender,
+                experience,
+            })
+        );
     }
 
     async findEmail(request: Request, response: Response, next: NextFunction) {

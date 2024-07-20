@@ -18,10 +18,21 @@ import retrofit2.Response
 
 class HistoryScreenViewModel : ViewModel() {
 
-    var user by mutableStateOf<User?>(null)
-
     private val _workouts = mutableStateListOf<Workout>()
     val workouts : List<Workout> = _workouts
+    var currentWorkout: Workout? = null
+        private set
+    var showCurrentWorkout: Boolean = false
+        private set
+
+    fun updateShowCurrentWorkout(state: Boolean){
+        showCurrentWorkout = state
+    }
+
+    fun onBackPressed(){
+        if (!showCurrentWorkout)
+            showCurrentWorkout = false
+    }
 
     init {
         getWorkoutsByUserId()

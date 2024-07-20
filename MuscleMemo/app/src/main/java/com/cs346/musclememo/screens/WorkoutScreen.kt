@@ -302,7 +302,7 @@ fun WorkoutSheet(
                     Spacer(modifier = Modifier.weight(1f))
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                WorkoutHistoryCard(workout = viewModel.currentWorkout)
+                WorkoutHistoryCard(workout = viewModel.currentWorkout, onClick = {})
                 Spacer(modifier = Modifier.weight(1f))
                 Row {
                     Spacer(modifier = Modifier.weight(1f))

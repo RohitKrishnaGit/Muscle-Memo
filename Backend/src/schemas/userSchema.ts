@@ -21,11 +21,16 @@ export const loginUserSchema = object({
     }),
 });
 
-export const updateUserParametersSchema = object({
+export const updateUserSchema = object({
     params: object({
         userId: string({
             required_error: "userId is required",
         }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+    body: object({
+        username: string().optional(),
+        gender: string().optional(),
+        experience: string().optional(),
     }),
 });
 

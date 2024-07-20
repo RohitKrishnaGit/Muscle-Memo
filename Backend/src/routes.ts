@@ -44,7 +44,7 @@ import {
     logoutAllUserSchema,
     oneUserSchema,
     removeUserSchema,
-    updateUserParametersSchema,
+    updateUserSchema,
 } from "./schemas/userSchema";
 import {
     allWorkoutSchema,
@@ -152,7 +152,7 @@ export const Routes = [
         route: "/users/update/:userId",
         controller: UserController,
         middleware: [
-            validateSchema(updateUserParametersSchema),
+            validateSchema(updateUserSchema),
             authenticateWithToken,
             ...applyUser(
                 ["params", "userId"],

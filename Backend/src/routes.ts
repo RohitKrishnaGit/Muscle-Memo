@@ -515,4 +515,11 @@ export const Routes = [
         middleware: [authenticateWithToken],
         action: "updateAllowedStatistics",
     },
+    {
+        method: "get",
+        route: "/PR/:id/",
+        controller: UserPRsController,
+        middleware: [authenticateWithToken],
+        action: "getAllUserPRs",
+    },
 ];

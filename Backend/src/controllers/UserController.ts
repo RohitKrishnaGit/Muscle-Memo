@@ -114,6 +114,10 @@ export class UserController {
             return "cannot send friend request to self";
         }
 
+        if (user.outgoingFriendRequests.includes(friend)) {
+            return "friend request already sent to this user"
+        }
+
         user.outgoingFriendRequests = [
             ...(user.outgoingFriendRequests ?? []),
             friend,

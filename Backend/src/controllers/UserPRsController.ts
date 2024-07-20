@@ -8,6 +8,20 @@ import { getNthColumnName } from "../utils/dynamicColumnName";
 export class UserPRsController {
     private userPRsRepository = AppDataSource.getRepository(UserPRs);
 
+    async getAllUserPRs(request: Request, response: Response, next: NextFunction) {
+        const id = parseInt(request.params.id);
+
+        const userPRs = await this.userPRsRepository.findOneBy({
+            id
+        });
+
+        if (!userPRs) {
+            return "unregistered user";
+        }
+
+        return userPRs
+    }
+
     async getUserPR(request: Request, response: Response, next: NextFunction) {
         const id = parseInt(request.params.id);
         const exerciseRefId = parseInt(request.params.exerciseRefId);

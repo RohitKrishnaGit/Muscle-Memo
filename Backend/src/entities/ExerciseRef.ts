@@ -17,9 +17,9 @@ export class ExerciseRef {
     @Column()
     distance: boolean;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true }) //todo: NOT NULLABLE
     description?: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true }) //todo: NOT NULLABLE
     imagePath?: string;
 }

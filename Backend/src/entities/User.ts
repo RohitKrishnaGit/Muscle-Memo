@@ -72,7 +72,7 @@ export class User {
     })
     userPRs: Relation<UserPRs>;
 
-    @OneToOne(() => UserPRs, (UserPRs => UserPRs.user), {
+    @OneToOne(() => AllowedStatistics, (AllowedStatistics => AllowedStatistics.user), {
         cascade: true
     })
     allowedStatistics: Relation<AllowedStatistics>;

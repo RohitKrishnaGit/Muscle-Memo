@@ -16,10 +16,10 @@ export class UserPRsController {
         });
 
         if (!userPRs) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
 
-        return userPRs
+        return success(userPRs);
     }
 
     async getUserPR(request: Request, response: Response, next: NextFunction) {
@@ -31,11 +31,11 @@ export class UserPRsController {
         });
 
         if (!userPRs) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
 
         const colName = await getNthColumnName(exerciseRefId, this.userPRsRepository)
-        return userPRs[colName as keyof UserPRs];
+        return success(userPRs[colName as keyof UserPRs]);
     }
 
     async updateUserPR(request: Request, response: Response, next: NextFunction) {
@@ -48,29 +48,33 @@ export class UserPRsController {
         });
 
         if (!userPRs) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
 
-        const colName = await getNthColumnName(exerciseRefId, this.userPRsRepository)
-        userPRs[colName as keyof UserPRs] = PR
-        return "successful PR update";
+        const colName = await getNthColumnName(exerciseRefId, this.userPRsRepository);
+        userPRs[colName as keyof UserPRs] = PR;
+        return success("successful PR update");
     }
 
     async getTopN(request: Request, response: Response, next: NextFunction) {
         const exerciseRefId = parseInt(request.params.exerciseRefId);
         const count = parseInt(request.params.count);
-
+        const colName = await getNthColumnName(exerciseRefId, this.userPRsRepository)
+        
         const userPRs = await this.userPRsRepository.find({
             take: count,
+            select: {
+                [colName]: true
+            },
             order: {
-                [getNthColumnName(exerciseRefId, this.userPRsRepository).toString()]: "ASC"
-            }
+                [colName]: "DESC"
+            },
         })
 
         if (!userPRs) {
-            return "no user PRs exist";
+            return failure("no user PRs exist");
         }
 
-        return userPRs;
+        return success(userPRs);
     }
 }

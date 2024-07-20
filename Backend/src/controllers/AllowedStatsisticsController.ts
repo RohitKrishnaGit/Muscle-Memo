@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { AllowedStatistics } from "../entities/AllowedStatistics";
 import { failure, success } from "../utils/responseTypes";
-import { User } from "../entities/User";
 import { getNthColumnName } from "../utils/dynamicColumnName";
 
 export class AllowedStatisticsController {
@@ -17,11 +16,11 @@ export class AllowedStatisticsController {
         });
 
         if (!allowedStatistics) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
 
         const colName = await getNthColumnName(exerciseRefId,this.allowedStatisticsRepository)
-        return allowedStatistics[colName as keyof AllowedStatistics];
+        return success(allowedStatistics[colName as keyof AllowedStatistics]);
     }
 
     async updateAllowedStatistics(request: Request, response: Response, next: NextFunction) {
@@ -34,11 +33,18 @@ export class AllowedStatisticsController {
         });
 
         if (!allowedStatistics) {
-            return "unregistered user";
+            return failure("unregistered user");
         }
 
-        const colName = await getNthColumnName(exerciseRefId,this.allowedStatisticsRepository)
-        allowedStatistics[colName as keyof AllowedStatistics] = allowedValue;
-        return "successful PR update";
+        const colName = await getNthColumnName(exerciseRefId,this.allowedStatisticsRepository);
+
+        await this.allowedStatisticsRepository.save({
+            ...allowedStatistics,
+            [colName]: allowedValue
+        });
+
+        //(allowedStatistics as Record<keyof AllowedStatistics,any>)[colName as keyof AllowedStatistics] = allowedValue;
+
+        return success("successful PR update");
     }
 }

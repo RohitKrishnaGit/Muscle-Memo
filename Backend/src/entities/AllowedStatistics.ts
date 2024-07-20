@@ -18,743 +18,743 @@ export class AllowedStatistics {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => User, (user) => user.userPRs)
+    @OneToOne(() => User, (user) => user.allowedStatistics)
     @JoinColumn()
     user: Relation<User>;
 
-    @Column()
-    Ab_Wheel?: number;
+    @Column({ default: false }) 
+    Ab_Wheel: boolean;
 
-    @Column()
-    Aerobics?: number;
+    @Column({ default: false })
+    Aerobics: boolean;
 
-    @Column()
-    Arnold_Press__Dumbbell?: number;
+    @Column({ default: false })
+    Arnold_Press__Dumbbell: boolean;
 
-    @Column()
-    Around_the_World?: number;
+    @Column({ default: false })
+    Around_the_World: boolean;
 
-    @Column()
-    Back_Extension?: number;
+    @Column({ default: false })
+    Back_Extension: boolean;
 
-    @Column()
-    Back_Extension__Machine?: number;
+    @Column({ default: false })
+    Back_Extension__Machine: boolean;
 
-    @Column()
-    Ball_Slams?: number;
+    @Column({ default: false })
+    Ball_Slams: boolean;
 
-    @Column()
-    Battle_Ropes?: number;
+    @Column({ default: false })
+    Battle_Ropes: boolean;
 
-    @Column()
-    Bench_Dip?: number;
+    @Column({ default: false })
+    Bench_Dip: boolean;
 
-    @Column()
-    Bench_Press__Barbell?: number;
+    @Column({ default: false })
+    Bench_Press__Barbell: boolean;
 
-    @Column()
-    Bench_Press__Cable?: number;
+    @Column({ default: false })
+    Bench_Press__Cable: boolean;
 
-    @Column()
-    Bench_Press__Dumbbell?: number;
+    @Column({ default: false })
+    Bench_Press__Dumbbell: boolean;
 
-    @Column()
-    Bench_Press__Smith_Machine?: number;
+    @Column({ default: false })
+    Bench_Press__Smith_Machine: boolean;
 
-    @Column()
-    Bench_Press_Close_Grip__Barbell?: number;
+    @Column({ default: false })
+    Bench_Press_Close_Grip__Barbell: boolean;
 
-    @Column()
-    Bench_Press_Wide_Grip__Barbell?: number;
+    @Column({ default: false })
+    Bench_Press_Wide_Grip__Barbell: boolean;
 
-    @Column()
-    Bent_Over_One_Arm_Row__Dumbbell?: number;
+    @Column({ default: false })
+    Bent_Over_One_Arm_Row__Dumbbell: boolean;
 
-    @Column()
-    Bent_Over_Row__Band?: number;
+    @Column({ default: false })
+    Bent_Over_Row__Band: boolean;
 
-    @Column()
-    Bent_Over_Row__Barbell?: number;
+    @Column({ default: false })
+    Bent_Over_Row__Barbell: boolean;
 
-    @Column()
-    Bent_Over_Row__Dumbbell?: number;
+    @Column({ default: false })
+    Bent_Over_Row__Dumbbell: boolean;
 
-    @Column()
-    Bent_Over_Row_Underhand__Barbell?: number;
+    @Column({ default: false })
+    Bent_Over_Row_Underhand__Barbell: boolean;
 
-    @Column()
-    Bicep_Curl__Barbell?: number;
+    @Column({ default: false })
+    Bicep_Curl__Barbell: boolean;
 
-    @Column()
-    Bicep_Curl__Cable?: number;
+    @Column({ default: false })
+    Bicep_Curl__Cable: boolean;
 
-    @Column()
-    Bicep_Curl__Dumbbell?: number;
+    @Column({ default: false })
+    Bicep_Curl__Dumbbell: boolean;
 
-    @Column()
-    Bicep_Curl__Machine?: number;
+    @Column({ default: false })
+    Bicep_Curl__Machine: boolean;
 
-    @Column()
-    Bicycle_Crunch?: number;
+    @Column({ default: false })
+    Bicycle_Crunch: boolean;
 
-    @Column()
-    Box_Jump?: number;
+    @Column({ default: false })
+    Box_Jump: boolean;
 
-    @Column()
-    Box_Squat?: number;
+    @Column({ default: false })
+    Box_Squat: boolean;
 
-    @Column()
-    Bulgarian_Split_Squat?: number;
+    @Column({ default: false })
+    Bulgarian_Split_Squat: boolean;
 
-    @Column()
-    Burpee?: number;
+    @Column({ default: false })
+    Burpee: boolean;
 
-    @Column()
-    Cable_Crossover?: number;
+    @Column({ default: false })
+    Cable_Crossover: boolean;
 
-    @Column()
-    Cable_Crunch?: number;
+    @Column({ default: false })
+    Cable_Crunch: boolean;
 
-    @Column()
-    Cable_Kickback?: number;
+    @Column({ default: false })
+    Cable_Kickback: boolean;
 
-    @Column()
-    Cable_Pull_Through?: number;
+    @Column({ default: false })
+    Cable_Pull_Through: boolean;
 
-    @Column()
-    Cable_Twist?: number;
+    @Column({ default: false })
+    Cable_Twist: boolean;
 
-    @Column()
-    Calf_Press_on_Leg_Press?: number;
+    @Column({ default: false })
+    Calf_Press_on_Leg_Press: boolean;
 
-    @Column()
-    Calf_Press_on_Seated_Leg_Press?: number;
+    @Column({ default: false })
+    Calf_Press_on_Seated_Leg_Press: boolean;
 
-    @Column()
-    Chest_Dip?: number;
+    @Column({ default: false })
+    Chest_Dip: boolean;
 
-    @Column()
-    Chest_Dip__Assisted?: number;
+    @Column({ default: false })
+    Chest_Dip__Assisted: boolean;
 
-    @Column()
-    Chest_Fly__Band?: number;
+    @Column({ default: false })
+    Chest_Fly__Band: boolean;
 
-    @Column()
-    Chest_Fly__Dumbbell?: number;
+    @Column({ default: false })
+    Chest_Fly__Dumbbell: boolean;
 
-    @Column()
-    Chest_Press__Band?: number;
+    @Column({ default: false })
+    Chest_Press__Band: boolean;
 
-    @Column()
-    Chest_Press__Machine?: number;
+    @Column({ default: false })
+    Chest_Press__Machine: boolean;
 
-    @Column()
-    Chin_Up?: number;
+    @Column({ default: false })
+    Chin_Up: boolean;
 
-    @Column()
-    Chin_up__Assisted?: number;
+    @Column({ default: false })
+    Chin_up__Assisted: boolean;
 
-    @Column()
-    Clean__Barbell?: number;
+    @Column({ default: false })
+    Clean__Barbell: boolean;
 
-    @Column()
-    Clean_and_Jerk__Barbell?: number;
+    @Column({ default: false })
+    Clean_and_Jerk__Barbell: boolean;
 
-    @Column()
-    Climbing?: number;
+    @Column({ default: false })
+    Climbing: boolean;
 
-    @Column()
-    Concentration_Curl__Dumbbell?: number;
+    @Column({ default: false })
+    Concentration_Curl__Dumbbell: boolean;
 
-    @Column()
-    Cross_Body_Crunch?: number;
+    @Column({ default: false })
+    Cross_Body_Crunch: boolean;
 
-    @Column()
-    Crunch?: number;
+    @Column({ default: false })
+    Crunch: boolean;
 
-    @Column()
-    Cycling?: number;
+    @Column({ default: false })
+    Cycling: boolean;
 
-    @Column()
-    Cycling__Indoor?: number;
+    @Column({ default: false })
+    Cycling__Indoor: boolean;
 
-    @Column()
-    Deadlift__Band?: number;
+    @Column({ default: false })
+    Deadlift__Band: boolean;
 
-    @Column()
-    Deadlift__Barbell?: number;
+    @Column({ default: false })
+    Deadlift__Barbell: boolean;
 
-    @Column()
-    Deadlift__Dumbbell?: number;
+    @Column({ default: false })
+    Deadlift__Dumbbell: boolean;
 
-    @Column()
-    Deadlift__Smith_Machine?: number;
+    @Column({ default: false })
+    Deadlift__Smith_Machine: boolean;
 
-    @Column()
-    Deadlift_High_Pull__Barbell?: number;
+    @Column({ default: false })
+    Deadlift_High_Pull__Barbell: boolean;
 
-    @Column()
-    Decline_Bench_Press__Barbell?: number;
+    @Column({ default: false })
+    Decline_Bench_Press__Barbell: boolean;
 
-    @Column()
-    Decline_Bench_Press__Dumbbell?: number;
+    @Column({ default: false })
+    Decline_Bench_Press__Dumbbell: boolean;
 
-    @Column()
-    Decline_Bench_Press__Smith_Machine?: number;
+    @Column({ default: false })
+    Decline_Bench_Press__Smith_Machine: boolean;
 
-    @Column()
-    Decline_Crunch?: number;
+    @Column({ default: false })
+    Decline_Crunch: boolean;
 
-    @Column()
-    Deficit_Deadlift__Barbell?: number;
+    @Column({ default: false })
+    Deficit_Deadlift__Barbell: boolean;
 
-    @Column()
-    Elliptical_Machine?: number;
+    @Column({ default: false })
+    Elliptical_Machine: boolean;
 
-    @Column()
-    Face_Pull__Cable?: number;
+    @Column({ default: false })
+    Face_Pull__Cable: boolean;
 
-    @Column()
-    Flat_Knee_Raise?: number;
+    @Column({ default: false })
+    Flat_Knee_Raise: boolean;
 
-    @Column()
-    Flat_Leg_Raise?: number;
+    @Column({ default: false })
+    Flat_Leg_Raise: boolean;
 
-    @Column()
-    Floor_Press__Barbell?: number;
+    @Column({ default: false })
+    Floor_Press__Barbell: boolean;
 
-    @Column()
-    Front_Raise__Band?: number;
+    @Column({ default: false })
+    Front_Raise__Band: boolean;
 
-    @Column()
-    Front_Raise__Cable?: number;
+    @Column({ default: false })
+    Front_Raise__Cable: boolean;
 
-    @Column()
-    Front_Raise__Dumbbell?: number;
+    @Column({ default: false })
+    Front_Raise__Dumbbell: boolean;
 
-    @Column()
-    Front_Raise__Plate?: number;
+    @Column({ default: false })
+    Front_Raise__Plate: boolean;
 
-    @Column()
-    Front_Squat__Barbell?: number;
+    @Column({ default: false })
+    Front_Squat__Barbell: boolean;
 
-    @Column()
-    Glute_Ham_Raise?: number;
+    @Column({ default: false })
+    Glute_Ham_Raise: boolean;
 
-    @Column()
-    Glute_Kickback__Machine?: number;
+    @Column({ default: false })
+    Glute_Kickback__Machine: boolean;
 
-    @Column()
-    Goblet_Squat__Kettlebell?: number;
+    @Column({ default: false })
+    Goblet_Squat__Kettlebell: boolean;
 
-    @Column()
-    Good_Morning__Barbell?: number;
+    @Column({ default: false })
+    Good_Morning__Barbell: boolean;
 
-    @Column()
-    Hack_Squat?: number;
+    @Column({ default: false })
+    Hack_Squat: boolean;
 
-    @Column()
-    Hack_Sqaut__Barbell?: number;
+    @Column({ default: false })
+    Hack_Sqaut__Barbell: boolean;
 
-    @Column()
-    Hammer_Curl__Band?: number;
+    @Column({ default: false })
+    Hammer_Curl__Band: boolean;
 
-    @Column()
-    Hammer_Curl__Cable?: number;
+    @Column({ default: false })
+    Hammer_Curl__Cable: boolean;
 
-    @Column()
-    Hammer_Curl__Dumbbell?: number;
+    @Column({ default: false })
+    Hammer_Curl__Dumbbell: boolean;
 
-    @Column()
-    Handstand_Push_Up?: number;
+    @Column({ default: false })
+    Handstand_Push_Up: boolean;
 
-    @Column()
-    Hand_Clean__Barbell?: number;
+    @Column({ default: false })
+    Hand_Clean__Barbell: boolean;
 
-    @Column()
-    Hang_Snatch__Barbell?: number;
+    @Column({ default: false })
+    Hang_Snatch__Barbell: boolean;
 
-    @Column()
-    Hanging_Knee_Raise?: number;
+    @Column({ default: false })
+    Hanging_Knee_Raise: boolean;
 
-    @Column()
-    High_Knee_Skips?: number;
+    @Column({ default: false })
+    High_Knee_Skips: boolean;
 
-    @Column()
-    Hiking?: number;
+    @Column({ default: false })
+    Hiking: boolean;
 
-    @Column()
-    Hip_Abductor__Machine?: number;
+    @Column({ default: false })
+    Hip_Abductor__Machine: boolean;
 
-    @Column()
-    Hip_Adductor__Machine?: number;
+    @Column({ default: false })
+    Hip_Adductor__Machine: boolean;
 
-    @Column()
-    Hip_Thrust__Barbell?: number;
+    @Column({ default: false })
+    Hip_Thrust__Barbell: boolean;
 
-    @Column()
-    Hip_Thrust__Bodyweight?: number;
+    @Column({ default: false })
+    Hip_Thrust__Bodyweight: boolean;
 
-    @Column()
-    Incline_Bench_Press__Barbell?: number;
+    @Column({ default: false })
+    Incline_Bench_Press__Barbell: boolean;
 
-    @Column()
-    Incline_Bench_Press__Cable?: number;
+    @Column({ default: false })
+    Incline_Bench_Press__Cable: boolean;
 
-    @Column()
-    Incline_Bench_Press__Dumbbell?: number;
+    @Column({ default: false })
+    Incline_Bench_Press__Dumbbell: boolean;
 
-    @Column()
-    Incline_Bench_Press__Smith_Machine?: number;
+    @Column({ default: false })
+    Incline_Bench_Press__Smith_Machine: boolean;
 
-    @Column()
-    Incline_Chest_Fly__Dumbbell?: number;
+    @Column({ default: false })
+    Incline_Chest_Fly__Dumbbell: boolean;
 
-    @Column()
-    Incline_Chest_Press__Machine?: number;
+    @Column({ default: false })
+    Incline_Chest_Press__Machine: boolean;
 
-    @Column()
-    Incline_Curl__Dumbbell?: number;
+    @Column({ default: false })
+    Incline_Curl__Dumbbell: boolean;
 
-    @Column()
-    Incline_Row__Dumbbell?: number;
+    @Column({ default: false })
+    Incline_Row__Dumbbell: boolean;
 
-    @Column()
-    Inverted_Row__Bodyweight?: number;
+    @Column({ default: false })
+    Inverted_Row__Bodyweight: boolean;
 
-    @Column()
-    Iso_Lateral_Chest_Press__Machine?: number;
+    @Column({ default: false })
+    Iso_Lateral_Chest_Press__Machine: boolean;
 
-    @Column()
-    Iso_Lateral_Row__Machine?: number;
+    @Column({ default: false })
+    Iso_Lateral_Row__Machine: boolean;
 
-    @Column()
-    Jackknife_Sit_Up?: number;
+    @Column({ default: false })
+    Jackknife_Sit_Up: boolean;
 
-    @Column()
-    Jump_Rope?: number;
+    @Column({ default: false })
+    Jump_Rope: boolean;
 
-    @Column()
-    Jump_Shrug__Barbell?: number;
+    @Column({ default: false })
+    Jump_Shrug__Barbell: boolean;
 
-    @Column()
-    Jump_Squat?: number;
+    @Column({ default: false })
+    Jump_Squat: boolean;
 
-    @Column()
-    Jumping_Jack?: number;
+    @Column({ default: false })
+    Jumping_Jack: boolean;
 
-    @Column()
-    Kettlebell_Swing?: number;
+    @Column({ default: false })
+    Kettlebell_Swing: boolean;
 
-    @Column()
-    Kettlebell_Turkish_Get_Up?: number;
+    @Column({ default: false })
+    Kettlebell_Turkish_Get_Up: boolean;
 
-    @Column()
-    Kipping_Pull_Up?: number;
+    @Column({ default: false })
+    Kipping_Pull_Up: boolean;
 
-    @Column()
-    Knee_Raise__Captains_Chair?: number;
+    @Column({ default: false })
+    Knee_Raise__Captains_Chair: boolean;
 
-    @Column()
-    Kneeling_Pulldown__Band?: number;
+    @Column({ default: false })
+    Kneeling_Pulldown__Band: boolean;
 
-    @Column()
-    Knees_to_Elbows?: number;
+    @Column({ default: false })
+    Knees_to_Elbows: boolean;
 
-    @Column()
-    Lat_Pulldown__Cable?: number;
+    @Column({ default: false })
+    Lat_Pulldown__Cable: boolean;
 
-    @Column()
-    Lat_Pulldown__Machine?: number;
+    @Column({ default: false })
+    Lat_Pulldown__Machine: boolean;
 
-    @Column()
-    Lat_Pulldown__Single_Arm?: number;
+    @Column({ default: false })
+    Lat_Pulldown__Single_Arm: boolean;
 
-    @Column()
-    Lat_Pulldown_Underhand__Band?: number;
+    @Column({ default: false })
+    Lat_Pulldown_Underhand__Band: boolean;
 
-    @Column()
-    Lat_Pulldown_Underhand__Cable?: number;
+    @Column({ default: false })
+    Lat_Pulldown_Underhand__Cable: boolean;
 
-    @Column()
-    Lat_Pulldown_Wide_Grip__Cable?: number;
+    @Column({ default: false })
+    Lat_Pulldown_Wide_Grip__Cable: boolean;
 
-    @Column()
-    Lateral_Box_Jump?: number;
+    @Column({ default: false })
+    Lateral_Box_Jump: boolean;
 
-    @Column()
-    Lateral_Raise__Band?: number;
+    @Column({ default: false })
+    Lateral_Raise__Band: boolean;
 
-    @Column()
-    Lateral_Raise__Cable?: number;
+    @Column({ default: false })
+    Lateral_Raise__Cable: boolean;
 
-    @Column()
-    Lateral_Raise__Dumbbell?: number;
+    @Column({ default: false })
+    Lateral_Raise__Dumbbell: boolean;
 
-    @Column()
-    Lateral_Raise__Machine?: number;
+    @Column({ default: false })
+    Lateral_Raise__Machine: boolean;
 
-    @Column()
-    Leg_Extension__Machine?: number;
+    @Column({ default: false })
+    Leg_Extension__Machine: boolean;
 
-    @Column()
-    Leg_Press?: number;
+    @Column({ default: false })
+    Leg_Press: boolean;
 
-    @Column()
-    Lunge__Barbell?: number;
+    @Column({ default: false })
+    Lunge__Barbell: boolean;
 
-    @Column()
-    Lunge__Bodyweight?: number;
+    @Column({ default: false })
+    Lunge__Bodyweight: boolean;
 
-    @Column()
-    Lunge__Dumbbell?: number;
+    @Column({ default: false })
+    Lunge__Dumbbell: boolean;
 
-    @Column()
-    Lying_Leg_Curl__Machine?: number;
+    @Column({ default: false })
+    Lying_Leg_Curl__Machine: boolean;
 
-    @Column()
-    Mountain_CLimber?: number;
+    @Column({ default: false })
+    Mountain_CLimber: boolean;
 
-    @Column()
-    Muscle_Up?: number;
+    @Column({ default: false })
+    Muscle_Up: boolean;
 
-    @Column()
-    Oblique_Crunch?: number;
+    @Column({ default: false })
+    Oblique_Crunch: boolean;
 
-    @Column()
-    Overhead_Press__Barbell?: number;
+    @Column({ default: false })
+    Overhead_Press__Barbell: boolean;
 
-    @Column()
-    Overhead_Press__Cable?: number;
+    @Column({ default: false })
+    Overhead_Press__Cable: boolean;
 
-    @Column()
-    Overhead_Press__Dumbbell?: number;
+    @Column({ default: false })
+    Overhead_Press__Dumbbell: boolean;
 
-    @Column()
-    Overhead_Press__Smith_Machine?: number;
+    @Column({ default: false })
+    Overhead_Press__Smith_Machine: boolean;
 
-    @Column()
-    Overhead_Squat__Barbell?: number;
+    @Column({ default: false })
+    Overhead_Squat__Barbell: boolean;
 
-    @Column()
-    Pec_Deck__Machine?: number;
+    @Column({ default: false })
+    Pec_Deck__Machine: boolean;
 
-    @Column()
-    Pendlay_Row__Barbell?: number;
+    @Column({ default: false })
+    Pendlay_Row__Barbell: boolean;
 
-    @Column()
-    Pistol_Squat?: number;
+    @Column({ default: false })
+    Pistol_Squat: boolean;
 
-    @Column()
-    Plank?: number;
+    @Column({ default: false })
+    Plank: boolean;
 
-    @Column()
-    Power_Clean?: number;
+    @Column({ default: false })
+    Power_Clean: boolean;
 
-    @Column()
-    Power_Snatch__Barbell?: number;
+    @Column({ default: false })
+    Power_Snatch__Barbell: boolean;
 
-    @Column()
-    Preacher_Curl__Barbell?: number;
+    @Column({ default: false })
+    Preacher_Curl__Barbell: boolean;
 
-    @Column()
-    Preacher_Curl__Dumbbell?: number;
+    @Column({ default: false })
+    Preacher_Curl__Dumbbell: boolean;
 
-    @Column()
-    Preacher_Curl__Machine?: number;
+    @Column({ default: false })
+    Preacher_Curl__Machine: boolean;
 
-    @Column()
-    Press_Under__Barbell?: number;
+    @Column({ default: false })
+    Press_Under__Barbell: boolean;
 
-    @Column()
-    Pull_Up?: number;
+    @Column({ default: false })
+    Pull_Up: boolean;
 
-    @Column()
-    Pull_Up__Assisted?: number;
+    @Column({ default: false })
+    Pull_Up__Assisted: boolean;
 
-    @Column()
-    Pull_up__Band?: number;
+    @Column({ default: false })
+    Pull_up__Band: boolean;
 
-    @Column()
-    Pullover__Dumbbell?: number;
+    @Column({ default: false })
+    Pullover__Dumbbell: boolean;
 
-    @Column()
-    Pullover__Machine?: number;
+    @Column({ default: false })
+    Pullover__Machine: boolean;
 
-    @Column()
-    Push_Press?: number;
+    @Column({ default: false })
+    Push_Press: boolean;
 
-    @Column()
-    Push_Up?: number;
+    @Column({ default: false })
+    Push_Up: boolean;
 
-    @Column()
-    Push_Up__Band?: number;
+    @Column({ default: false })
+    Push_Up__Band: boolean;
 
-    @Column()
-    Push_Up__Knees?: number;
+    @Column({ default: false })
+    Push_Up__Knees: boolean;
 
-    @Column()
-    Rack_Pull__Barbell?: number;
+    @Column({ default: false })
+    Rack_Pull__Barbell: boolean;
 
-    @Column()
-    Reverse_Crunch?: number;
+    @Column({ default: false })
+    Reverse_Crunch: boolean;
 
-    @Column()
-    Reverse_Curl__Band?: number;
+    @Column({ default: false })
+    Reverse_Curl__Band: boolean;
 
-    @Column()
-    Reverse_Curl__Barbell?: number;
+    @Column({ default: false })
+    Reverse_Curl__Barbell: boolean;
 
-    @Column()
-    Reverse_Curl__Dumbbell?: number;
+    @Column({ default: false })
+    Reverse_Curl__Dumbbell: boolean;
 
-    @Column()
-    Reverse_Fly__Cable?: number;
+    @Column({ default: false })
+    Reverse_Fly__Cable: boolean;
 
-    @Column()
-    Reverse_Fly__Dumbbell?: number;
+    @Column({ default: false })
+    Reverse_Fly__Dumbbell: boolean;
 
-    @Column()
-    Reverse_Fly__Machine?: number;
+    @Column({ default: false })
+    Reverse_Fly__Machine: boolean;
 
-    @Column()
-    Reverse_Grip_Concentration_Curl__Dumbbell?: number;
+    @Column({ default: false })
+    Reverse_Grip_Concentration_Curl__Dumbbell: boolean;
 
-    @Column()
-    Reverse_Plank?: number;
+    @Column({ default: false })
+    Reverse_Plank: boolean;
 
-    @Column()
-    Romanian_Deadlift__Barbell?: number;
+    @Column({ default: false })
+    Romanian_Deadlift__Barbell: boolean;
 
-    @Column()
-    Romanian_Deadlift__Dumbbell?: number;
+    @Column({ default: false })
+    Romanian_Deadlift__Dumbbell: boolean;
 
-    @Column()
-    Rowing__Machine?: number;
+    @Column({ default: false })
+    Rowing__Machine: boolean;
 
-    @Column()
-    Running?: number;
+    @Column({ default: false })
+    Running: boolean;
 
-    @Column()
-    Running__Treadmill?: number;
+    @Column({ default: false })
+    Running__Treadmill: boolean;
 
-    @Column()
-    Russian_Twist?: number;
+    @Column({ default: false })
+    Russian_Twist: boolean;
 
-    @Column()
-    Seated_Calf_Raise__Machine?: number;
+    @Column({ default: false })
+    Seated_Calf_Raise__Machine: boolean;
 
-    @Column()
-    Seated_Calf_Raise__Plate_Loaded?: number;
+    @Column({ default: false })
+    Seated_Calf_Raise__Plate_Loaded: boolean;
 
-    @Column()
-    Seated_Leg_Curl__Machine?: number;
+    @Column({ default: false })
+    Seated_Leg_Curl__Machine: boolean;
 
-    @Column()
-    Seated_Leg_Press__Machine?: number;
+    @Column({ default: false })
+    Seated_Leg_Press__Machine: boolean;
 
-    @Column()
-    Seated_Oerhead_Press__Barbell?: number;
+    @Column({ default: false })
+    Seated_Oerhead_Press__Barbell: boolean;
 
-    @Column()
-    Seated_Overhead_Press__Dumbbell?: number;
+    @Column({ default: false })
+    Seated_Overhead_Press__Dumbbell: boolean;
 
-    @Column()
-    Seated_Palms_Up_Wrist_Curl__Dumbbell?: number;
+    @Column({ default: false })
+    Seated_Palms_Up_Wrist_Curl__Dumbbell: boolean;
 
-    @Column()
-    Seated_Row__Cable?: number;
+    @Column({ default: false })
+    Seated_Row__Cable: boolean;
 
-    @Column()
-    Seated_Row__Machine?: number;
+    @Column({ default: false })
+    Seated_Row__Machine: boolean;
 
-    @Column()
-    Shoulder_Press__Plate_Loaded?: number;
+    @Column({ default: false })
+    Shoulder_Press__Plate_Loaded: boolean;
 
-    @Column()
-    Shrug__Barbell?: number;
+    @Column({ default: false })
+    Shrug__Barbell: boolean;
 
-    @Column()
-    Shrug__Dumbbell?: number;
+    @Column({ default: false })
+    Shrug__Dumbbell: boolean;
 
-    @Column()
-    Shrug__Machine?: number;
+    @Column({ default: false })
+    Shrug__Machine: boolean;
 
-    @Column()
-    Shrug__Smith_Machine?: number;
+    @Column({ default: false })
+    Shrug__Smith_Machine: boolean;
 
-    @Column()
-    Side_Bend__Band?: number;
+    @Column({ default: false })
+    Side_Bend__Band: boolean;
 
-    @Column()
-    Side_Bend__Cable?: number;
+    @Column({ default: false })
+    Side_Bend__Cable: boolean;
 
-    @Column()
-    Side_Plank?: number;
+    @Column({ default: false })
+    Side_Plank: boolean;
 
-    @Column()
-    Single_Leg_Bridge?: number;
+    @Column({ default: false })
+    Single_Leg_Bridge: boolean;
 
-    @Column()
-    Sit_Up?: number;
+    @Column({ default: false })
+    Sit_Up: boolean;
 
-    @Column()
-    Skating?: number;
+    @Column({ default: false })
+    Skating: boolean;
 
-    @Column()
-    Skiing?: number;
+    @Column({ default: false })
+    Skiing: boolean;
 
-    @Column()
-    Skullcrusher__Dumbbell?: number;
+    @Column({ default: false })
+    Skullcrusher__Dumbbell: boolean;
 
-    @Column()
-    Skullcrusher__Barbell?: number;
+    @Column({ default: false })
+    Skullcrusher__Barbell: boolean;
 
-    @Column()
-    Snatch__Barbell?: number;
+    @Column({ default: false })
+    Snatch__Barbell: boolean;
 
-    @Column()
-    Snatch_Pull__Barbell?: number;
+    @Column({ default: false })
+    Snatch_Pull__Barbell: boolean;
 
-    @Column()
-    Snowboarding?: number;
+    @Column({ default: false })
+    Snowboarding: boolean;
 
-    @Column()
-    Split_Jerk__Barbell?: number;
+    @Column({ default: false })
+    Split_Jerk__Barbell: boolean;
 
-    @Column()
-    Squat__Band?: number;
+    @Column({ default: false })
+    Squat__Band: boolean;
 
-    @Column()
-    Squat__Barbell?: number;
+    @Column({ default: false })
+    Squat__Barbell: boolean;
 
-    @Column()
-    Squat__Bodyweight?: number;
+    @Column({ default: false })
+    Squat__Bodyweight: boolean;
 
-    @Column()
-    Squat__Dumbbell?: number;
+    @Column({ default: false })
+    Squat__Dumbbell: boolean;
 
-    @Column()
-    Squat__Machine?: number;
+    @Column({ default: false })
+    Squat__Machine: boolean;
 
-    @Column()
-    Squat__Smith_Machine?: number;
+    @Column({ default: false })
+    Squat__Smith_Machine: boolean;
 
-    @Column()
-    Squat_Row__Band?: number;
+    @Column({ default: false })
+    Squat_Row__Band: boolean;
 
-    @Column()
-    Standing_Calf_Raise__Barbell?: number;
+    @Column({ default: false })
+    Standing_Calf_Raise__Barbell: boolean;
 
-    @Column()
-    Standing_Calf_Raise__Bodyweight?: number;
+    @Column({ default: false })
+    Standing_Calf_Raise__Bodyweight: boolean;
 
-    @Column()
-    Standing_Calf_Raise__Dumbbell?: number;
+    @Column({ default: false })
+    Standing_Calf_Raise__Dumbbell: boolean;
 
-    @Column()
-    Standing_Calf_Raise__Machine?: number;
+    @Column({ default: false })
+    Standing_Calf_Raise__Machine: boolean;
 
-    @Column()
-    Standing_Calf_Raise__Smith_Machine?: number;
+    @Column({ default: false })
+    Standing_Calf_Raise__Smith_Machine: boolean;
 
-    @Column()
-    Step_up?: number;
+    @Column({ default: false })
+    Step_up: boolean;
 
-    @Column()
-    Stiff_Leg_Deadlift__Barbell?: number;
+    @Column({ default: false })
+    Stiff_Leg_Deadlift__Barbell: boolean;
 
-    @Column()
-    Stiff_Leg_Deadlift__Dumbbell?: number;
+    @Column({ default: false })
+    Stiff_Leg_Deadlift__Dumbbell: boolean;
 
-    @Column()
-    Straight_Leg_Deadlift__Band?: number;
+    @Column({ default: false })
+    Straight_Leg_Deadlift__Band: boolean;
 
-    @Column()
-    Stretching?: number;
+    @Column({ default: false })
+    Stretching: boolean;
 
-    @Column()
-    Strict_Military_Press__Barbell?: number;
+    @Column({ default: false })
+    Strict_Military_Press__Barbell: boolean;
 
-    @Column()
-    Sumo_Deadlift__Barbell?: number;
+    @Column({ default: false })
+    Sumo_Deadlift__Barbell: boolean;
 
-    @Column()
-    Sumo_Deadlift_High_Pull__Barbell?: number;
+    @Column({ default: false })
+    Sumo_Deadlift_High_Pull__Barbell: boolean;
 
-    @Column()
-    Superman?: number;
+    @Column({ default: false })
+    Superman: boolean;
 
-    @Column()
-    Swimming?: number;
+    @Column({ default: false })
+    Swimming: boolean;
 
-    @Column()
-    T_Bar_Row?: number;
+    @Column({ default: false })
+    T_Bar_Row: boolean;
 
-    @Column()
-    Thurster__Barbell?: number;
+    @Column({ default: false })
+    Thurster__Barbell: boolean;
 
-    @Column()
-    Thruster__Kettlebell?: number;
+    @Column({ default: false })
+    Thruster__Kettlebell: boolean;
 
-    @Column()
-    Toes_To_Bar?: number;
+    @Column({ default: false })
+    Toes_To_Bar: boolean;
 
-    @Column()
-    Torso_Rotation__Machine?: number;
+    @Column({ default: false })
+    Torso_Rotation__Machine: boolean;
 
-    @Column()
-    Trap_Bar_Deadlift?: number;
+    @Column({ default: false })
+    Trap_Bar_Deadlift: boolean;
 
-    @Column()
-    Triceps_Dip?: number;
+    @Column({ default: false })
+    Triceps_Dip: boolean;
 
-    @Column()
-    Triceps_Dip__Assisted?: number;
+    @Column({ default: false })
+    Triceps_Dip__Assisted: boolean;
 
-    @Column()
-    Triceps_Extension?: number;
+    @Column({ default: false })
+    Triceps_Extension: boolean;
 
-    @Column()
-    Triceps_Extension__Barbell?: number;
+    @Column({ default: false })
+    Triceps_Extension__Barbell: boolean;
 
-    @Column()
-    Triceps_Extension__Cable?: number;
+    @Column({ default: false })
+    Triceps_Extension__Cable: boolean;
 
-    @Column()
-    Triceps_Extension__Dumbbell?: number;
+    @Column({ default: false })
+    Triceps_Extension__Dumbbell: boolean;
 
-    @Column()
-    Triceps_Extension__Machine?: number;
+    @Column({ default: false })
+    Triceps_Extension__Machine: boolean;
 
-    @Column()
-    Triceps_Pushdown__Cable__Straight_Bar?: number;
+    @Column({ default: false })
+    Triceps_Pushdown__Cable__Straight_Bar: boolean;
 
-    @Column()
-    Upright_Row__Barbell?: number;
+    @Column({ default: false })
+    Upright_Row__Barbell: boolean;
 
-    @Column()
-    Uprgith_Row__Cable?: number;
+    @Column({ default: false })
+    Uprgith_Row__Cable: boolean;
 
-    @Column()
-    Upright_Row__Dumbbell?: number;
+    @Column({ default: false })
+    Upright_Row__Dumbbell: boolean;
 
-    @Column()
-    V_up?: number;
+    @Column({ default: false })
+    V_up: boolean;
 
-    @Column()
-    Walking?: number;
+    @Column({ default: false })
+    Walking: boolean;
 
-    @Column()
-    Wide_Pull_Up?: number;
+    @Column({ default: false })
+    Wide_Pull_Up: boolean;
 
-    @Column()
-    Wrist_Roller?: number;
+    @Column({ default: false })
+    Wrist_Roller: boolean;
 
-    @Column()
-    Yoga?: number;
+    @Column({ default: false })
+    Yoga: boolean;
 
-    @Column()
-    Zercher_Squat__Barbell?: number;
+    @Column({ default: false })
+    Zercher_Squat__Barbell: boolean;
 
 }

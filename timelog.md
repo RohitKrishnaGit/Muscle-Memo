@@ -36,3 +36,4 @@
 | 7/16/24 |         |            |          |            | 1         |        | Update login screen, fix bug with returning to login screen |
 | 7/16/24 |         |            |          |            | 1         |        | Allow for multiple devices to log in, do some QOL changes   |
 | 7/16/24 | 5       |            |          |            |           |        | Update Users and add endpoints for gender and experience    |
+| 7/12/24 | 3       | 3          | 3        | 3          | 3         | 3      | Work on deliverable 4                                       |

@@ -5,6 +5,6 @@ sealed class Screen (val route: String){
     object Workout : Screen(route = "workout")
     object Leaderboard : Screen(route = "leaderboard")
     object Profile : Screen(route = "profile")
-    object History : Screen(route = "history")
+    object FindBuddy : Screen(route = "findBuddy")
     object Friends : Screen(route = "friend")
 }

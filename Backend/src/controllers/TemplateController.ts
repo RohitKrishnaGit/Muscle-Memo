@@ -29,7 +29,7 @@ export class TemplateController {
         if (!template) {
             return failure("this template does not exist");
         }
-        return template;
+        return success(template);
     }
 
     async create(request: Request, response: Response, next: NextFunction) {

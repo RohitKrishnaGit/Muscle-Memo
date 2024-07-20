@@ -26,9 +26,6 @@ export class User {
     username: string;
 
     @Column()
-    fullName: string;
-
-    @Column()
     email: string;
 
     @Column({ select: false })

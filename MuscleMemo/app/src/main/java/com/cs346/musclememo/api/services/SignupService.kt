@@ -8,10 +8,11 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 data class SignupRequest (
-    var username: String,
-    var password: String,
-    var email: String,
-    var fullName: String
+    val username: String,
+    val password: String,
+    val email: String,
+    val gender: String,
+    val experience: String,
 )
 
 

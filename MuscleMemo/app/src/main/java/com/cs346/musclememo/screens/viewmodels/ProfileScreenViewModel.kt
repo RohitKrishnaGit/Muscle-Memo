@@ -10,6 +10,8 @@ import com.cs346.musclememo.api.RetrofitInstance
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.utils.AppPreferences
+import com.cs346.musclememo.utils.Conversions.experienceToSlider
+import com.cs346.musclememo.utils.Conversions.sliderToExperience
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -42,24 +44,6 @@ class ProfileScreenViewModel : ViewModel() {
     var editEnabled by mutableStateOf(false)
         private set
 
-    private fun getExperience(value: Float): String{
-        return if (value == 1.0f)
-            "Professional"
-        else if (value == 0.5f)
-            "Intermediate"
-        else
-            "Novice"
-    }
-
-    fun getSliderPos(experience: String): Float {
-        return if (experience == "Professional")
-            1.0f
-        else if (experience == "Intermediate")
-            0.5f
-        else
-            0.0f
-    }
-
     private fun customGender(): String{
         if (user.gender != "Male" && user.gender != "Female" && user.gender != "Rather Not Say")
             return "Custom"
@@ -72,7 +56,7 @@ class ProfileScreenViewModel : ViewModel() {
         newGender = customGender()
         newCustomGender = if (customGender() == "Custom") user.gender else ""
         newProfilePicture = user.profilePicture
-        newExperience = getSliderPos(user.experience)
+        newExperience = experienceToSlider(user.experience)
     }
 
     fun getNewUser(): User {
@@ -83,7 +67,7 @@ class ProfileScreenViewModel : ViewModel() {
             workouts = user.workouts,
             profilePicture = newProfilePicture,
             gender = if (newGender == "Custom") newCustomGender else newGender,
-            experience = getExperience(newExperience)
+            experience = sliderToExperience(newExperience)
         )
     }
 

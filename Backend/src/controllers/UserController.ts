@@ -256,8 +256,7 @@ export class UserController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { username, fullName, email, password, gender, experience } =
-            request.body;
+        const { username, email, password, gender, experience } = request.body;
 
         const userExists = !!(await this.userRepository.findOneBy({ email }));
 
@@ -267,7 +266,6 @@ export class UserController {
 
         const user = Object.assign(new User(), {
             username,
-            fullName,
             email,
             password: await generatePasswordHash(password),
             gender,

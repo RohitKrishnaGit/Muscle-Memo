@@ -15,6 +15,21 @@ export class CustomExerciseRef {
     @Column()
     name: string;
 
+    @Column()
+    durationVSReps: boolean;
+
+    @Column()
+    weight: boolean;
+
+    @Column()
+    distance: boolean;
+
+    @Column({ nullable: true })
+    description?: string;
+
+    @Column({ nullable: true })
+    imagePath?: string;
+
     @ManyToOne(() => User, (user) => user)
     user: Relation<User>;
 }

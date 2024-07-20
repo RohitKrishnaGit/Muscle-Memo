@@ -1,4 +1,4 @@
-import { number, object, string } from "zod";
+import { boolean, object, string } from "zod";
 
 export const allCustomExerciseRefSchema = object({
     params: object({
@@ -24,11 +24,49 @@ export const createCustomExerciseRefSchema = object({
         name: string({
             required_error: "name is required",
         }),
-        userId: number({
+        durationVSReps: boolean({
+            required_error: "durationVSReps is required",
+        }),
+        weight: boolean({
+            required_error: "weight is required",
+        }),
+        distance: boolean({
+            required_error: "distance is required",
+        }),
+        description: string().optional(),
+        imagePath: string().optional(),
+    }),
+    params: object({
+        userId: string({
             required_error: "userId is required",
-        }).or(
-            string().regex(/^me$/, "userId should be either numerical or me")
-        ),
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+});
+
+export const updateCustomExerciseRefSchema = object({
+    body: object({
+        name: string({
+            required_error: "name is required",
+        }),
+        durationVSReps: boolean({
+            required_error: "durationVSReps is required",
+        }),
+        weight: boolean({
+            required_error: "weight is required",
+        }),
+        distance: boolean({
+            required_error: "distance is required",
+        }),
+        description: string().optional(),
+        imagePath: string().optional(),
+    }),
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+        id: string({
+            required_error: "id is required",
+        }).regex(/^\d+$/, "id should be numerical"),
     }),
 });
 

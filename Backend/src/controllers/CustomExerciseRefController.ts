@@ -35,15 +35,58 @@ export class CustomExerciseRefController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { name, userId } = request.body;
+        const userId = parseInt(request.params.userId);
+        const {
+            name,
+            durationVSReps,
+            weight,
+            distance,
+            description,
+            imagePath,
+        } = request.body;
 
         const customExerciseRef = Object.assign(new CustomExerciseRef(), {
             name,
+            durationVSReps,
+            weight,
+            distance,
+            description,
+            imagePath,
             user: { id: userId } as User,
         });
 
         return success(
             this.customExerciseRefRepository.save(customExerciseRef)
+        );
+    }
+
+    async update(request: Request, response: Response, next: NextFunction) {
+        const id = parseInt(request.params.id);
+        const userId = parseInt(request.params.userId);
+        const {
+            name,
+            durationVSReps,
+            weight,
+            distance,
+            description,
+            imagePath,
+        } = request.body;
+
+        const prevCustomExerciseRef =
+            await this.customExerciseRefRepository.findOne({
+                where: { id, user: { id: userId } },
+            });
+
+        return success(
+            this.customExerciseRefRepository.save({
+                ...prevCustomExerciseRef,
+                name,
+                durationVSReps,
+                weight,
+                distance,
+                description,
+                imagePath,
+            })
         );
     }
 

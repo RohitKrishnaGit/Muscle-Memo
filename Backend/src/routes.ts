@@ -19,6 +19,7 @@ import {
     createCustomExerciseRefSchema,
     oneCustomExerciseRefSchema,
     removeCustomExerciseRefSchema,
+    updateCustomExerciseRefSchema,
 } from "./schemas/customExerciseSchema";
 import {
     allExerciseRefSchema,
@@ -240,18 +241,33 @@ export const Routes = [
     },
     {
         method: "post",
-        route: "/customExerciseRefs",
+        route: "/customExerciseRefs/:userId",
         controller: CustomExerciseRefController,
         middleware: [
             validateSchema(createCustomExerciseRefSchema),
             authenticateWithToken,
             ...applyUser(
-                ["body", "userId"],
+                ["params", "userId"],
                 convertMe,
                 enforce(or(sameUser, isAdmin))
             ),
         ],
         action: "create",
+    },
+    {
+        method: "put",
+        route: "/customExerciseRefs/:userId/:id",
+        controller: CustomExerciseRefController,
+        middleware: [
+            validateSchema(updateCustomExerciseRefSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "update",
     },
     {
         method: "delete",

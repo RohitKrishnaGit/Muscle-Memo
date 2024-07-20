@@ -28,10 +28,11 @@ AppDataSource.initialize()
 
         const user = Object.assign(new User(), {
             username,
-            fullName: "admin",
             email,
             password: await generatePasswordHash(password),
             role: Role.ADMIN,
+            gender: "admin",
+            experience: "admin",
         });
 
         await userRepository.save(user);

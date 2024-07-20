@@ -9,13 +9,13 @@ export class ExerciseRef {
     name: string;
 
     @Column()
-    durationVSReps: number;
+    durationVSReps: boolean;
 
     @Column()
-    weight: number;
+    weight: boolean;
 
     @Column()
-    distance: number;
+    distance: boolean;
 
     @Column({ nullable: true })
     description?: string;

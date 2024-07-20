@@ -21,7 +21,7 @@ export const loginUserSchema = object({
     }),
 });
 
-export const updateUserParametersSchema =  object({
+export const updateUserParametersSchema = object({
     params: object({
         userId: string({
             required_error: "userId is required",

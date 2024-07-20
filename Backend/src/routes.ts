@@ -167,7 +167,7 @@ export const Routes = [
         method: "get",
         route: "/users/email/:email",
         controller: UserController,
-        middleware: [validateSchema(allUserSchema),],
+        middleware: [validateSchema(allUserSchema)],
         action: "findEmail",
     },
 

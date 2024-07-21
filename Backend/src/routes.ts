@@ -1,6 +1,5 @@
-
-import { CombinedExerciseRefController } from "./controllers/CombinedExerciseRefController";
 import { AllowedStatisticsController } from "./controllers/AllowedStatsisticsController";
+import { CombinedExerciseRefController } from "./controllers/CombinedExerciseRefController";
 import { CustomExerciseRefController } from "./controllers/CustomExerciseRefController";
 import { ExerciseController } from "./controllers/ExerciseController";
 import { ExerciseRefController } from "./controllers/ExerciseRefController";
@@ -8,8 +7,8 @@ import { NotificationController } from "./controllers/NotificationController";
 import { TemplateController } from "./controllers/TemplateController";
 import { TokenController } from "./controllers/TokenController";
 import { UserController } from "./controllers/UserController";
-import { WorkoutController } from "./controllers/WorkoutController";
 import { UserPrsController } from "./controllers/UserPRsController";
+import { WorkoutController } from "./controllers/WorkoutController";
 import {
     applyUser,
     authenticateWithToken,
@@ -38,6 +37,15 @@ import {
     removeExerciseSchema,
 } from "./schemas/exerciseSchema";
 import {
+    getAllPrSchema,
+    getPrSchema,
+    getPrVisibilitySchema,
+    leaderboardFriendsSchema,
+    leaderboardSchema,
+    postPrSchema,
+    postPrVisibilitySchema,
+} from "./schemas/leaderboardPRSchema";
+import {
     allTemplateSchema,
     createTemplateSchema,
     oneTemplateSchema,
@@ -56,8 +64,8 @@ import {
     oneUserSchema,
     outgoingFriendReqSchema,
     removeUserSchema,
-    updateUserFirebaseTokenSchema,
     sendFriendReqSchema,
+    updateUserFirebaseTokenSchema,
     updateUserSchema,
 } from "./schemas/userSchema";
 import {
@@ -66,11 +74,6 @@ import {
     oneWorkoutSchema,
     removeWorkoutSchema,
 } from "./schemas/workoutSchema";
-import {
-    getAllPrSchema,
-    getPrSchema, getPrVisibilitySchema, leaderboardFriendsSchema, leaderboardSchema, postPrSchema,
-    postPrVisibilitySchema
-} from "./schemas/leaderboardPRSchema";
 
 export const Routes = [
     /* User routes */
@@ -254,7 +257,7 @@ export const Routes = [
                 enforce(or(sameUser, isAdmin))
             ),
         ],
-        action: "updateFirebaseToken"
+        action: "updateFirebaseToken",
     },
 
     /* exerciseRef routes */
@@ -577,18 +580,14 @@ export const Routes = [
         method: "get",
         route: "/leaderboard/:exerciseRefId/:count",
         controller: UserPrsController,
-        middleware: [
-            validateSchema(leaderboardSchema),
-        ],
+        middleware: [validateSchema(leaderboardSchema)],
         action: "getTopN",
     },
     {
         method: "get",
         route: "/leaderboard/:userId/:exerciseRefId/:count",
         controller: UserPrsController,
-        middleware: [
-            validateSchema(leaderboardFriendsSchema),
-        ],
+        middleware: [validateSchema(leaderboardFriendsSchema)],
         action: "getTopNFriends",
     },
     {
@@ -644,6 +643,5 @@ export const Routes = [
         controller: NotificationController,
         middleware: [],
         action: "notification",
-    }
-
+    },
 ];

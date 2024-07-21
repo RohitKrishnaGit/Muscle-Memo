@@ -1,10 +1,10 @@
-import { Auth, google } from "googleapis";
+import { OAuth2Client } from "google-auth-library";
 import { createTransport } from "nodemailer";
 
-let creds: Auth.OAuth2Client;
+let creds: OAuth2Client;
 
 export const initEmailService = () => {
-    creds = new google.auth.OAuth2(
+    creds = new OAuth2Client(
         process.env.G_CLIENT_ID,
         process.env.G_CLIENT_SECRET,
         process.env.G_REDIRECT_URI

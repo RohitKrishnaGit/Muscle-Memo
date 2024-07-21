@@ -178,6 +178,53 @@ export class UserController {
         return success("friend request accept successs");
     }
 
+    async rejectFriendRequest(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
+        const userId = parseInt(request.params.userId);
+        const { friendId } = request.body;
+
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+            relations: {
+                friends: true,
+            },
+        });
+
+        const friend = await this.userRepository.findOne({
+            where: { id: friendId },
+            relations: {
+                outgoingFriendRequests: true,
+                friends: true,
+            },
+        });
+
+        if (!user) {
+            return failure("unregistered user");
+        }
+        if (!friend) {
+            return failure("target user does not exist");
+        }
+
+        const len = friend.outgoingFriendRequests.length;
+        friend.outgoingFriendRequests = friend.outgoingFriendRequests?.filter(
+            (friendReq) => {
+                return friendReq.id !== user.id;
+            }
+        );
+
+        if (friend.outgoingFriendRequests.length === len) {
+            return failure("this friend request does not exist");
+        }
+
+        await this.userRepository.save(user);
+        await this.userRepository.save(friend);
+
+        return success("friend request accept successs");
+    }
+
     async removeFriend(
         request: Request,
         response: Response,
@@ -208,13 +255,13 @@ export class UserController {
         }
 
         const len1 = user.friends.length;
-        user.friends = user.friends?.filter((friend) => {
-            return friend.id !== user.id;
+        user.friends = user.friends?.filter((userFriend) => {
+            return userFriend.id !== friendId;
         });
 
         const len2 = friend.friends.length;
-        friend.friends = friend.friends?.filter((friend) => {
-            return friend.id !== user.id;
+        friend.friends = friend.friends?.filter((friendFriend) => {
+            return friendFriend.id !== userId;
         });
 
         if (user.friends.length === len1 || friend.friends.length === len2) {

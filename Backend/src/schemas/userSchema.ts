@@ -60,6 +60,32 @@ export const acceptFriendReqSchema = object({
     }),
 });
 
+export const rejectFriendReqSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+    body: object({
+        friendId: number({
+            required_error: "friendId is required",
+        }),
+    }),
+});
+
+export const removeFriendSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+    body: object({
+        friendId: number({
+            required_error: "friendId is required",
+        }),
+    }),
+});
+
 export const loginUserSchema = object({
     body: object({
         email: string({

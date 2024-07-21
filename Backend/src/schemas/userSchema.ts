@@ -34,6 +34,37 @@ export const updateUserSchema = object({
     }),
 });
 
+export const updateUserFirebaseTokenSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+    body: object({
+        firebaseTokens: string({
+            required_error: "token is required",
+        }),
+    }),
+});
+
+
+export const logoutSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+    body: object({
+        firebaseTokens: string({
+            required_error: "firebsae token is required",
+        }),
+        refreshToken: string({
+            required_error: "refresh token is required",
+        }),
+    }),
+});
+
+
 export const logoutAllUserSchema = object({});
 
 export const createUserSchema = object({

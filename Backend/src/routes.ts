@@ -4,6 +4,7 @@ import { AllowedStatisticsController } from "./controllers/AllowedStatsisticsCon
 import { CustomExerciseRefController } from "./controllers/CustomExerciseRefController";
 import { ExerciseController } from "./controllers/ExerciseController";
 import { ExerciseRefController } from "./controllers/ExerciseRefController";
+import { NotificationController } from "./controllers/NotificationController";
 import { TemplateController } from "./controllers/TemplateController";
 import { TokenController } from "./controllers/TokenController";
 import { UserController } from "./controllers/UserController";
@@ -49,8 +50,10 @@ import {
     createUserSchema,
     loginUserSchema,
     logoutAllUserSchema,
+    logoutSchema,
     oneUserSchema,
     removeUserSchema,
+    updateUserFirebaseTokenSchema,
     updateUserSchema,
 } from "./schemas/userSchema";
 import {
@@ -68,6 +71,21 @@ export const Routes = [
         controller: UserController,
         middleware: [validateSchema(loginUserSchema)],
         action: "login",
+    },
+    {
+        method: "delete",
+        route: "/users/logout/:userId",
+        controller: UserController,
+        middleware: [
+            validateSchema(logoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "logout",
     },
     {
         method: "delete",
@@ -176,6 +194,22 @@ export const Routes = [
         controller: UserController,
         middleware: [validateSchema(allUserSchema)],
         action: "findEmail",
+    },
+
+    {
+        method: "put",
+        route: "/users/update/firebase/:userId",
+        controller: UserController,
+        middleware: [
+            validateSchema(updateUserFirebaseTokenSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "updateFirebaseToken"
     },
 
     /* exerciseRef routes */
@@ -479,6 +513,7 @@ export const Routes = [
         action: "newToken",
     },
 
+<<<<<<< HEAD
     /* PR & leaderboard routes */
     {
         method: "get",
@@ -522,4 +557,14 @@ export const Routes = [
         middleware: [authenticateWithToken],
         action: "getAllUserPRs",
     },
+=======
+    /* Notification Controller */
+    {
+        method: "post",
+        route: "/notification",
+        controller: NotificationController,
+        middleware: [],
+        action: "notification",
+    }
+>>>>>>> 725ef79 (WIP push notifs)
 ];

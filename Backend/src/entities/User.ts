@@ -40,6 +40,9 @@ export class User {
     @Column()
     experience: string;
 
+    @Column()
+    firebaseTokens: string;
+
     @ManyToMany(() => User, (user) => user.outgoingFriendRequests)
     incomingFriendRequests: Relation<User[]>;
 

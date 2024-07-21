@@ -36,4 +36,6 @@
 | 7/16/24 |         |            |          |            | 1         |        | Update login screen, fix bug with returning to login screen |
 | 7/16/24 |         |            |          |            | 1         |        | Allow for multiple devices to log in, do some QOL changes   |
 | 7/16/24 | 5       |            |          |            |           |        | Update Users and add endpoints for gender and experience    |
-| 7/12/24 | 3       | 3          | 3        | 3          | 3         | 3      | Work on deliverable 4                                       |
+| 7/17/24 | 3       | 3          | 3        | 3          | 3         | 3      | Work on deliverable 5                                       |
+| 7/20/24 |         |            |          |            | 7         |        | Assist Rohit and Eric with descriptions and push notifs     |
+| 7/21/24 |         |            |          |            | 3         |        | Use google gmail to send emails                             |

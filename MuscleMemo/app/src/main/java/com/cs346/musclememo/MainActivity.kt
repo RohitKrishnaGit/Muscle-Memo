@@ -141,6 +141,7 @@ fun MainScreen() {
     }
 }
 
+private
 
 @Preview(showBackground = true)
 @Composable

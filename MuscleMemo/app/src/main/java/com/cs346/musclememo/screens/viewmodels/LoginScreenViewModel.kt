@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import com.cs346.musclememo.api.RetrofitInstance
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.api.services.FirebaseToken
+import com.cs346.musclememo.api.services.ImageUploadService
 import com.cs346.musclememo.utils.AppPreferences
 import com.cs346.musclememo.api.services.LoginRequest
 import com.cs346.musclememo.api.services.LoginResponse
@@ -17,9 +18,11 @@ import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.screens.services.SignupRequest
 import com.cs346.musclememo.utils.Conversions.sliderToExperience
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.storage.FirebaseStorage
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.UUID
 
 
 class LoginScreenViewModel : ViewModel() {
@@ -72,6 +75,12 @@ class LoginScreenViewModel : ViewModel() {
 
     fun updateProfilePicture(uri: Uri?) {
         profilePicture = uri
+        if (profilePicture != null){
+            var imageUploader = ImageUploadService()
+            imageUploader.uploadImage(profilePicture!!)
+        }
+
+
     }
 
     fun updateSliderPosition(pos: Float) {
@@ -242,7 +251,7 @@ class LoginScreenViewModel : ViewModel() {
                 password,
                 email,
                 if (gender === "Custom") customGender else gender,
-                sliderToExperience(sliderPosition)
+                sliderToExperience(sliderPosition),
             )
         ).enqueue(object :
             Callback<ApiResponse<String>> {

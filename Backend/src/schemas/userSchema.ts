@@ -107,6 +107,7 @@ export const updateUserSchema = object({
         username: string().optional(),
         gender: string().optional(),
         experience: string().optional(),
+        profilePicture: string().optional(),
     }),
 });
 

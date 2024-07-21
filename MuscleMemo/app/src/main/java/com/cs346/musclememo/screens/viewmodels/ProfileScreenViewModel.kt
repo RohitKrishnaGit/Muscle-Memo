@@ -30,7 +30,7 @@ class ProfileScreenViewModel : ViewModel() {
     val listOfTheme = listOf("Auto", "Dark", "Light")
     var showThemeOptions by mutableStateOf(false)
         private set
-    var newProfilePicture by mutableStateOf<Uri?>(null)
+    var newProfilePicture by mutableStateOf<String?>(null)
         private set
     var newUsername by mutableStateOf("")
         private set
@@ -101,7 +101,8 @@ class ProfileScreenViewModel : ViewModel() {
     }
 
     fun updateNewProfilePicture (uri: Uri?){
-        newProfilePicture = uri
+        newProfilePicture = null
+        //TODO call image upload function
     }
 
     fun getTheme(): String {

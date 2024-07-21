@@ -12,6 +12,8 @@ public interface ExerciseService {
     @GET("/exerciseRefs")
     fun getExerciseRef(): Call<ApiResponse<List<ExerciseRef>>>
 
+    @GET("/combinedExerciseRefs/me")
+    fun getCombinedExerciseRefs(): Call<ApiResponse<List<ExerciseRef>>>
 
     @POST("/exercises")
     fun createExercise(@Body exercise: Exercise): Call<ApiResponse<Boolean>>

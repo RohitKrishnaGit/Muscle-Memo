@@ -1,55 +1,52 @@
 package com.cs346.musclememo.screens.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun MMDialog(
     showDialog: Boolean,
     title: String,
-    text: String = "",
-    initialValue: String,
-    onConfirm: (String) -> Unit,
+    onConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
-    hasInputField: Boolean = true,
-    hasText: Boolean = true,
-    labelText: String = "Name"
+    body: @Composable () -> Unit,
+    confirmButtonText: String = "Confirm",
+    cancelButtonText: String = "Cancel",
+    errorText: String? = null
 ) {
     if (showDialog) {
-        var inputValue by remember { mutableStateOf(initialValue) }
-
         AlertDialog(
             onDismissRequest = onDismissRequest,
             title = { Text(title) },
             text = {
                 Column {
-                    if (hasText) Text(text)
-                    if (hasInputField) TextField(
-                        value = inputValue,
-                        onValueChange = { inputValue = it },
-                        label = { Text(labelText) }
-                    )
+                    body()
+                    errorText?.takeIf { it.isNotEmpty() }?.let {
+                        Text(
+                            text = it,
+                            color = Color.Red,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
-                    onConfirm(if (hasInputField) inputValue else "")
-                    onDismissRequest()
+                    onConfirm()
                 }) {
-                    Text("Confirm")
+                    Text(confirmButtonText)
                 }
             },
             dismissButton = {
                 TextButton(onClick = onDismissRequest) {
-                    Text("Cancel")
+                    Text(cancelButtonText)
                 }
             }
         )

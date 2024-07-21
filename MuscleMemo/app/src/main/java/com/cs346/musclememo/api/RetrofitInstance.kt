@@ -2,6 +2,7 @@
 package com.cs346.musclememo.api
 
 
+import com.cs346.musclememo.api.services.CustomExerciseService
 import com.cs346.musclememo.api.services.UserService
 import com.cs346.musclememo.screens.services.SignupService
 import com.google.gson.Gson
@@ -38,6 +39,10 @@ object RetrofitInstance: RetrofitInterface {
 
     val workoutService: WorkoutService by lazy {
         retrofit.create(WorkoutService::class.java)
+    }
+
+    val customExerciseService: CustomExerciseService by lazy {
+        retrofit.create(CustomExerciseService::class.java)
     }
 
     val exerciseService: ExerciseService by lazy {

@@ -12,7 +12,7 @@ import { CustomExerciseRef } from "./CustomExerciseRef";
 import { Template } from "./Template";
 import { UserToken } from "./UserToken";
 import { Workout } from "./Workout";
-import { UserPRs } from "./UserPRs";
+import { UserPrs } from "./UserPrs";
 import { AllowedStatistics } from "./AllowedStatistics"
 
 export enum Role {
@@ -67,10 +67,10 @@ export class User {
     @OneToMany(() => UserToken, (userToken) => userToken.user)
     tokens: Relation<UserToken[]>;
 
-    @OneToOne(() => UserPRs, (UserPRs => UserPRs.user), {
+    @OneToOne(() => UserPrs, (UserPrs => UserPrs.user), {
         cascade: true
     })
-    userPRs: Relation<UserPRs>;
+    userPrs: Relation<UserPrs>;
 
     @OneToOne(() => AllowedStatistics, (AllowedStatistics => AllowedStatistics.user), {
         cascade: true

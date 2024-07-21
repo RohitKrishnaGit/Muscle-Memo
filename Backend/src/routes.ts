@@ -63,6 +63,8 @@ import {
     logoutSchema,
     oneUserSchema,
     outgoingFriendReqSchema,
+    rejectFriendReqSchema,
+    removeFriendSchema,
     removeUserSchema,
     sendFriendReqSchema,
     updateUserFirebaseTokenSchema,
@@ -186,6 +188,36 @@ export const Routes = [
             ),
         ],
         action: "acceptFriendRequest",
+    },
+    {
+        method: "post",
+        route: "/users/:userId/rejectFriendRequest",
+        controller: UserController,
+        middleware: [
+            validateSchema(rejectFriendReqSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "rejectFriendRequest",
+    },
+    {
+        method: "post",
+        route: "/users/:userId/removeFriend",
+        controller: UserController,
+        middleware: [
+            validateSchema(removeFriendSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "removeFriend",
     },
     {
         method: "get",

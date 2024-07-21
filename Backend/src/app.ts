@@ -2,7 +2,9 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import { AppDataSource } from "./data-source";
+import { initialize } from "./firebaseAdmin";
 import { Routes } from "./routes";
+import { initEmailService } from "./services/EmailService";
 import { ApiResponse } from "./utils/responseTypes";
 
 dotenv.config();
@@ -10,6 +12,8 @@ AppDataSource.initialize()
     .then(async () => {
         // create express app
         const app = express();
+        initialize();
+        initEmailService();
         const port = process.env.PORT || 3000;
         app.use(bodyParser.json());
 
@@ -29,16 +33,26 @@ AppDataSource.initialize()
                                 next
                             );
                         if (result instanceof Promise) {
-                            result.then((result) =>
-                                result !== null && result !== undefined
-                                    ? res.status(result.code).json(result)
-                                    : undefined
-                            );
+                            result.then((result) => {
+                                try {
+                                    return result !== null &&
+                                        result !== undefined
+                                        ? res.status(result.code).json(result)
+                                        : undefined;
+                                } catch (err) {
+                                    console.error(err);
+                                    return res.status(500).json({
+                                        error: true,
+                                        code: 500,
+                                        message: "Internal Server Error",
+                                    });
+                                }
+                            });
                         } else if (result !== null && result !== undefined) {
                             res.status(result.code).json(result);
                         }
                     } catch (err) {
-                        console.log(err);
+                        console.error(err);
                         res.status(500).json({
                             error: true,
                             code: 500,

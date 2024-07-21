@@ -13,6 +13,6 @@ public interface  WorkoutService {
     @POST("/workouts")
     fun createWorkout(@Body workout: Workout): Call<ApiResponse<Workout>>
 
-    @GET("/workouts/{userId}")
-    fun getWorkoutByUserId (@Path("userId") userId: Int): Call<ApiResponse<List<Workout>>>
+    @GET("/workouts/me")
+    fun getWorkoutByUserId (): Call<ApiResponse<List<Workout>>>
 }

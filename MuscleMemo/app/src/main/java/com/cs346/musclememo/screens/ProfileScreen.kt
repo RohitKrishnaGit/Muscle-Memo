@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -25,7 +23,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,9 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.screens.components.ChooseExperience
 import com.cs346.musclememo.screens.components.ChooseGender
@@ -47,6 +41,7 @@ import com.cs346.musclememo.screens.components.DisplayProfile
 import com.cs346.musclememo.screens.components.DropdownSetting
 import com.cs346.musclememo.screens.components.EditSurface
 import com.cs346.musclememo.screens.components.SignoutButton
+import com.cs346.musclememo.screens.components.TopAppBar
 import com.cs346.musclememo.screens.viewmodels.ProfileScreenViewModel
 import com.cs346.musclememo.utils.AppPreferences
 
@@ -151,7 +146,6 @@ fun SettingsScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp)
                     .background(MaterialTheme.colorScheme.background)
             ) {
                 Column (
@@ -161,71 +155,65 @@ fun SettingsScreen(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.Top
                 ){
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.1f),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    TopAppBar(icon = Icons.AutoMirrored.Filled.ArrowBack, text = "Settings") {
+                        viewModel.updateShowSettings(false)
+                    }
+                    Column (
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 24.dp)
                     ){
-                        IconButton(
-                            onClick = { viewModel.updateShowSettings(false) }
+                        DropdownSetting(
+                            title = "Unit of Distance",
+                            text = AppPreferences.systemOfMeasurementDistance ?: "km",
+                            setText = viewModel::updateSystemDistance,
+                            expanded = viewModel.showDistanceOptions,
+                            options = viewModel.listOfMeasurementDistance,
+                            onExpandedChange = viewModel::updateShowDistanceOptions
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        DropdownSetting(
+                            title = "Unit of Weight",
+                            text = AppPreferences.systemOfMeasurementWeight ?: "kg",
+                            setText = viewModel::updateSystemWeight,
+                            expanded = viewModel.showWeightOptions,
+                            options = viewModel.listOfMeasurementWeight,
+                            onExpandedChange = viewModel::updateShowWeightOptions
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        DropdownSetting(
+                            title = "App Theme",
+                            text = viewModel.getTheme(),
+                            setText = viewModel::updateTheme,
+                            expanded = viewModel.showThemeOptions,
+                            options = viewModel.listOfTheme,
+                            onExpandedChange = viewModel::updateShowThemeOptions
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        SignoutButton(
+                            onClick = {
+                                viewModel.updateShowSettings(false)
+                                viewModel.logout()
+                                signOut()
+                            },
                         ) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to previous screen")
+                            Text(
+                                text = "Sign Out",
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
                         }
-                        Text(text = "Settings")
-                        Spacer(modifier = Modifier.size(48.dp))
-                    }
-                    DropdownSetting(
-                        title = "Unit of Distance",
-                        text = AppPreferences.systemOfMeasurementDistance ?: "km",
-                        setText = viewModel::updateSystemDistance,
-                        expanded = viewModel.showDistanceOptions,
-                        options = viewModel.listOfMeasurementDistance,
-                        onExpandedChange = viewModel::updateShowDistanceOptions
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-                    DropdownSetting(
-                        title = "Unit of Weight",
-                        text = AppPreferences.systemOfMeasurementWeight ?: "kg",
-                        setText = viewModel::updateSystemWeight,
-                        expanded = viewModel.showWeightOptions,
-                        options = viewModel.listOfMeasurementWeight,
-                        onExpandedChange = viewModel::updateShowWeightOptions
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-                    DropdownSetting(
-                        title = "App Theme",
-                        text = viewModel.getTheme(),
-                        setText = viewModel::updateTheme,
-                        expanded = viewModel.showThemeOptions,
-                        options = viewModel.listOfTheme,
-                        onExpandedChange = viewModel::updateShowThemeOptions
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-                    SignoutButton(
-                        onClick = {
-                            viewModel.updateShowSettings(false)
-                            signOut()
-                                  },
-                    ) {
-                        Text(
-                            text = "Sign Out",
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(20.dp))
-                    SignoutButton(
-                        onClick = {
-                            viewModel.updateShowSettings(false)
-                            signOut()
-                            viewModel.signoutAllDevices()
+                        Spacer(modifier = Modifier.height(20.dp))
+                        SignoutButton(
+                            onClick = {
+                                viewModel.updateShowSettings(false)
+                                signOut()
+                                viewModel.logoutAllDevices()
+                            }
+                        ) {
+                            Text(
+                                text = "Sign Out From All Devices",
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
                         }
-                    ) {
-                        Text(
-                            text = "Sign Out From All Devices",
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
                     }
                 }
             }

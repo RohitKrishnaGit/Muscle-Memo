@@ -18,18 +18,40 @@ import retrofit2.Response
 
 class HistoryScreenViewModel : ViewModel() {
 
-    var user by mutableStateOf<User?>(null)
-
     private val _workouts = mutableStateListOf<Workout>()
     val workouts : List<Workout> = _workouts
+    var currentWorkout: Workout? = null
+        private set
+    var showCurrentWorkout by mutableStateOf(false)
+        private set
 
-    init {
-        getWorkoutsByUserId(1)
+    fun updateShowCurrentWorkout(state: Boolean){
+        showCurrentWorkout = state
     }
 
-    fun getWorkoutsByUserId(userId: Int){
+    fun updateCurrentWorkout(workout: Workout){
+        currentWorkout = workout
+    }
+
+    fun onBackPressed(){
+        if (showCurrentWorkout) {
+            showCurrentWorkout = false
+            currentWorkout = null
+        }
+    }
+
+    fun convertDate(date: String): String {
+        //TODO: proper conversion
+        return "Saturday, July 20th"
+    }
+
+    init {
+        getWorkoutsByUserId()
+    }
+
+    private fun getWorkoutsByUserId(){
         val apiService = RetrofitInstance.workoutService
-        val call = apiService.getWorkoutByUserId(userId)
+        val call = apiService.getWorkoutByUserId()
 
         call.enqueue(object : Callback<ApiResponse<List<Workout>>> {
             override fun onResponse(call: Call<ApiResponse<List<Workout>>>, response: Response<ApiResponse<List<Workout>>>) {

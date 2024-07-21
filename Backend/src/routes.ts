@@ -1,9 +1,13 @@
+import { AllowedStatisticsController } from "./controllers/AllowedStatsisticsController";
+import { CombinedExerciseRefController } from "./controllers/CombinedExerciseRefController";
 import { CustomExerciseRefController } from "./controllers/CustomExerciseRefController";
 import { ExerciseController } from "./controllers/ExerciseController";
 import { ExerciseRefController } from "./controllers/ExerciseRefController";
+import { NotificationController } from "./controllers/NotificationController";
 import { TemplateController } from "./controllers/TemplateController";
 import { TokenController } from "./controllers/TokenController";
 import { UserController } from "./controllers/UserController";
+import { UserPrsController } from "./controllers/UserPRsController";
 import { WorkoutController } from "./controllers/WorkoutController";
 import {
     applyUser,
@@ -14,11 +18,13 @@ import {
 } from "./middleware/auth";
 import { enforce, or } from "./middleware/enforce";
 import { validateSchema } from "./middleware/validation";
+import { allCombinedExerciseRefSchema } from "./schemas/combinedExerciseRefSchema";
 import {
     allCustomExerciseRefSchema,
     createCustomExerciseRefSchema,
     oneCustomExerciseRefSchema,
     removeCustomExerciseRefSchema,
+    updateCustomExerciseRefSchema,
 } from "./schemas/customExerciseSchema";
 import {
     allExerciseRefSchema,
@@ -31,6 +37,15 @@ import {
     removeExerciseSchema,
 } from "./schemas/exerciseSchema";
 import {
+    getAllPrSchema,
+    getPrSchema,
+    getPrVisibilitySchema,
+    leaderboardFriendsSchema,
+    leaderboardSchema,
+    postPrSchema,
+    postPrVisibilitySchema,
+} from "./schemas/leaderboardPRSchema";
+import {
     allTemplateSchema,
     createTemplateSchema,
     oneTemplateSchema,
@@ -38,12 +53,22 @@ import {
 } from "./schemas/templateSchema";
 import { newTokenSchema } from "./schemas/tokenSchema";
 import {
+    acceptFriendReqSchema,
     allUserSchema,
     createUserSchema,
+    getFriendsSchema,
+    incomingFriendReqSchema,
     loginUserSchema,
     logoutAllUserSchema,
+    logoutSchema,
     oneUserSchema,
+    outgoingFriendReqSchema,
+    rejectFriendReqSchema,
+    removeFriendSchema,
     removeUserSchema,
+    sendFriendReqSchema,
+    updateUserFirebaseTokenSchema,
+    updateUserSchema,
 } from "./schemas/userSchema";
 import {
     allWorkoutSchema,
@@ -60,6 +85,21 @@ export const Routes = [
         controller: UserController,
         middleware: [validateSchema(loginUserSchema)],
         action: "login",
+    },
+    {
+        method: "post",
+        route: "/users/logout/:userId",
+        controller: UserController,
+        middleware: [
+            validateSchema(logoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "logout",
     },
     {
         method: "delete",
@@ -80,44 +120,103 @@ export const Routes = [
     },
     {
         method: "get",
-        route: "/users/:id/friends",
+        route: "/users/:userId/friends",
         controller: UserController,
-        middleware: [authenticateWithToken],
+        middleware: [
+            validateSchema(getFriendsSchema),
+            authenticateWithToken,
+            ...applyUser(["params", "userId"], convertMe),
+        ],
         action: "getFriends",
     },
     {
         method: "get",
-        route: "/users/:id/incomingFriendRequests",
+        route: "/users/:userId/incomingFriendRequests",
         controller: UserController,
-        middleware: [authenticateWithToken],
+        middleware: [
+            validateSchema(incomingFriendReqSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
         action: "getIncomingFriendRequests",
     },
     {
         method: "get",
-        route: "/users/:id/outgoingFriendRequests",
+        route: "/users/:userId/outgoingFriendRequests",
         controller: UserController,
-        middleware: [authenticateWithToken],
+        middleware: [
+            validateSchema(outgoingFriendReqSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
         action: "getOutgoingFriendRequests",
     },
     {
         method: "post",
-        route: "/users/:id/sendFriendRequest",
+        route: "/users/:userId/sendFriendRequest",
         controller: UserController,
-        middleware: [authenticateWithToken],
+        middleware: [
+            validateSchema(sendFriendReqSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
         action: "sendFriendRequest",
     },
     {
         method: "post",
-        route: "/users/:id/acceptFriendRequest",
+        route: "/users/:userId/acceptFriendRequest",
         controller: UserController,
-        middleware: [authenticateWithToken],
+        middleware: [
+            validateSchema(acceptFriendReqSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
         action: "acceptFriendRequest",
     },
     {
         method: "post",
-        route: "/users/:id/removeFriend",
+        route: "/users/:userId/rejectFriendRequest",
         controller: UserController,
-        middleware: [authenticateWithToken],
+        middleware: [
+            validateSchema(rejectFriendReqSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "rejectFriendRequest",
+    },
+    {
+        method: "post",
+        route: "/users/:userId/removeFriend",
+        controller: UserController,
+        middleware: [
+            validateSchema(removeFriendSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
         action: "removeFriend",
     },
     {
@@ -153,6 +252,45 @@ export const Routes = [
         middleware: [validateSchema(allUserSchema), authenticateWithToken],
         action: "all",
     },
+    {
+        method: "put",
+        route: "/users/update/:userId",
+        controller: UserController,
+        middleware: [
+            validateSchema(updateUserSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "update",
+    },
+
+    {
+        method: "get",
+        route: "/users/email/:email",
+        controller: UserController,
+        middleware: [validateSchema(allUserSchema)],
+        action: "findEmail",
+    },
+
+    {
+        method: "put",
+        route: "/users/update/firebase/:userId",
+        controller: UserController,
+        middleware: [
+            validateSchema(updateUserFirebaseTokenSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "updateFirebaseToken",
+    },
 
     /* exerciseRef routes */
     {
@@ -175,22 +313,6 @@ export const Routes = [
         ],
         action: "all",
     },
-    /* Shouldn't need these, temporarily keeping until cleanup can be confirmed */
-    // {
-    //     method: "post",
-    //     route: "/exerciseRefs",
-    //     controller: ExerciseRefController,
-    //     action: "create",
-    // },
-    // {
-    //     method: "delete",
-    //     route: "/exerciseRefs/:id",
-    //     controller: CustomExerciseRefController,
-    //     action: "remove",
-    // },
-
-    /* customExerciseRef routes */
-    /* Shouldn't need to work with ALL customExerciseRefs, just those per user */
     {
         method: "get",
         route: "/customExerciseRefs/:userId/:id",
@@ -223,18 +345,33 @@ export const Routes = [
     },
     {
         method: "post",
-        route: "/customExerciseRefs",
+        route: "/customExerciseRefs/:userId",
         controller: CustomExerciseRefController,
         middleware: [
             validateSchema(createCustomExerciseRefSchema),
             authenticateWithToken,
             ...applyUser(
-                ["body", "userId"],
+                ["params", "userId"],
                 convertMe,
                 enforce(or(sameUser, isAdmin))
             ),
         ],
         action: "create",
+    },
+    {
+        method: "put",
+        route: "/customExerciseRefs/:userId/:id",
+        controller: CustomExerciseRefController,
+        middleware: [
+            validateSchema(updateCustomExerciseRefSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "update",
     },
     {
         method: "delete",
@@ -250,6 +387,22 @@ export const Routes = [
             ),
         ],
         action: "remove",
+    },
+
+    {
+        method: "get",
+        route: "/combinedExerciseRefs/:userId",
+        controller: CombinedExerciseRefController,
+        middleware: [
+            validateSchema(allCombinedExerciseRefSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "all",
     },
 
     /* Workout routes */
@@ -422,5 +575,105 @@ export const Routes = [
         controller: TokenController,
         middleware: [validateSchema(newTokenSchema)],
         action: "newToken",
+    },
+
+    /* Pr & leaderboard routes */
+    {
+        method: "get",
+        route: "/Pr/:userId/:exerciseRefId",
+        controller: UserPrsController,
+        middleware: [
+            validateSchema(getPrSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "getUserPr",
+    },
+    {
+        method: "post",
+        route: "/Pr/:userId/:exerciseRefId",
+        controller: UserPrsController,
+        middleware: [
+            validateSchema(postPrSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "updateUserPr",
+    },
+    {
+        method: "get",
+        route: "/leaderboard/:exerciseRefId/:count",
+        controller: UserPrsController,
+        middleware: [validateSchema(leaderboardSchema)],
+        action: "getTopN",
+    },
+    {
+        method: "get",
+        route: "/leaderboard/:userId/:exerciseRefId/:count",
+        controller: UserPrsController,
+        middleware: [validateSchema(leaderboardFriendsSchema)],
+        action: "getTopNFriends",
+    },
+    {
+        method: "get",
+        route: "/Pr/visibility/:userId/:exerciseRefId",
+        controller: AllowedStatisticsController,
+        middleware: [
+            validateSchema(getPrVisibilitySchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "getAllowedStatistics",
+    },
+    {
+        method: "post",
+        route: "/Pr/visibility/:userId/:exerciseRefId",
+        controller: AllowedStatisticsController,
+        middleware: [
+            validateSchema(postPrVisibilitySchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "updateAllowedStatistics",
+    },
+    {
+        method: "get",
+        route: "/Pr/:userId/",
+        controller: UserPrsController,
+        middleware: [
+            validateSchema(getAllPrSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "getAllUserPrs",
+    },
+
+    /* Notification Controller */
+    {
+        method: "post",
+        route: "/notification",
+        controller: NotificationController,
+        middleware: [],
+        action: "notification",
     },
 ];

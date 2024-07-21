@@ -17,6 +17,12 @@ export class Workout {
     @Column()
     name: string;
 
+    @Column({ default: Date.now })
+    date: number;
+
+    @Column()
+    duration: number;
+
     @ManyToOne(() => User, (user) => user.workouts)
     user: User;
 

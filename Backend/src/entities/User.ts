@@ -4,11 +4,14 @@ import {
     JoinTable,
     ManyToMany,
     OneToMany,
+    OneToOne,
     PrimaryGeneratedColumn,
     Relation,
 } from "typeorm";
+import { AllowedStatistics } from "./AllowedStatistics";
 import { CustomExerciseRef } from "./CustomExerciseRef";
 import { Template } from "./Template";
+import { UserPrs } from "./UserPrs";
 import { UserToken } from "./UserToken";
 import { Workout } from "./Workout";
 
@@ -26,13 +29,19 @@ export class User {
     username: string;
 
     @Column()
-    fullName: string;
-
-    @Column()
     email: string;
 
     @Column({ select: false })
     password: string;
+
+    @Column()
+    gender: string;
+
+    @Column()
+    experience: string;
+
+    @Column({ default: "[]" })
+    firebaseTokens: string;
 
     @ManyToMany(() => User, (user) => user.outgoingFriendRequests)
     incomingFriendRequests: Relation<User[]>;
@@ -60,6 +69,20 @@ export class User {
 
     @OneToMany(() => UserToken, (userToken) => userToken.user)
     tokens: Relation<UserToken[]>;
+
+    @OneToOne(() => UserPrs, (UserPrs) => UserPrs.user, {
+        cascade: true,
+    })
+    userPrs: Relation<UserPrs>;
+
+    @OneToOne(
+        () => AllowedStatistics,
+        (AllowedStatistics) => AllowedStatistics.user,
+        {
+            cascade: true,
+        }
+    )
+    allowedStatistics: Relation<AllowedStatistics>;
 
     @Column({ select: false, default: Role.USER })
     role: Role;

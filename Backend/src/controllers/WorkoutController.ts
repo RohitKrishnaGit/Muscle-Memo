@@ -9,7 +9,6 @@ export class WorkoutController {
 
     async all(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
-        console.log("make it here");
         const data = (
             await this.workoutRepository.find({
                 where: { user: { id: userId } },
@@ -41,15 +40,16 @@ export class WorkoutController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { name, userId} = request.body;
+        const { name, userId, date, duration } = request.body;
 
         const workout = Object.assign(new Workout(), {
             name,
+            date,
+            duration,
             user: { id: userId } as User,
         });
 
         return success(this.workoutRepository.save(workout));
-
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {

@@ -2,7 +2,6 @@ import {
     Column,
     Entity,
     ManyToOne,
-    OneToMany,
     PrimaryGeneratedColumn,
     Relation,
 } from "typeorm";
@@ -19,7 +18,9 @@ export class Exercise {
     @ManyToOne(() => Workout, (workout) => workout.exercises)
     workout: Relation<Workout>;
 
-    @ManyToOne(() => Template, (template) => template.exercises, {nullable: true})
+    @ManyToOne(() => Template, (template) => template.exercises, {
+        nullable: true,
+    })
     template: Relation<Workout>;
 
     @ManyToOne(() => ExerciseRef, { nullable: true })
@@ -30,5 +31,4 @@ export class Exercise {
 
     @Column()
     exerciseSet: string;
-
 }

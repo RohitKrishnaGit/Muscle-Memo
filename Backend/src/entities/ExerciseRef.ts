@@ -9,17 +9,17 @@ export class ExerciseRef {
     name: string;
 
     @Column()
-    durationVSReps: number;
+    durationVSReps: boolean;
 
     @Column()
-    weight: number;
+    weight: boolean;
 
     @Column()
-    distance: number;
+    distance: boolean;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true }) //todo: NOT NULLABLE
     description?: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true }) //todo: NOT NULLABLE
     imagePath?: string;
 }

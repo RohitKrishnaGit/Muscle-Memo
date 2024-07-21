@@ -24,7 +24,7 @@
 | 7/11/24 |         |            |          |            | 2         |        | Standardize response body on backend and frontend           |
 | 7/12/24 |         |            |          |            | 3         |        | Implement schema validation on backend request              |
 | 7/12/24 | 3       | 3          | 3        | 3          | 2         | 3      | Work on deliverable 4                                       |
-| 7/15/24 |         |            | 10       |            |           |        | Continue work on leaderboard API, friends API & chat        |
+| 7/15/24 |         |            | 10       |            |           |        | Continue work on leaderboard API & chat. Finish friends API |
 | 7/14/24 | 7       |            |          |            |           |        | History workout endpoint implementation                     |
 | 7/14/24 |         |            |          |            | 2         |        | Help with workout history feature                           |
 | 7/15/24 |         |            |          |            | 2         |        | Expose endpoints for users to get information about self    |
@@ -32,6 +32,13 @@
 | 7/15/24 |         |            |          |            | 1         |        | Encrypt role into JWT token for faster access               |
 | 7/15/24 |         |            |          |            | 1         |        | Investigate into firebase for push notifs and image storage |
 | 7/15/24 | 1       |            |          |            | 1         |        | Added workout metadata                                      |
+| 7/15/24 |         |            | 5        |            |           |        | Finish work on leaderboard API & PRs API                    |
 | 7/16/24 |         |            |          |            | 1         |        | Update login screen, fix bug with returning to login screen |
 | 7/16/24 |         |            |          |            | 1         |        | Allow for multiple devices to log in, do some QOL changes   |
 | 7/16/24 | 5       |            |          |            |           |        | Update Users and add endpoints for gender and experience    |
+| 7/17/24 | 3       | 3          | 3        | 3          | 3         | 3      | Work on deliverable 5                                       |
+| 7/20/24 |         |            |          |            | 7         |        | Assist Rohit and Eric with descriptions and push notifs     |
+| 7/21/24 |         |            |          |            | 3         |        | Use google gmail to send emails                             |
+| 7/20/24 |         |            | 7        |            |           |        | Finish leaderboard endpoint and update friends endpoint     |
+| 7/20/24 |         |            | 2        |            |           |        | Add descriptions to all exerciseRefs                        |
+| 7/20/24 |         |            | 1        |            |           |        | Update Workouts table to contain date and duration          |

@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class NavItem(
@@ -13,10 +14,10 @@ sealed class NavItem(
     var icon: ImageVector,
     val screen: Screen
 ){
-    object Leaderboard : NavItem("Rankings", Icons.Default.Leaderboard, Screen.Leaderboard)
     object Friend : NavItem("Friends", Icons.Default.Favorite, Screen.Friends)
+    object FindBuddy : NavItem("Find a Buddy", Icons.Default.Search, Screen.FindBuddy)
     object Workout : NavItem("Workout", Icons.Default.Add, Screen.Workout)
-    object History : NavItem("History", Icons.Default.AccessTime, Screen.History)
+    object Leaderboard : NavItem("Rankings", Icons.Default.Leaderboard, Screen.Leaderboard)
     object Profile : NavItem("Profile", Icons.Default.AccountCircle, Screen.Profile)
 }
 

@@ -10,29 +10,45 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,18 +57,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.screens.components.MMButton
 import com.cs346.musclememo.screens.components.MMDialog
 import com.cs346.musclememo.screens.components.ExerciseSets
 import com.cs346.musclememo.screens.components.ExerciseTitle
 import com.cs346.musclememo.screens.components.TopAppBar
 import com.cs346.musclememo.screens.components.WorkoutHistoryCard
-import com.cs346.musclememo.screens.components.WorkoutHistorySheet
 import com.cs346.musclememo.screens.components.getTransitionDirection
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
-import java.util.Random
 
 @Composable
 fun WorkoutScreen(
@@ -76,6 +93,7 @@ fun WorkoutScreen(
             MMButton(
                 onClick = {
                     viewModel.resetWorkout()
+                    viewModel.fetchCombinedExercises()
                     viewModel.setWorkoutScreenVisible(true)
                 },
                 text = "Start A New Workout",
@@ -112,10 +130,6 @@ fun WorkoutScreen(
 fun NewWorkoutScreen (
     viewModel :WorkoutScreenViewModel
 ){
-    LaunchedEffect(Unit){
-        viewModel.getExercises()
-    }
-
     BackHandler (viewModel.chooseWorkoutVisible) {
         viewModel.onBackPressed()
     }
@@ -256,54 +270,208 @@ fun CurrentWorkout(
     // TODO: add WorkoutSheet contents in here
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun WorkoutSheet(
     viewModel: WorkoutScreenViewModel
 ) {
-    // dialogs
-    var showChangeWorkoutNameDialog by remember { mutableStateOf(false) }
-    var showCancelWorkoutDialog by remember { mutableStateOf(false) }
-    var showDeleteExerciseDialog by remember { mutableStateOf(false) }
     var selectedExerciseIndex by remember { mutableIntStateOf(-1) }
+    var selectedExercise by remember { mutableStateOf<ExerciseRef?>(null) }
 
     MMDialog(
-        showDialog = showChangeWorkoutNameDialog,
+        showDialog = viewModel.showChangeWorkoutNameDialog,
         title = "Change Workout Name",
-        initialValue = viewModel.currentWorkout.name,
-        onConfirm = { viewModel.setWorkoutName(it) },
-        onDismissRequest = { showChangeWorkoutNameDialog = false },
-        hasText = false
+        onConfirm = {
+            viewModel.setWorkoutName(viewModel.tempWorkoutName)
+        },
+        onDismissRequest = { viewModel.updateShowChangeWorkoutNameDialog(false) },
+        body = {
+            TextField(
+                value = viewModel.tempWorkoutName,
+                onValueChange = { viewModel.tempWorkoutName = it },
+                label = { Text("Workout Name") }
+            )
+        },
+        confirmButtonText = "Save",
+        cancelButtonText = "Cancel"
     )
 
     MMDialog(
-        showDialog = showCancelWorkoutDialog,
+        showDialog = viewModel.showCancelWorkoutDialog,
         title = "Cancel Workout",
-        text = "Are you sure you want to cancel this workout?",
-        initialValue = "",
         onConfirm = {
             viewModel.setWorkoutScreenVisible(false)
+            viewModel.updateShowCancelWorkoutDialog(false)
         },
-        onDismissRequest = { showCancelWorkoutDialog = false },
-        hasInputField = false,
+        onDismissRequest = { viewModel.updateShowCancelWorkoutDialog(false) },
+        body = {
+            Text("Are you sure you want to cancel this workout?")
+        }
     )
 
     MMDialog(
-        showDialog = showDeleteExerciseDialog,
+        showDialog = viewModel.showDeleteExerciseDialog,
         title = "Delete Exercise",
-        text = "Are you sure you want to delete this exercise?",
-        initialValue = "",
-        onConfirm = { _ ->
+        onConfirm = {
             if (selectedExerciseIndex != -1) {
                 viewModel.removeExercise(selectedExerciseIndex)
                 selectedExerciseIndex = -1
             }
-            showDeleteExerciseDialog = false
+            viewModel.updateShowRemoveExerciseDialog(false)
         },
         onDismissRequest = {
             selectedExerciseIndex = -1
-            showDeleteExerciseDialog = false
+            viewModel.updateShowRemoveExerciseDialog(false)
         },
-        hasInputField = false,
+        body = {
+            Text("Are you sure you want to delete this exercise?")
+        }
+    )
+
+    MMDialog(
+        showDialog = viewModel.showAddNewCustomExerciseDialog,
+        title = "Add New Exercise",
+        onConfirm = {
+            viewModel.updateDialogButtonsEnabled(false)
+            viewModel.createCustomExercise(viewModel.newExerciseRef)
+        },
+        onDismissRequest = {
+            viewModel.updateShowAddNewCustomExerciseDialog(false)
+            viewModel.updateDialogErrorMessage("")
+            viewModel.updateDialogButtonsEnabled(true)
+        },
+        body = {
+            Column {
+                TextField(
+                    value = viewModel.newExerciseRef.name,
+                    onValueChange = { viewModel.updateNewExerciseRef(viewModel.newExerciseRef.copy(name = it)) },
+                    label = { Text("Exercise Name") }
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = viewModel.newExerciseRef.durationVSReps,
+                        onClick = { viewModel.updateNewExerciseRef(viewModel.newExerciseRef.copy(durationVSReps = true)) }
+                    )
+                    Text("Repetitions", modifier = Modifier.align(Alignment.CenterVertically))
+                    RadioButton(
+                        selected = !viewModel.newExerciseRef.durationVSReps,
+                        onClick = { viewModel.updateNewExerciseRef(viewModel.newExerciseRef.copy(durationVSReps = false)) }
+                    )
+                    Text("Duration", modifier = Modifier.align(Alignment.CenterVertically))
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = viewModel.newExerciseRef.weight,
+                        onCheckedChange = { checked ->
+                            viewModel.updateNewExerciseRef(viewModel.newExerciseRef.copy(weight = checked))
+                        }
+                    )
+                    Text("Weight-based", modifier = Modifier.align(Alignment.CenterVertically))
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = viewModel.newExerciseRef.distance,
+                        onCheckedChange = { checked ->
+                            viewModel.updateNewExerciseRef(viewModel.newExerciseRef.copy(distance = checked))
+                        }
+                    )
+                    Text("Distance-based", modifier = Modifier.align(Alignment.CenterVertically))
+                }
+            }
+        },
+        errorText = viewModel.dialogErrorMessage,
+        confirmButtonText = "Add",
+        cancelButtonText = "Cancel"
+    )
+
+    MMDialog(
+        showDialog = viewModel.showEditCustomExerciseDialog,
+        title = "Edit Exercise",
+        onConfirm = {
+            selectedExercise?.let { exercise ->
+                viewModel.updateDialogButtonsEnabled(false)
+                viewModel.updateCustomExercise(exercise)
+            }
+        },
+        onDismissRequest = {
+            selectedExercise = null
+            viewModel.updateShowEditCustomExerciseDialog(false)
+            viewModel.updateDialogErrorMessage("")
+            viewModel.updateDialogButtonsEnabled(true)
+        },
+        body = {
+            Column {
+                selectedExercise?.let { exercise ->
+                    TextField(
+                        value = exercise.name,
+                        onValueChange = { newName ->
+                            selectedExercise = exercise.copy(name = newName)
+                        },
+                        label = { Text("Exercise Name") }
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = exercise.durationVSReps,
+                            onClick = {
+                                selectedExercise = exercise.copy(durationVSReps = true)
+                            }
+                        )
+                        Text("Repetitions", modifier = Modifier.align(Alignment.CenterVertically))
+                        RadioButton(
+                            selected = !exercise.durationVSReps,
+                            onClick = {
+                                selectedExercise = exercise.copy(durationVSReps = false)
+                            }
+                        )
+                        Text("Duration", modifier = Modifier.align(Alignment.CenterVertically))
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = exercise.weight,
+                            onCheckedChange = { checked ->
+                                selectedExercise = exercise.copy(weight = checked)
+                            }
+                        )
+                        Text("Weight-based", modifier = Modifier.align(Alignment.CenterVertically))
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = exercise.distance,
+                            onCheckedChange = { checked ->
+                                selectedExercise = exercise.copy(distance = checked)
+                            }
+                        )
+                        Text("Distance-based", modifier = Modifier.align(Alignment.CenterVertically))
+                    }
+                }
+            }
+        },
+        errorText = viewModel.dialogErrorMessage,
+        confirmButtonText = "Save",
+        cancelButtonText = "Cancel"
+    )
+
+    MMDialog(
+        showDialog = viewModel.showDeleteCustomExerciseDialog,
+        title = "Delete Exercise",
+        onConfirm = {
+            selectedExercise?.let { exercise ->
+                viewModel.deleteCustomExercise(exercise)
+            }
+        },
+        onDismissRequest = {
+            selectedExercise = null
+            viewModel.updateDialogErrorMessage("")
+            viewModel.updateShowDeleteCustomExerciseDialog(false)
+        },
+        body = {
+            Column {
+                selectedExercise?.let { exercise ->
+                    Text("Are you sure you want to delete ${exercise.name}?")
+                }
+            }
+        },
+        errorText = viewModel.dialogErrorMessage,
     )
 
     AnimatedVisibility(
@@ -343,7 +511,8 @@ fun WorkoutSheet(
                             fontSize = 20.sp
                         )
                         IconButton(onClick = {
-                            showChangeWorkoutNameDialog = true
+                            viewModel.tempWorkoutName = viewModel.currentWorkout.name
+                            viewModel.updateShowChangeWorkoutNameDialog(true)
                         }) {
                             Icon(Icons.Filled.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.onSecondary)
                         }
@@ -361,7 +530,7 @@ fun WorkoutSheet(
                             ExerciseTitle(
                                 exerciseRef = exerciseIt.exerciseRef,
                                 onClick = {
-                                    showDeleteExerciseDialog = true
+                                    viewModel.updateShowRemoveExerciseDialog(true)
                                     selectedExerciseIndex = index
                                 }
                             )
@@ -384,10 +553,7 @@ fun WorkoutSheet(
                         Column {
                             MMButton(
                                 onClick = {
-                                    // todo: select a specific exercise
-
-                                    val selectedExerciseId = Random().nextInt(viewModel.exerciseRefs.size)
-                                    viewModel.addNewExercise(exerciseRef = viewModel.exerciseRefs[selectedExerciseId])
+                                    viewModel.setAddExerciseScreenVisible(true)
                                 },
                                 text = "Add New Exercise",
                                 maxWidth = true,
@@ -403,7 +569,7 @@ fun WorkoutSheet(
                             ) {
                                 MMButton(
                                     onClick = {
-                                        showCancelWorkoutDialog = true
+                                        viewModel.updateShowCancelWorkoutDialog(true)
                                     },
                                     text = "Cancel Workout",
                                     backgroundColor = MaterialTheme.colorScheme.errorContainer,
@@ -431,6 +597,7 @@ fun WorkoutSheet(
             }
         }
     }
+
     AnimatedVisibility(
         visible = viewModel.summaryVisible,
         enter = slideInVertically(initialOffsetY = { it }),
@@ -465,4 +632,184 @@ fun WorkoutSheet(
             }
         }
     }
+
+    AnimatedVisibility(
+        visible = viewModel.addExerciseVisible,
+        enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }),
+        exit = slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth })
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
+            Column {
+                if (viewModel.isExerciseSearchMode) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(0.dp)
+                            .background(MaterialTheme.colorScheme.secondary)
+                            .heightIn(min = 60.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        IconButton(onClick = {
+                            viewModel.updateExerciseSearchText("")
+                            viewModel.updateExerciseSearchMode(false)
+                        }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        }
+                        TextField(
+                            value = viewModel.exerciseSearchText,
+                            onValueChange = viewModel::updateExerciseSearchText,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(vertical = 0.dp),
+                            placeholder = { Text(" Search Exercises") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                containerColor = Color.Transparent,
+                                cursorColor = Color.White,
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedPlaceholderColor = Color.White,
+                                unfocusedPlaceholderColor = Color.White
+                            )
+                        )
+                        IconButton(onClick = { viewModel.toggleSort() }) {
+                            if (viewModel.isSortedAlphabetically) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.Sort,
+                                    tint = Color.White,
+                                    contentDescription = "Sort Ascending",
+                                )
+                            } else {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.Sort,
+                                    tint = Color.White,
+                                    contentDescription = "Sort Descending",
+                                    modifier = Modifier.rotate(180f),
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(0.dp)
+                            .background(MaterialTheme.colorScheme.secondary)
+                            .heightIn(min = 60.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        IconButton(onClick = { viewModel.setAddExerciseScreenVisible(false) }) {
+                            Icon(Icons.Filled.Close, contentDescription = "Close", tint = Color.White)
+                        }
+                        Text("Add Exercise", modifier = Modifier.padding(end = 8.dp), color = Color.White)
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            IconButton(onClick = { viewModel.updateExerciseSearchMode(true) }) {
+                                Icon(Icons.Filled.Search, contentDescription = "Search", tint = Color.White)
+                            }
+                            IconButton(onClick = { viewModel.toggleSort() }) {
+                                if (viewModel.isSortedAlphabetically) {
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.Sort,
+                                        tint = Color.White,
+                                        contentDescription = "Sort Ascending",
+                                    )
+                                } else {
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.Sort,
+                                        tint = Color.White,
+                                        contentDescription = "Sort Descending",
+                                        modifier = Modifier.rotate(180f),
+                                    )
+                                }
+                            }
+                            IconButton(onClick = {
+                                viewModel.resetNewExerciseRef()
+                                viewModel.updateShowAddNewCustomExerciseDialog(true)
+                            }) {
+                                Icon(Icons.Filled.Add, contentDescription = "Add", tint = Color.White)
+                            }
+                        }
+                    }
+                }
+                LazyColumn {
+                    val groupedExercises = viewModel.filteredExercises.groupBy { it.name.first().uppercase() }
+
+                    groupedExercises.forEach { (initial, exercises) ->
+                        stickyHeader {
+                            Text(
+                                text = initial,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.primary)
+                                    .padding(8.dp),
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+
+                        items(exercises) { exerciseRef ->
+                            var showMenu by remember { mutableStateOf(false) }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(50.dp)
+                                    .clickable(onClick = {
+                                        viewModel.addNewExercise(exerciseRef)
+                                        viewModel.setAddExerciseScreenVisible(false)
+                                    }),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = exerciseRef.name,
+                                    modifier = Modifier
+                                        .padding(start = 16.dp)
+                                        .weight(1f),
+                                    fontSize = 18.sp
+                                )
+
+                                if (exerciseRef.isCustom) {
+                                    IconButton(onClick = { showMenu = true }) {
+                                        Icon(Icons.Filled.MoreVert, contentDescription = "More")
+                                    }
+
+                                    DropdownMenu(
+                                        expanded = showMenu,
+                                        onDismissRequest = { showMenu = false },
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = { Text("Edit") },
+                                            onClick = {
+                                                showMenu = false
+                                                selectedExercise = exerciseRef
+                                                viewModel.updateShowEditCustomExerciseDialog(true)
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Delete") },
+                                            onClick = {
+                                                showMenu = false
+                                                selectedExercise = exerciseRef
+                                                viewModel.updateShowDeleteCustomExerciseDialog(true)
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

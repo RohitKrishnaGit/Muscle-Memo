@@ -9,5 +9,6 @@ data class User (
     val workouts: MutableList<Workout>?,
     val profilePicture: Uri?,
     val gender: String,
-    val experience: String
+    val experience: String,
+    val firebaseTokens: String = "[]"
 )

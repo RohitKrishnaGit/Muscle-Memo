@@ -4,6 +4,7 @@ import { AllowedStatisticsController } from "./controllers/AllowedStatsisticsCon
 import { CustomExerciseRefController } from "./controllers/CustomExerciseRefController";
 import { ExerciseController } from "./controllers/ExerciseController";
 import { ExerciseRefController } from "./controllers/ExerciseRefController";
+import { NotificationController } from "./controllers/NotificationController";
 import { TemplateController } from "./controllers/TemplateController";
 import { TokenController } from "./controllers/TokenController";
 import { UserController } from "./controllers/UserController";
@@ -51,9 +52,11 @@ import {
     incomingFriendReqSchema,
     loginUserSchema,
     logoutAllUserSchema,
+    logoutSchema,
     oneUserSchema,
     outgoingFriendReqSchema,
     removeUserSchema,
+    updateUserFirebaseTokenSchema,
     sendFriendReqSchema,
     updateUserSchema,
 } from "./schemas/userSchema";
@@ -77,6 +80,21 @@ export const Routes = [
         controller: UserController,
         middleware: [validateSchema(loginUserSchema)],
         action: "login",
+    },
+    {
+        method: "delete",
+        route: "/users/logout/:userId",
+        controller: UserController,
+        middleware: [
+            validateSchema(logoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "logout",
     },
     {
         method: "delete",
@@ -221,6 +239,22 @@ export const Routes = [
         controller: UserController,
         middleware: [validateSchema(allUserSchema)],
         action: "findEmail",
+    },
+
+    {
+        method: "put",
+        route: "/users/update/firebase/:userId",
+        controller: UserController,
+        middleware: [
+            validateSchema(updateUserFirebaseTokenSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "updateFirebaseToken"
     },
 
     /* exerciseRef routes */
@@ -602,4 +636,14 @@ export const Routes = [
         ],
         action: "getAllUserPrs",
     },
+
+    /* Notification Controller */
+    {
+        method: "post",
+        route: "/notification",
+        controller: NotificationController,
+        middleware: [],
+        action: "notification",
+    }
+
 ];

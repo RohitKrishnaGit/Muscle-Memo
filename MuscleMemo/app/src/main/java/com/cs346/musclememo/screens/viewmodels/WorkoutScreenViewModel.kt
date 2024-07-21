@@ -124,7 +124,8 @@ class WorkoutScreenViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<ApiResponse<List<ExerciseRef>>>, t: Throwable) {
-                println("Exercise Ref failed")
+                t.printStackTrace()
+
             }
 
         })

@@ -253,6 +253,37 @@ export class UserController {
         return success(generateTokens(user));
     }
 
+    async logout(request: Request, response: Response, next: NextFunction) {
+        let {refreshToken, firebaseTokens} = request.body
+        const id = request.user?.id
+        const userToken = await this.userTokenRepository.findOneBy({
+            token: refreshToken
+        });
+        if(!userToken){
+            return failure("Refresh token is invalid")
+        }
+        await this.userTokenRepository.remove(userToken);
+
+        let userToUpdate = await this.userRepository.findOneBy({
+            id,
+        });
+
+        if (userToUpdate){
+            let listOfTokens = JSON.parse(userToUpdate.firebaseTokens)
+
+            firebaseTokens = JSON.stringify(listOfTokens.filter((token: string)=>{
+                return (token != firebaseTokens)
+            }))
+        }
+        if (!userToUpdate) return failure("Update failed");
+        return success(
+            this.userRepository.save({
+                ...userToUpdate,
+                firebaseTokens
+            })
+        );
+    }
+
     async logoutAll(request: Request, response: Response, next: NextFunction) {
         const userTokens = await this.userTokenRepository.findBy({
             user: { id: request.user?.id },
@@ -262,7 +293,7 @@ export class UserController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { username, email, password, gender, experience } = request.body;
+        const { username, email, password, gender, experience, firebaseTokens } = request.body;
 
         const userExists = !!(await this.userRepository.findOneBy({ email }));
 
@@ -278,6 +309,7 @@ export class UserController {
             experience,
             userPrs: new UserPrs(),
             allowedStatistics: new AllowedStatistics(),
+            firebaseTokens
         });
 
         await this.userRepository.save(user);
@@ -314,6 +346,32 @@ export class UserController {
                 username,
                 gender,
                 experience,
+            })
+        );
+    }
+
+    async updateFirebaseToken(request:Request, response: Response, next: NextFunction){
+        let {firebaseTokens} = request.body
+        console.log(firebaseTokens)
+        const id = parseInt(request.params.userId);
+        let userToUpdate = await this.userRepository.findOneBy({
+            id,
+        });
+        if (userToUpdate){
+            let listOfTokens = JSON.parse(userToUpdate.firebaseTokens)
+            if (listOfTokens){
+                if (!listOfTokens.includes(firebaseTokens)){
+                    listOfTokens.push(firebaseTokens)
+                }
+            }
+            firebaseTokens = JSON.stringify(listOfTokens)
+            console.log(listOfTokens)
+        }
+        if (!userToUpdate) return failure("Update failed");
+        return success(
+            this.userRepository.save({
+                ...userToUpdate,
+                firebaseTokens
             })
         );
     }

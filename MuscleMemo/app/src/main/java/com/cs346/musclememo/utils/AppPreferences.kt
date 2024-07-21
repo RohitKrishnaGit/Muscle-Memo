@@ -45,8 +45,12 @@ object AppPreferences {
         get() = Key.DARKMODE.getBoolean()
         set(value) = Key.DARKMODE.setBoolean(value)
 
+    var firebaseToken: String?
+        get() = Key.FIREBASE_TOKEN.getString()
+        set(value) = Key.FIREBASE_TOKEN.setString(value)
+
     private enum class Key {
-        ACCESS_TOKEN, REFRESH_TOKEN, SYSTEMMEASUREMENTDISTANCE, SYSTEMMEASUREMENTWEIGHT, DARKMODE;
+        ACCESS_TOKEN, REFRESH_TOKEN, SYSTEMMEASUREMENTDISTANCE, SYSTEMMEASUREMENTWEIGHT, DARKMODE, FIREBASE_TOKEN;
 
         fun getBoolean(): Boolean? = if (sharedPreferences!!.contains(name)) sharedPreferences!!.getBoolean(name, false) else null
         fun getFloat(): Float? = if (sharedPreferences!!.contains(name)) sharedPreferences!!.getFloat(name, 0f) else null

@@ -4,12 +4,14 @@ import express, { Request, Response } from "express";
 import { AppDataSource } from "./data-source";
 import { Routes } from "./routes";
 import { ApiResponse } from "./utils/responseTypes";
+import { initialize } from "./firebaseAdmin";
 
 dotenv.config();
 AppDataSource.initialize()
     .then(async () => {
         // create express app
         const app = express();
+        initialize();
         const port = process.env.PORT || 3000;
         app.use(bodyParser.json());
 

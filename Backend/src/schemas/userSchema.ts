@@ -1,4 +1,4 @@
-import { object, string } from "zod";
+import { object, string, number } from "zod";
 
 export const allUserSchema = object({});
 
@@ -7,6 +7,56 @@ export const oneUserSchema = object({
         id: string({
             required_error: "id is required",
         }).regex(/(^\d+$)|(^me$)/, "id should be either numerical or me"),
+    }),
+});
+
+export const getFriendsSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+});
+
+export const incomingFriendReqSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+});
+
+export const outgoingFriendReqSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+});
+
+export const sendFriendReqSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+    body: object({
+        friendId: number({
+            required_error: "friendId is required",
+        })
+    }),
+});
+
+export const acceptFriendReqSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+    body: object({
+        friendId: number({
+            required_error: "friendId is required",
+        })
     }),
 });
 

@@ -19,7 +19,7 @@ export class CombinedExerciseRefController {
             await this.customExerciseRefRepository.findBy({
                 user: { id: userId },
             })
-        ).map((ref) => ({ ...ref, isCustom: false }));
+        ).map((ref) => ({ ...ref, isCustom: true }));
 
         return success(
             [...exerciseRefs, ...customExerciseRefs].sort((a, b) => {

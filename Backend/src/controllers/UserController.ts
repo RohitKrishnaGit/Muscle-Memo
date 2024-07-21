@@ -7,7 +7,6 @@ import { UserToken } from "../entities/UserToken";
 import { generatePasswordHash, validatePassword } from "../utils/password";
 import { failure, success } from "../utils/responseTypes";
 import { generateTokens } from "../utils/token";
-import { profile } from "console";
 
 export class UserController {
     private userRepository = AppDataSource.getRepository(User);

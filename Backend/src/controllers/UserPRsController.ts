@@ -1,80 +1,133 @@
 import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
-import { UserPRs } from "../entities/UserPRs";
+import { UserPrs } from "../entities/UserPrs";
 import { failure, success } from "../utils/responseTypes";
-import { User } from "../entities/User";
 import { getNthColumnName } from "../utils/dynamicColumnName";
+import { AllowedStatistics } from "../entities/AllowedStatistics";
+import { User } from "../entities/User";
 
-export class UserPRsController {
-    private userPRsRepository = AppDataSource.getRepository(UserPRs);
+export class UserPrsController {
+    private userPrsRepository = AppDataSource.getRepository(UserPrs);
+    private userRepository = AppDataSource.getRepository(User);
 
-    async getAllUserPRs(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id);
+    async getAllUserPrs(request: Request, response: Response, next: NextFunction) {
+        const userId = parseInt(request.params.userId);
 
-        const userPRs = await this.userPRsRepository.findOneBy({
-            id
+        const userPrs = await this.userPrsRepository.findOneBy({
+            user: { id: userId },
         });
 
-        if (!userPRs) {
+        if (!userPrs) {
             return failure("unregistered user");
         }
 
-        return success(userPRs);
+        return success(userPrs);
     }
 
-    async getUserPR(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id);
+    async getUserPr(request: Request, response: Response, next: NextFunction) {
+        const userId = parseInt(request.params.userId);
         const exerciseRefId = parseInt(request.params.exerciseRefId);
 
-        const userPRs = await this.userPRsRepository.findOneBy({
-            id
+        const userPrs = await this.userPrsRepository.findOneBy({
+            user: { id: userId },
         });
 
-        if (!userPRs) {
+        if (!userPrs) {
             return failure("unregistered user");
         }
 
-        const colName = await getNthColumnName(exerciseRefId, this.userPRsRepository)
-        return success(userPRs[colName as keyof UserPRs]);
+        const colName = await getNthColumnName(exerciseRefId, this.userPrsRepository)
+        return success(userPrs[colName as keyof UserPrs]);
     }
 
-    async updateUserPR(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id);
+    async updateUserPr(request: Request, response: Response, next: NextFunction) {
+        const userId = parseInt(request.params.userId);
         const exerciseRefId = parseInt(request.params.exerciseRefId);
-        const { PR } = request.body;
+        const { Pr } = request.body;
 
-        const userPRs = await this.userPRsRepository.findOneBy({
-            id
+        const userPrs = await this.userPrsRepository.findOneBy({
+            user: { id: userId },
         });
 
-        if (!userPRs) {
+        if (!userPrs) {
             return failure("unregistered user");
         }
+        
+        const colName = await getNthColumnName(exerciseRefId, this.userPrsRepository);
 
-        const colName = await getNthColumnName(exerciseRefId, this.userPRsRepository);
-        userPRs[colName as keyof UserPRs] = PR;
+        await this.userPrsRepository.save({
+            ...userPrs,
+            [colName]: Pr
+        });
+
         return success("successful PR update");
     }
 
     async getTopN(request: Request, response: Response, next: NextFunction) {
         const exerciseRefId = parseInt(request.params.exerciseRefId);
         const count = parseInt(request.params.count);
-        const colName = await getNthColumnName(exerciseRefId, this.userPRsRepository)
-        
-        const userPRs = await this.userPRsRepository.find({
-            take: count,
-            select: {
-                [colName]: true
-            },
-            order: {
-                [colName]: "DESC"
-            },
-        })
+        const colName = await getNthColumnName(exerciseRefId, this.userPrsRepository);
 
-        if (!userPRs) {
-            return failure("no user PRs exist");
+        const userPrs = await this.userPrsRepository.createQueryBuilder('userPrs')
+            .select([
+                'userPrs.userId',
+                `userPrs.${colName} AS ${colName}`
+            ])
+            .innerJoin(
+                AllowedStatistics,
+                'allowedStatistics',
+                `userPrs.userId = allowedStatistics.userId AND allowedStatistics.${colName} = true`
+            )
+            .orderBy('userPrs.' + colName, 'DESC')
+            .take(count)
+            .getRawMany();
+
+        if (userPrs.length === 0) {
+            return failure("No user PRs exist");
         }
 
-        return success(userPRs);
+        return success(userPrs);
+    }
+
+    async getTopNFriends(request: Request, response: Response, next: NextFunction) {
+        const userId = parseInt(request.params.userId);
+        const exerciseRefId = parseInt(request.params.exerciseRefId);
+        const count = parseInt(request.params.count);
+
+        const colName = await getNthColumnName(exerciseRefId, this.userPrsRepository);
+
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+            relations: {
+                friends: true,
+            },
+        });
+
+        if (!user) {
+            return failure("unregistered user");
+        }
+
+        const userIds = [...user.friends, user].map((entry) => entry.id);
+
+        const userPrs = await this.userPrsRepository.createQueryBuilder('userPrs')
+            .select([
+                'userPrs.userId',
+                `userPrs.${colName} AS ${colName}`
+            ])
+            .where('userPrs.userId IN (:...userIdList)', {userIdList: userIds})
+            .innerJoin(
+                AllowedStatistics,
+                'allowedStatistics',
+                `userPrs.userId = allowedStatistics.userId AND allowedStatistics.${colName} = true`
+            )
+            .orderBy('userPrs.' + colName, 'DESC')
+            .take(count)
+            .getRawMany();
+
+        if (userPrs.length === 0) {
+            return failure("No user PRs exist");
+        }
+
+        return success(userPrs);
     }
 }

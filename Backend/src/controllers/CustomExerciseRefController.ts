@@ -44,7 +44,7 @@ export class CustomExerciseRefController {
             description,
             imagePath,
         } = request.body;
-
+    
         const customExerciseRef = Object.assign(new CustomExerciseRef(), {
             name,
             durationVSReps,
@@ -54,10 +54,11 @@ export class CustomExerciseRefController {
             imagePath,
             user: { id: userId } as User,
         });
-
-        return success(
-            this.customExerciseRefRepository.save(customExerciseRef)
-        );
+    
+        const savedExercise = await this.customExerciseRefRepository.save(customExerciseRef);
+        const exerciseWithCustomFlag = { ...savedExercise, isCustom: true };
+    
+        return success(exerciseWithCustomFlag);
     }
 
     async update(request: Request, response: Response, next: NextFunction) {

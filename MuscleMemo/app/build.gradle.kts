@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -68,6 +69,8 @@ dependencies {
     implementation (libs.gson.v282)
 
     implementation(libs.coil.compose)
+    implementation(libs.firebase.messaging.ktx)
+    implementation(libs.core.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -76,6 +79,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    // Import the Firebase BoM
+    implementation(libs.firebase.bom)
+    implementation(libs.firebase.messaging)
+
+
+    // TODO: Add the dependencies for Firebase products you want to use
+    // When using the BoM, don't specify versions in Firebase dependencies
 
 
 

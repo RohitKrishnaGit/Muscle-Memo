@@ -7,13 +7,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.cs346.musclememo.api.RetrofitInstance
 import androidx.lifecycle.ViewModel
+import com.cs346.musclememo.api.services.FirebaseToken
 import com.cs346.musclememo.utils.AppPreferences
 import com.cs346.musclememo.api.services.LoginRequest
 import com.cs346.musclememo.api.services.LoginResponse
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.api.types.parseErrorBody
+import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.screens.services.SignupRequest
 import com.cs346.musclememo.utils.Conversions.sliderToExperience
+import com.google.firebase.messaging.FirebaseMessaging
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -217,6 +220,7 @@ class LoginScreenViewModel : ViewModel() {
                     response.body()?.data?.let {
                         AppPreferences.accessToken = it.accessToken
                         AppPreferences.refreshToken = it.refreshToken
+                        sendFireBaseToken()
                         onSuccess()
                     }
                 }
@@ -271,6 +275,35 @@ class LoginScreenViewModel : ViewModel() {
                 onFailure()
             }
         })
+    }
+
+    fun sendFireBaseToken(){
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                println("FCM Registration token: $token")
+                AppPreferences.firebaseToken = token
+                // Send token to your backend server if needed
+                RetrofitInstance.userService.updateUserTokens(FirebaseToken(firebaseTokens = token))
+                    .enqueue(object: Callback<ApiResponse<User>>{
+                        override fun onResponse(
+                            call: Call<ApiResponse<User>>,
+                            response: Response<ApiResponse<User>>
+                        ) {
+                            println(response.body())
+                        }
+
+                        override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
+                            t.printStackTrace()
+                        }
+
+                    } )
+                //sendTokenToServer(token)
+            } else {
+                //Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+            }
+        }
+
     }
 
     enum class LoginState {

@@ -14,11 +14,11 @@ export enum Role {
 }
 
 @Entity()
-export class UserPRs {
+export class UserPrs {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => User, (user) => user.userPRs)
+    @OneToOne(() => User, (user) => user.userPrs)
     @JoinColumn()
     user: Relation<User>;
 

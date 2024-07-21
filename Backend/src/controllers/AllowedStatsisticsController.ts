@@ -8,11 +8,11 @@ export class AllowedStatisticsController {
     private allowedStatisticsRepository = AppDataSource.getRepository(AllowedStatistics);
 
     async getAllowedStatistics(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id);
+        const userId = parseInt(request.params.userId);
         const exerciseRefId = parseInt(request.params.exerciseRefId);
 
         const allowedStatistics = await this.allowedStatisticsRepository.findOneBy({
-            id
+            user: { id: userId },
         });
 
         if (!allowedStatistics) {
@@ -24,12 +24,12 @@ export class AllowedStatisticsController {
     }
 
     async updateAllowedStatistics(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id);
+        const userId = parseInt(request.params.userId);
         const exerciseRefId = parseInt(request.params.exerciseRefId);
         const { allowedValue } = request.body;
 
         const allowedStatistics = await this.allowedStatisticsRepository.findOneBy({
-            id
+            user: { id: userId },
         });
 
         if (!allowedStatistics) {
@@ -43,8 +43,6 @@ export class AllowedStatisticsController {
             [colName]: allowedValue
         });
 
-        //(allowedStatistics as Record<keyof AllowedStatistics,any>)[colName as keyof AllowedStatistics] = allowedValue;
-
-        return success("successful PR update");
+        return success("successful allowed PR update");
     }
 }

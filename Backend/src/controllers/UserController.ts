@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
+import { AllowedStatistics } from "../entities/AllowedStatistics";
 import { User } from "../entities/User";
+import { UserPrs } from "../entities/UserPrs";
 import { UserToken } from "../entities/UserToken";
 import { generatePasswordHash, validatePassword } from "../utils/password";
 import { failure, success } from "../utils/responseTypes";
 import { generateTokens } from "../utils/token";
-import { AllowedStatistics } from "../entities/AllowedStatistics";
-import { UserPrs } from "../entities/UserPrs";
 
 export class UserController {
     private userRepository = AppDataSource.getRepository(User);
@@ -254,13 +254,13 @@ export class UserController {
     }
 
     async logout(request: Request, response: Response, next: NextFunction) {
-        let {refreshToken, firebaseTokens} = request.body
-        const id = request.user?.id
+        let { refreshToken, firebaseTokens } = request.body;
+        const id = request.user?.id;
         const userToken = await this.userTokenRepository.findOneBy({
-            token: refreshToken
+            token: refreshToken,
         });
-        if(!userToken){
-            return failure("Refresh token is invalid")
+        if (!userToken) {
+            return failure("Refresh token is invalid");
         }
         await this.userTokenRepository.remove(userToken);
 
@@ -268,18 +268,20 @@ export class UserController {
             id,
         });
 
-        if (userToUpdate){
-            let listOfTokens = JSON.parse(userToUpdate.firebaseTokens)
+        if (userToUpdate) {
+            let listOfTokens = JSON.parse(userToUpdate.firebaseTokens);
 
-            firebaseTokens = JSON.stringify(listOfTokens.filter((token: string)=>{
-                return (token != firebaseTokens)
-            }))
+            firebaseTokens = JSON.stringify(
+                listOfTokens.filter((token: string) => {
+                    return token != firebaseTokens;
+                })
+            );
         }
         if (!userToUpdate) return failure("Update failed");
         return success(
             this.userRepository.save({
                 ...userToUpdate,
-                firebaseTokens
+                firebaseTokens,
             })
         );
     }
@@ -293,7 +295,14 @@ export class UserController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { username, email, password, gender, experience, firebaseTokens } = request.body;
+        const {
+            username,
+            email,
+            password,
+            gender,
+            experience,
+            firebaseTokens,
+        } = request.body;
 
         const userExists = !!(await this.userRepository.findOneBy({ email }));
 
@@ -309,7 +318,7 @@ export class UserController {
             experience,
             userPrs: new UserPrs(),
             allowedStatistics: new AllowedStatistics(),
-            firebaseTokens
+            firebaseTokens,
         });
 
         await this.userRepository.save(user);
@@ -350,28 +359,32 @@ export class UserController {
         );
     }
 
-    async updateFirebaseToken(request:Request, response: Response, next: NextFunction){
-        let {firebaseTokens} = request.body
-        console.log(firebaseTokens)
+    async updateFirebaseToken(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
+        let { firebaseTokens } = request.body;
+        console.log(firebaseTokens);
         const id = parseInt(request.params.userId);
         let userToUpdate = await this.userRepository.findOneBy({
             id,
         });
-        if (userToUpdate){
-            let listOfTokens = JSON.parse(userToUpdate.firebaseTokens)
-            if (listOfTokens){
-                if (!listOfTokens.includes(firebaseTokens)){
-                    listOfTokens.push(firebaseTokens)
+        if (userToUpdate) {
+            let listOfTokens = JSON.parse(userToUpdate.firebaseTokens);
+            if (listOfTokens) {
+                if (!listOfTokens.includes(firebaseTokens)) {
+                    listOfTokens.push(firebaseTokens);
                 }
             }
-            firebaseTokens = JSON.stringify(listOfTokens)
-            console.log(listOfTokens)
+            firebaseTokens = JSON.stringify(listOfTokens);
+            console.log(listOfTokens);
         }
         if (!userToUpdate) return failure("Update failed");
         return success(
             this.userRepository.save({
                 ...userToUpdate,
-                firebaseTokens
+                firebaseTokens,
             })
         );
     }

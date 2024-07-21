@@ -2,9 +2,10 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import { AppDataSource } from "./data-source";
-import { Routes } from "./routes";
-import { ApiResponse } from "./utils/responseTypes";
 import { initialize } from "./firebaseAdmin";
+import { Routes } from "./routes";
+import { initEmailService } from "./services/EmailService";
+import { ApiResponse } from "./utils/responseTypes";
 
 dotenv.config();
 AppDataSource.initialize()
@@ -12,6 +13,7 @@ AppDataSource.initialize()
         // create express app
         const app = express();
         initialize();
+        initEmailService();
         const port = process.env.PORT || 3000;
         app.use(bodyParser.json());
 

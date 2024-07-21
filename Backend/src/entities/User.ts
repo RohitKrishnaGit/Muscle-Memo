@@ -8,12 +8,12 @@ import {
     PrimaryGeneratedColumn,
     Relation,
 } from "typeorm";
+import { AllowedStatistics } from "./AllowedStatistics";
 import { CustomExerciseRef } from "./CustomExerciseRef";
 import { Template } from "./Template";
+import { UserPrs } from "./UserPrs";
 import { UserToken } from "./UserToken";
 import { Workout } from "./Workout";
-import { UserPrs } from "./UserPrs";
-import { AllowedStatistics } from "./AllowedStatistics"
 
 export enum Role {
     ADMIN,
@@ -70,14 +70,18 @@ export class User {
     @OneToMany(() => UserToken, (userToken) => userToken.user)
     tokens: Relation<UserToken[]>;
 
-    @OneToOne(() => UserPrs, (UserPrs => UserPrs.user), {
-        cascade: true
+    @OneToOne(() => UserPrs, (UserPrs) => UserPrs.user, {
+        cascade: true,
     })
     userPrs: Relation<UserPrs>;
 
-    @OneToOne(() => AllowedStatistics, (AllowedStatistics => AllowedStatistics.user), {
-        cascade: true
-    })
+    @OneToOne(
+        () => AllowedStatistics,
+        (AllowedStatistics) => AllowedStatistics.user,
+        {
+            cascade: true,
+        }
+    )
     allowedStatistics: Relation<AllowedStatistics>;
 
     @Column({ select: false, default: Role.USER })

@@ -32,10 +32,13 @@
 | 7/15/24 |         |            |          |            | 1         |        | Encrypt role into JWT token for faster access               |
 | 7/15/24 |         |            |          |            | 1         |        | Investigate into firebase for push notifs and image storage |
 | 7/15/24 | 1       |            |          |            | 1         |        | Added workout metadata                                      |
-| 7/15/24 | 1       |            | 5        |            |           |        | Finish work on leaderboard API & PRs API                    |
+| 7/15/24 |         |            | 5        |            |           |        | Finish work on leaderboard API & PRs API                    |
 | 7/16/24 |         |            |          |            | 1         |        | Update login screen, fix bug with returning to login screen |
 | 7/16/24 |         |            |          |            | 1         |        | Allow for multiple devices to log in, do some QOL changes   |
 | 7/16/24 | 5       |            |          |            |           |        | Update Users and add endpoints for gender and experience    |
 | 7/17/24 | 3       | 3          | 3        | 3          | 3         | 3      | Work on deliverable 5                                       |
 | 7/20/24 |         |            |          |            | 7         |        | Assist Rohit and Eric with descriptions and push notifs     |
 | 7/21/24 |         |            |          |            | 3         |        | Use google gmail to send emails                             |
+| 7/20/24 |         |            | 7        |            |           |        | Finish leaderboard endpoint and update friends endpoint     |
+| 7/20/24 |         |            | 2        |            |           |        | Add descriptions to all exerciseRefs                        |
+| 7/20/24 |         |            | 1        |            |           |        | Update Workouts table to contain date and duration          |

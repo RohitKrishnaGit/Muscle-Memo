@@ -6,7 +6,7 @@ import { generatePasswordHash, validatePassword } from "../utils/password";
 import { failure, success } from "../utils/responseTypes";
 import { generateTokens } from "../utils/token";
 import { AllowedStatistics } from "../entities/AllowedStatistics";
-import { UserPRs } from "../entities/UserPRs";
+import { UserPrs } from "../entities/UserPrs";
 
 export class UserController {
     private userRepository = AppDataSource.getRepository(User);
@@ -30,10 +30,10 @@ export class UserController {
     }
 
     async getFriends(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id);
+        const userId = parseInt(request.params.userId);
 
         const user = await this.userRepository.findOne({
-            where: { id },
+            where: { id: userId },
             relations: {
                 friends: true,
             },
@@ -50,10 +50,10 @@ export class UserController {
         response: Response,
         next: NextFunction
     ) {
-        const id = parseInt(request.params.id);
+        const userId = parseInt(request.params.userId);
 
         const user = await this.userRepository.findOne({
-            where: { id },
+            where: { id: userId },
             relations: {
                 incomingFriendRequests: true,
             },
@@ -70,10 +70,10 @@ export class UserController {
         response: Response,
         next: NextFunction
     ) {
-        const id = parseInt(request.params.id);
+        const userId = parseInt(request.params.userId);
 
         const user = await this.userRepository.findOne({
-            where: { id },
+            where: { id: userId },
             relations: {
                 outgoingFriendRequests: true,
             },
@@ -90,11 +90,11 @@ export class UserController {
         response: Response,
         next: NextFunction
     ) {
-        const id = parseInt(request.params.id);
+        const userId = parseInt(request.params.userId);
         const { friendId } = request.body;
 
         const user = await this.userRepository.findOne({
-            where: { id },
+            where: { id: userId },
             relations: {
                 outgoingFriendRequests: true,
             },
@@ -133,11 +133,11 @@ export class UserController {
         response: Response,
         next: NextFunction
     ) {
-        const id = parseInt(request.params.id);
+        const userId = parseInt(request.params.userId);
         const { friendId } = request.body;
 
         const user = await this.userRepository.findOne({
-            where: { id },
+            where: { id: userId },
             relations: {
                 friends: true,
             },
@@ -183,11 +183,11 @@ export class UserController {
         response: Response,
         next: NextFunction
     ) {
-        const id = parseInt(request.params.id);
+        const userId = parseInt(request.params.userId);
         const { friendId } = request.body;
 
         const user = await this.userRepository.findOne({
-            where: { id },
+            where: { id: userId },
             relations: {
                 friends: true,
             },
@@ -276,7 +276,7 @@ export class UserController {
             password: await generatePasswordHash(password),
             gender,
             experience,
-            userPRs: new UserPRs(),
+            userPrs: new UserPrs(),
             allowedStatistics: new AllowedStatistics(),
         });
 

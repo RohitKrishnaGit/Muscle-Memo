@@ -9,7 +9,6 @@ export class WorkoutController {
 
     async all(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
-        console.log("make it here");
         const data = (
             await this.workoutRepository.find({
                 where: { user: { id: userId } },

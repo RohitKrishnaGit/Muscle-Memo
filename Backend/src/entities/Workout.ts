@@ -17,8 +17,8 @@ export class Workout {
     @Column()
     name: string;
 
-    @Column()
-    date: string;
+    @Column({ default: Date.now })
+    date: number;
 
     @Column()
     duration: number;

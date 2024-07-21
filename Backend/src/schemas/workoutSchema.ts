@@ -29,6 +29,8 @@ export const createWorkoutSchema = object({
         }).or(
             string().regex(/^me$/, "userId should be either numerical or me")
         ),
+        date: number().optional(),
+        duration: number({ required_error: "duration is required" }),
     }),
 });
 

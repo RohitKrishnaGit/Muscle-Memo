@@ -1,4 +1,4 @@
-import { object, string, number } from "zod";
+import { number, object, string } from "zod";
 
 export const allUserSchema = object({});
 
@@ -43,7 +43,7 @@ export const sendFriendReqSchema = object({
     body: object({
         friendId: number({
             required_error: "friendId is required",
-        })
+        }),
     }),
 });
 
@@ -56,7 +56,7 @@ export const acceptFriendReqSchema = object({
     body: object({
         friendId: number({
             required_error: "friendId is required",
-        })
+        }),
     }),
 });
 
@@ -97,7 +97,6 @@ export const updateUserFirebaseTokenSchema = object({
     }),
 });
 
-
 export const logoutSchema = object({
     params: object({
         userId: string({
@@ -105,7 +104,7 @@ export const logoutSchema = object({
         }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
     }),
     body: object({
-        firebaseTokens: string({
+        firebaseToken: string({
             required_error: "firebsae token is required",
         }),
         refreshToken: string({
@@ -113,7 +112,6 @@ export const logoutSchema = object({
         }),
     }),
 });
-
 
 export const logoutAllUserSchema = object({});
 

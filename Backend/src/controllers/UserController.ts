@@ -254,8 +254,8 @@ export class UserController {
     }
 
     async logout(request: Request, response: Response, next: NextFunction) {
-        let { refreshToken, firebaseTokens } = request.body;
-        const id = request.user?.id;
+        let { refreshToken, firebaseToken } = request.body;
+        const id = parseInt(request.params.userId);
         const userToken = await this.userTokenRepository.findOneBy({
             token: refreshToken,
         });
@@ -264,26 +264,23 @@ export class UserController {
         }
         await this.userTokenRepository.remove(userToken);
 
-        let userToUpdate = await this.userRepository.findOneBy({
+        const userToUpdate = await this.userRepository.findOneBy({
             id,
         });
 
-        if (userToUpdate) {
-            let listOfTokens = JSON.parse(userToUpdate.firebaseTokens);
-
-            firebaseTokens = JSON.stringify(
-                listOfTokens.filter((token: string) => {
-                    return token != firebaseTokens;
-                })
-            );
-        }
         if (!userToUpdate) return failure("Update failed");
-        return success(
-            this.userRepository.save({
-                ...userToUpdate,
-                firebaseTokens,
-            })
+
+        let listOfTokens = JSON.parse(userToUpdate.firebaseTokens);
+
+        listOfTokens = JSON.stringify(
+            listOfTokens.filter((token: string) => token != firebaseToken)
         );
+
+        await this.userRepository.save({
+            ...userToUpdate,
+            firebaseTokens: listOfTokens,
+        });
+        return success("Successfully logged out");
     }
 
     async logoutAll(request: Request, response: Response, next: NextFunction) {
@@ -295,14 +292,7 @@ export class UserController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const {
-            username,
-            email,
-            password,
-            gender,
-            experience,
-            firebaseTokens,
-        } = request.body;
+        const { username, email, password, gender, experience } = request.body;
 
         const userExists = !!(await this.userRepository.findOneBy({ email }));
 
@@ -318,7 +308,6 @@ export class UserController {
             experience,
             userPrs: new UserPrs(),
             allowedStatistics: new AllowedStatistics(),
-            firebaseTokens,
         });
 
         await this.userRepository.save(user);

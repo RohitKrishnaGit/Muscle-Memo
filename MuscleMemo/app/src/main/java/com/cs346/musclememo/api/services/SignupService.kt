@@ -13,7 +13,6 @@ data class SignupRequest (
     val email: String,
     val gender: String,
     val experience: String,
-    val firebaseTokens: String = "[]"
 )
 
 

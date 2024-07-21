@@ -85,7 +85,7 @@ export const Routes = [
         action: "login",
     },
     {
-        method: "delete",
+        method: "post",
         route: "/users/logout/:userId",
         controller: UserController,
         middleware: [

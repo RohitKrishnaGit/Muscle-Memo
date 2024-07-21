@@ -40,7 +40,7 @@ export class User {
     @Column()
     experience: string;
 
-    @Column()
+    @Column({ default: "[]" })
     firebaseTokens: string;
 
     @ManyToMany(() => User, (user) => user.outgoingFriendRequests)

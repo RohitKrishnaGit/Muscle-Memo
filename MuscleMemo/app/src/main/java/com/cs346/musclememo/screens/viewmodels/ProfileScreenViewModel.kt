@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.api.RetrofitInstance
+import com.cs346.musclememo.api.services.LogoutRequest
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.utils.AppPreferences
@@ -148,8 +149,26 @@ class ProfileScreenViewModel : ViewModel() {
         //TODO: call endpoints from here with attributes in user
     }
 
-    fun signoutAllDevices (){
-        RetrofitInstance.userService.signoutAllDevices().enqueue(object:
+    fun logout (){
+        AppPreferences.refreshToken?.let { refreshToken ->
+            AppPreferences.firebaseToken?.let{ firebaseToken ->
+                RetrofitInstance.userService.logout(LogoutRequest(refreshToken, firebaseToken)).enqueue(object:
+                    Callback<ApiResponse<String>>{
+                    override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
+                        return
+                    }
+
+                    override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
+                        return
+                    }
+                })
+            }
+        }
+
+    }
+
+    fun logoutAllDevices (){
+        RetrofitInstance.userService.logoutAllDevices().enqueue(object:
         Callback<ApiResponse<String>>{
             override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
                 return

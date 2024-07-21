@@ -10,14 +10,18 @@ import retrofit2.http.PUT
 
 data class LoginRequest(val email: String, val password: String)
 data class LoginResponse(val accessToken: String, val refreshToken: String)
+data class LogoutRequest(val refreshToken: String, val firebaseToken: String)
 data class FirebaseToken(var firebaseTokens: String = "")
 
 interface UserService {
     @POST("/users/login")
     fun getAuthentication(@Body body: LoginRequest): Call<ApiResponse<LoginResponse>>
 
+    @POST("/users/logout/me")
+    fun logout(@Body body: LogoutRequest): Call<ApiResponse<String>>
+
     @DELETE("/users/logoutAll")
-    fun signoutAllDevices(): Call<ApiResponse<String>>
+    fun logoutAllDevices(): Call<ApiResponse<String>>
 
     @PUT("/users/update/me")
     fun updateUser (@Body user: User): Call<ApiResponse<User>>

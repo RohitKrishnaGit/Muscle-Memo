@@ -220,7 +220,7 @@ class LoginScreenViewModel : ViewModel() {
                     response.body()?.data?.let {
                         AppPreferences.accessToken = it.accessToken
                         AppPreferences.refreshToken = it.refreshToken
-                        //sendFireBaseToken()
+                        sendFireBaseToken()
                         onSuccess()
                     }
                 }
@@ -289,7 +289,9 @@ class LoginScreenViewModel : ViewModel() {
                         override fun onResponse(
                             call: Call<ApiResponse<User>>,
                             response: Response<ApiResponse<User>>
-                        ) {}
+                        ) {
+                            println(response.body())
+                        }
 
                         override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
                             t.printStackTrace()

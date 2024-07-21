@@ -513,7 +513,6 @@ export const Routes = [
         action: "newToken",
     },
 
-<<<<<<< HEAD
     /* PR & leaderboard routes */
     {
         method: "get",
@@ -557,7 +556,7 @@ export const Routes = [
         middleware: [authenticateWithToken],
         action: "getAllUserPRs",
     },
-=======
+
     /* Notification Controller */
     {
         method: "post",
@@ -566,5 +565,5 @@ export const Routes = [
         middleware: [],
         action: "notification",
     }
->>>>>>> 725ef79 (WIP push notifs)
+
 ];

@@ -30,12 +30,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
+import com.cs346.musclememo.api.RetrofitInstance
+import com.cs346.musclememo.api.services.FirebaseToken
+import com.cs346.musclememo.api.types.ApiResponse
+import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.navigation.AppNavHost
 import com.cs346.musclememo.navigation.BottomNavigationBar
 import com.cs346.musclememo.navigation.Screen
 import com.cs346.musclememo.utils.AppPreferences
 import com.example.compose.MuscleMemoTheme
 import com.google.firebase.messaging.FirebaseMessaging
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +52,15 @@ class MainActivity : ComponentActivity() {
 //        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
 //            requestPermissionLauncher.launch(permission)
 //        }
-
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                println("FCM Registration token: $token")
+                AppPreferences.firebaseToken = token
+            } else {
+                //Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+            }
+        }
         // Get the FCM token
 
         enableEdgeToEdge()

@@ -307,12 +307,9 @@ export class UserController {
             password: await generatePasswordHash(password),
             gender,
             experience,
-<<<<<<< HEAD
             userPRs: new UserPRs(),
             allowedStatistics: new AllowedStatistics(),
-=======
             firebaseTokens
->>>>>>> 725ef79 (WIP push notifs)
         });
 
         await this.userRepository.save(user);

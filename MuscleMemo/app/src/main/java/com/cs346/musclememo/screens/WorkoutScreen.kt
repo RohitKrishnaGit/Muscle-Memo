@@ -6,9 +6,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -215,7 +213,7 @@ fun NewWorkout(viewModel: WorkoutScreenViewModel) {
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     IconButton(onClick = {
-                        // todo: add a new template
+                        // todo: show template sheet
                     }) {
                         Icon(
                             Icons.Filled.Add,
@@ -223,10 +221,12 @@ fun NewWorkout(viewModel: WorkoutScreenViewModel) {
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
+                    DisplayTemplates(viewModel = viewModel)
                 }
             }
         }
     }
+    CreateTemplateSheet(viewModel = viewModel)
 }
 
 @Composable
@@ -325,12 +325,13 @@ fun CurrentWorkout(
                             }
                         )
                         ExerciseSets(
+                            exerciseRef = exerciseIt.exerciseRef,
                             sets = exerciseIt.exerciseSet,
                             deleteSet = { setIndex ->
-                                viewModel.removeSet(index, setIndex)
+                                viewModel.removeWorkoutSet(index, setIndex)
                             },
                             addSet = {
-                                viewModel.addSet(index)
+                                viewModel.addWorkoutSet(index)
                             }
                         )
                     }
@@ -745,7 +746,7 @@ private fun AddExercise(
                                     .fillMaxWidth()
                                     .height(50.dp)
                                     .clickable(onClick = {
-                                        viewModel.addNewExercise(exerciseRef)
+                                        viewModel.addWorkoutExercise(exerciseRef)
                                         viewModel.setAddExerciseScreenVisible(false)
                                     }),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -793,4 +794,19 @@ private fun AddExercise(
             }
         }
     }
+}
+
+
+@Composable
+fun DisplayTemplates(
+    viewModel: WorkoutScreenViewModel
+){
+
+}
+
+@Composable
+fun CreateTemplateSheet(
+    viewModel: WorkoutScreenViewModel
+){
+
 }

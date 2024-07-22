@@ -140,7 +140,7 @@ class WorkoutScreenViewModel: ViewModel() {
         }
         else if (showDeleteExerciseDialog) {
             if (selectedExerciseIndex != -1) {
-                removeExercise(selectedExerciseIndex)
+                removeWorkoutExercise(selectedExerciseIndex)
                 selectedExerciseIndex = -1
             }
             showDeleteExerciseDialog = false
@@ -431,16 +431,16 @@ class WorkoutScreenViewModel: ViewModel() {
     fun resetWorkout(){
         currentWorkout.setWorkout()
     }
-    private fun removeExercise(exerciseIndex: Int){
+    private fun removeWorkoutExercise(exerciseIndex: Int){
         currentWorkout.removeExercise(exerciseIndex)
     }
-    fun addNewExercise(exerciseRef: ExerciseRef){
-        currentWorkout.addNewExercise(exerciseRef)
+    fun addWorkoutExercise(exerciseRef: ExerciseRef){
+        currentWorkout.addExercise(exerciseRef)
     }
-    fun addSet(exerciseIndex: Int) {
+    fun addWorkoutSet(exerciseIndex: Int) {
         currentWorkout.addSet(exerciseIndex)
     }
-    fun removeSet(exerciseIndex: Int, setIndex: Int) {
+    fun removeWorkoutSet(exerciseIndex: Int, setIndex: Int) {
         currentWorkout.removeSet(exerciseIndex, setIndex)
     }
     fun updateShowCurrentHistoryWorkout(state: Boolean){

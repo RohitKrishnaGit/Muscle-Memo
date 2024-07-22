@@ -24,7 +24,7 @@ class Workout(
         userId = workout.userId
     }
 
-    fun addNewExercise(exerciseRef: ExerciseRef) {
+    fun addExercise(exerciseRef: ExerciseRef) {
         exercises.add(ExerciseIteration(exerciseRef))
     }
 

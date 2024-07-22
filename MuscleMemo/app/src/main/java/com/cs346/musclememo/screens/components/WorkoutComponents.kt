@@ -72,24 +72,36 @@ fun ExerciseTitle(
 
 @Composable
 fun ExerciseSets(
+    exerciseRef: ExerciseRef,
     sets: MutableList<ExerciseSet>,
     deleteSet: (Int) -> Unit,
     addSet: () -> Unit
 ) {
-
-    val focusManager = LocalFocusManager.current
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 24.dp, end = 24.dp)
     ) {
-        val setFields = listOf(
-            Pair("Set", 1f),
-            Pair("Weight (kg)", 4f),
-            Pair("Reps", 4f),
-            Pair("", 1f)
-        )
+        data class FieldAttributes(val spacing: Float, val text: String)
+
+        val dividedSpacing = 8f / (1 + (if (exerciseRef.weight) 1 else 0) + (if (exerciseRef.distance) 1 else 0))
+
+        val setFields = mutableMapOf<String, FieldAttributes>().apply {
+            put("set", FieldAttributes(1f, "Set"))
+
+            if (exerciseRef.weight)
+                put("weight", FieldAttributes(dividedSpacing, "Weight (kg)"))
+
+            if (exerciseRef.distance)
+                put("distance", FieldAttributes(dividedSpacing, "Distance (m)"))
+
+            if (exerciseRef.durationVSReps)
+                put("duration", FieldAttributes(dividedSpacing, "Duration (s)"))
+            else
+                put("reps", FieldAttributes(dividedSpacing, "Reps"))
+
+            put("button", FieldAttributes(1f, ""))
+        }
 
         if (sets.isNotEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -97,13 +109,13 @@ fun ExerciseSets(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
             ) {
-                for ((text, weight) in setFields) {
+                for (entry in setFields) {
                     Box(
-                        modifier = Modifier.weight(weight),
+                        modifier = Modifier.weight(entry.value.spacing),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = text,
+                            text = entry.value.text,
                             color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                         )
@@ -121,7 +133,7 @@ fun ExerciseSets(
             ) {
                 Row(
                     modifier = Modifier
-                        .weight(setFields[0].second),
+                        .weight(setFields["set"]?.spacing ?: 1f),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
@@ -131,36 +143,63 @@ fun ExerciseSets(
                     )
                 }
 
-                OutlinedTextField(
-                    value = set.weight?.toString() ?: "",
-                    onValueChange = { newValue ->
-                        set.weight = newValue.toIntOrNull()
-                        println(newValue)
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-                    modifier = Modifier
-                        .weight(setFields[1].second)
-                        .padding(start = 8.dp),
-                )
-
-                OutlinedTextField(
-                    value = set.reps?.toString() ?: "",
-                    onValueChange = { newValue ->
-                        set.reps = newValue.toIntOrNull()
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-                    modifier = Modifier
-                        .weight(setFields[2].second)
-                        .padding(start = 8.dp, end = 8.dp),
-                    keyboardActions = KeyboardActions(onDone = {
-                        focusManager.clearFocus()
-                    }
+                if (exerciseRef.weight) {
+                    OutlinedTextField(
+                        value = set.weight?.toString() ?: "",
+                        onValueChange = { newValue ->
+                            set.weight = newValue.toIntOrNull()
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                        modifier = Modifier
+                            .weight(setFields["weight"]?.spacing ?: 1f)
+                            .padding(start = 8.dp),
                     )
-                )
+                }
+
+                if (exerciseRef.distance) {
+                    OutlinedTextField(
+                        value = set.distance?.toString() ?: "",
+                        onValueChange = { newValue ->
+                            set.distance = newValue.toIntOrNull()
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                        modifier = Modifier
+                            .weight(setFields["distance"]?.spacing ?: 1f)
+                            .padding(start = 8.dp),
+                    )
+                }
+
+                if (exerciseRef.durationVSReps) {
+                    OutlinedTextField(
+                        value = set.duration?.toString() ?: "",
+                        onValueChange = { newValue ->
+                            set.duration = newValue.toIntOrNull()
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                        modifier = Modifier
+                            .weight(setFields["duration"]?.spacing ?: 1f)
+                            .padding(start = 8.dp),
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = set.reps?.toString() ?: "",
+                        onValueChange = { newValue ->
+                            set.reps = newValue.toIntOrNull()
+
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done
+                        ),
+                        modifier = Modifier
+                            .weight(setFields["reps"]?.spacing ?: 1f)
+                            .padding(start = 8.dp),
+                    )
+                }
 
                 IconButton(
                     onClick = { deleteSet(setIndex) },
-                    modifier = Modifier.weight(setFields[3].second)
+                    modifier = Modifier.weight(setFields["button"]?.spacing ?: 1f)
                 ) {
                     Icon(Icons.Filled.Close, contentDescription = "Delete Set")
                 }

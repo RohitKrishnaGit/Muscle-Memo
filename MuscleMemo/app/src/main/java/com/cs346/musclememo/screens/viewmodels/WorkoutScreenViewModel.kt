@@ -10,12 +10,15 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.api.services.ExerciseDataSet
 import com.cs346.musclememo.api.services.ExerciseRequest
-import com.cs346.musclememo.api.services.WorkoutRequest
-import com.cs346.musclememo.api.services.WorkoutResponse
+import com.cs346.musclememo.api.services.CreateWorkoutRequest
+import com.cs346.musclememo.api.services.CreateWorkoutResponse
+import com.cs346.musclememo.api.services.GetWorkoutResponse
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.api.types.parseErrorBody
 import com.cs346.musclememo.classes.Exercise
+import com.cs346.musclememo.classes.ExerciseIteration
 import com.cs346.musclememo.classes.ExerciseRef
+import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.classes.Workout
 import retrofit2.Call
 import retrofit2.Callback
@@ -76,7 +79,7 @@ class WorkoutScreenViewModel: ViewModel() {
         private set
     var showCurrentWorkout by mutableStateOf(false)
         private set
-    val workouts = mutableStateOf<List<Workout>>(listOf())
+    var workouts = mutableStateOf<List<Workout>>(listOf())
     private var workoutIndex = 0
     private val workoutOrder: List<WorkoutState> = listOf(
         WorkoutState.NEW_WORKOUT,
@@ -190,16 +193,16 @@ class WorkoutScreenViewModel: ViewModel() {
 
     fun finishWorkout(){
         RetrofitInstance.workoutService.createWorkout(
-            WorkoutRequest(
+            CreateWorkoutRequest(
                 name = currentWorkout.name,
                 date = currentWorkout.date,
                 duration = currentWorkout.duration
             )
         ).enqueue(object :
-            Callback<ApiResponse<WorkoutResponse>> {
+            Callback<ApiResponse<CreateWorkoutResponse>> {
             override fun onResponse(
-                call: Call<ApiResponse<WorkoutResponse>>,
-                response: Response<ApiResponse<WorkoutResponse>>
+                call: Call<ApiResponse<CreateWorkoutResponse>>,
+                response: Response<ApiResponse<CreateWorkoutResponse>>
             ) {
                 if (response.isSuccessful) {
                     // Handle successful response
@@ -218,7 +221,7 @@ class WorkoutScreenViewModel: ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<ApiResponse<WorkoutResponse>>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<CreateWorkoutResponse>>, t: Throwable) {
                 println("Failure: ${t.message}")
             }
         }
@@ -368,19 +371,56 @@ class WorkoutScreenViewModel: ViewModel() {
         val apiService = RetrofitInstance.workoutService
         val call = apiService.getWorkoutByUserId()
 
-        call.enqueue(object : Callback<ApiResponse<List<Workout>>> {
-            override fun onResponse(call: Call<ApiResponse<List<Workout>>>, response: Response<ApiResponse<List<Workout>>>) {
+        call.enqueue(object : Callback<ApiResponse<List<GetWorkoutResponse>>> {
+            override fun onResponse(
+                call: Call<ApiResponse<List<GetWorkoutResponse>>>,
+                response: Response<ApiResponse<List<GetWorkoutResponse>>>
+            ) {
                 if (response.isSuccessful) {
                     response.body()?.data?.let {
-                        workouts.value = it
+                        val newWorkouts = mutableListOf<Workout>()
+                        it.forEach {
+                            val newExercises = mutableListOf<ExerciseIteration>()
+                            it.exercises.forEach{
+                                val newSets = mutableListOf<ExerciseSet>()
+                                it.exerciseSet.forEach {
+                                    newSets.add(ExerciseSet(
+                                        initialReps = it.reps,
+                                        initialDuration = it.duration,
+                                        initialWeight = it.weight,
+                                        initialDistance = it.distance
+                                    ))
+                                }
+                                newExercises.add(
+                                    ExerciseIteration(
+                                        exerciseRef = it.exerciseRef,
+                                        exerciseSet = newSets
+                                    )
+                                )
+                            }
+                            newWorkouts.add(
+                                Workout(
+                                    id = it.workoutId,
+                                    initialName = it.name,
+                                    date = it.date,
+                                    duration = it.duration,
+                                    exercises = newExercises
+                                )
+                            )
+                        }
+                        workouts.value = newWorkouts
                     }
                 }
                 else{
                     println(response.parseErrorBody())
                 }
             }
-            override fun onFailure(call: Call<ApiResponse<List<Workout>>>, t: Throwable) {
-                println("Failure: ${t.message}")
+
+            override fun onFailure(
+                call: Call<ApiResponse<List<GetWorkoutResponse>>>,
+                t: Throwable
+            ) {
+                println("Failed to get workouts")
             }
         })
     }
@@ -411,8 +451,10 @@ class WorkoutScreenViewModel: ViewModel() {
     }
     fun updateWorkoutName(state: Boolean, nameFocusRequester: FocusRequester){
         nameEnabled = state
-        if (state)
+        if (state) {
             nameFocusRequester.requestFocus()
+            println("requested focus")
+        }
         else
             nameFocusRequester.freeFocus()
     }

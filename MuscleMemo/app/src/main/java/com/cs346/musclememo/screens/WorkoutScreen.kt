@@ -103,7 +103,7 @@ fun WorkoutScreen(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             MMButton(
                 onClick = {
@@ -114,8 +114,9 @@ fun WorkoutScreen(
                 maxWidth = true
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             Text(text = "History", fontSize = 24.sp)
+            Spacer(modifier = Modifier.height(20.dp))
             DisplayHistory(viewModel)
         }
     }

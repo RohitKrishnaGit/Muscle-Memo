@@ -70,7 +70,7 @@ fun WorkoutHistoryCard (
         Spacer(modifier = Modifier.weight(1f))
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.95f)
+                .fillMaxWidth()
                 .clickable(enabled = enabled, onClick = onClick)
         ) {
             Column (

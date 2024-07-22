@@ -6,9 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 
-class ExerciseSet {
-    var reps by  mutableStateOf<Int?>(null)
-    var duration by  mutableStateOf<Int?>(null)
-    var weight by mutableStateOf<Int?>(null)
-    var distance by  mutableStateOf<Int?>(null)
+class ExerciseSet(
+    var initialReps: Int? = null,
+    var initialDuration: Int? = null,
+    var initialWeight: Int? = null,
+    var initialDistance: Int? = null
+) {
+    var reps by  mutableStateOf<Int?>(initialReps)
+    var duration by  mutableStateOf<Int?>(initialDuration)
+    var weight by mutableStateOf<Int?>(initialWeight)
+    var distance by  mutableStateOf<Int?>(initialDistance)
 }

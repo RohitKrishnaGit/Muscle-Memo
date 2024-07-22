@@ -89,11 +89,43 @@ class WorkoutScreenViewModel: ViewModel() {
     var showChangeWorkoutNameDialog by mutableStateOf(false)
     var tempWorkoutName by mutableStateOf("")
 
-    var seconds by mutableStateOf(0)
+    var seconds by mutableIntStateOf(0)
 
-    fun convertDate(date: String): String {
-        //TODO: proper conversion
-        return "Saturday, July 20th"
+    fun resetState(){
+        currentWorkout = Workout()
+        newExerciseRef = ExerciseRef(
+            name = "",
+            id = -1,
+            durationVSReps = true,
+            weight = true,
+            distance = false,
+            isCustom = true,
+        )
+        selectedExerciseIndex = -1
+        selectedExercise = null
+        workoutVisible = false
+        addExerciseVisible = false
+        isExerciseSearchMode = false
+        exerciseSearchText = ""
+        isSortedAlphabetically = true
+        showCancelWorkoutDialog = false
+        showDeleteExerciseDialog = false
+        showDeleteCustomExerciseDialog = false
+        showAddNewCustomExerciseDialog = false
+        showEditCustomExerciseDialog = false
+        dialogErrorMessage = ""
+        dialogButtonsEnabled = true
+        currentHistoryWorkout = null
+        showCurrentWorkout = false
+        workouts = mutableStateOf<List<Workout>>(listOf())
+        workoutIndex = 0
+        workoutScreenData = createWorkoutScreenData()
+        showChangeWorkoutNameDialog = false
+        tempWorkoutName = ""
+        seconds = 0
+
+        getWorkoutsByUserId()
+        fetchCombinedExercises()
     }
 
     fun onBackPressed(){

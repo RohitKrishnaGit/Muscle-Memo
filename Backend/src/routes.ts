@@ -64,6 +64,7 @@ import { newTokenSchema } from "./schemas/tokenSchema";
 import {
     acceptFriendReqSchema,
     allUserSchema,
+    confirmPasswordResetSchema,
     createUserSchema,
     getFriendsSchema,
     incomingFriendReqSchema,
@@ -76,6 +77,8 @@ import {
     removeFriendSchema,
     removeUserSchema,
     reportUserSchema,
+    requestPasswordResetSchema,
+    resetPasswordSchema,
     sendFriendReqSchema,
     updateUserFirebaseTokenSchema,
     updateUserSchema,
@@ -314,7 +317,7 @@ export const Routes = [
         method: "post",
         route: "/users/reset-password/request",
         controller: UserController,
-        middleware: [],
+        middleware: [validateSchema(requestPasswordResetSchema)],
         action: "requestPasswordReset",
     },
 
@@ -322,7 +325,7 @@ export const Routes = [
         method: "post",
         route: "/users/reset-password/confirm/:code",
         controller: UserController,
-        middleware: [],
+        middleware: [validateSchema(confirmPasswordResetSchema)],
         action: "confirmPasswordReset",
     },
 
@@ -330,7 +333,7 @@ export const Routes = [
         method: "post",
         route: "/users/reset-password/:code",
         controller: UserController,
-        middleware: [],
+        middleware: [validateSchema(resetPasswordSchema)],
         action: "resetPassword",
     },
 

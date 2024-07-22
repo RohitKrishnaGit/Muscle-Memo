@@ -13,7 +13,7 @@ data class LoginRequest(val email: String, val password: String)
 data class LoginResponse(val accessToken: String, val refreshToken: String)
 data class LogoutRequest(val refreshToken: String, val firebaseToken: String)
 data class FirebaseToken(var firebaseTokens: String = "")
-
+data class ReportRequest(val reportedUserId: Int, val reason: String)
 interface UserService {
     @POST("/users/login")
     fun getAuthentication(@Body body: LoginRequest): Call<ApiResponse<LoginResponse>>
@@ -32,4 +32,7 @@ interface UserService {
 
     @GET("/users/me")
     fun getMyUser(): Call<ApiResponse<User>>
+
+    @POST("/users/report")
+    fun reportUser(@Body body: ReportRequest): Call<ApiResponse<String>>
 }

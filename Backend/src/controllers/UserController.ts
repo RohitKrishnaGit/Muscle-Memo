@@ -4,6 +4,8 @@ import { AllowedStatistics } from "../entities/AllowedStatistics";
 import { User } from "../entities/User";
 import { UserPrs } from "../entities/UserPrs";
 import { UserToken } from "../entities/UserToken";
+import { sendEmail } from "../services/EmailService";
+import { reportHtml } from "../utils/emailPresets";
 import { generatePasswordHash, validatePassword } from "../utils/password";
 import { failure, success } from "../utils/responseTypes";
 import { generateTokens } from "../utils/token";
@@ -339,7 +341,14 @@ export class UserController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { username, email, password, gender, experience, profilePicture} = request.body;
+        const {
+            username,
+            email,
+            password,
+            gender,
+            experience,
+            profilePicture,
+        } = request.body;
 
         const userExists = !!(await this.userRepository.findOneBy({ email }));
 
@@ -355,7 +364,7 @@ export class UserController {
             experience,
             userPrs: new UserPrs(),
             allowedStatistics: new AllowedStatistics(),
-            profilePicture
+            profilePicture,
         });
 
         await this.userRepository.save(user);
@@ -392,7 +401,7 @@ export class UserController {
                 username,
                 gender,
                 experience,
-                profilePicture
+                profilePicture,
             })
         );
     }
@@ -438,5 +447,34 @@ export class UserController {
             return success(true);
         }
         return success(false);
+    }
+
+    async reportUser(request: Request, response: Response, next: NextFunction) {
+        const { reportedUserId, reason } = request.body;
+        const reporterId = request.user?.id;
+
+        if (!reporterId) return failure("Access Token Error");
+
+        const reporter = await this.userRepository.findOneBy({
+            id: reporterId,
+        });
+        const reportee = await this.userRepository.findOneBy({
+            id: reportedUserId,
+        });
+
+        if (!reporter) return failure("Reporting user does not exist");
+        if (!reportee) return failure("Reported user does not exist");
+
+        await sendEmail(
+            "musclememo.help@gmail.com",
+            "User Reported",
+            reportHtml(
+                `${reporter.username} (${reporter.email})`,
+                `${reportee.username} (${reportee.email})`,
+                reason
+            )
+        );
+
+        return success("User Reported");
     }
 }

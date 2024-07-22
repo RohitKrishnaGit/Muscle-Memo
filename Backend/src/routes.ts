@@ -66,6 +66,7 @@ import {
     rejectFriendReqSchema,
     removeFriendSchema,
     removeUserSchema,
+    reportUserSchema,
     sendFriendReqSchema,
     updateUserFirebaseTokenSchema,
     updateUserSchema,
@@ -290,6 +291,14 @@ export const Routes = [
             ),
         ],
         action: "updateFirebaseToken",
+    },
+
+    {
+        method: "post",
+        route: "/users/report",
+        controller: UserController,
+        middleware: [validateSchema(reportUserSchema), authenticateWithToken],
+        action: "reportUser",
     },
 
     /* exerciseRef routes */

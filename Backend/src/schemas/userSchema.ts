@@ -111,6 +111,17 @@ export const updateUserSchema = object({
     }),
 });
 
+export const reportUserSchema = object({
+    body: object({
+        reportedUserId: number({
+            required_error: "reportedUserId is required",
+        }),
+        reason: string({
+            required_error: "reason is required",
+        }),
+    }),
+});
+
 export const updateUserFirebaseTokenSchema = object({
     params: object({
         userId: string({

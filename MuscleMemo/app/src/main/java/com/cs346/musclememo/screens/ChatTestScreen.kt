@@ -1,5 +1,6 @@
 package com.cs346.musclememo.screens
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +16,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.screens.components.MMButton
 import com.cs346.musclememo.screens.viewmodels.LeaderboardScreenViewModel
 import com.cs346.musclememo.SocketManager
+import com.cs346.musclememo.navigation.Screen
+import com.cs346.musclememo.utils.AppPreferences
 
+
+//TEMPORARILY USED AS EXAMPLE TO HELP FRONT END DEVS, REMOVE FOR FINAL
 @Composable
 fun ChatTestScreen() {
     val viewModel = viewModel<LeaderboardScreenViewModel>()
@@ -29,15 +34,17 @@ fun ChatTestScreen() {
             sm.connect()
             sm.joinRoom("3")
             sm.onMessageReceived { msg -> println(msg) }
+            sm.onHistoryRequest { msg -> println(msg) }
         }
         MMButton(
             onClick = {
-                sm.sendMessage("Hello, everyone!")
-
-                //sm.disconnect()
+                if (AppPreferences.refreshToken!=null) {
+                    sm.sendMessage("Hello, everyone!", AppPreferences.refreshToken.toString())
+                }
             },
-            text = "Start A New Workout",
+            text = "Send Message Test",
             maxWidth = true
         )
+        //need to sm.disconnect() on navigation away from chat
     }
 }

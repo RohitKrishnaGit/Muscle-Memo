@@ -16,10 +16,16 @@ export const initChatService = (server: any) => {
             io.to(socket.id).emit('history', 'fetch history');
         });
 
-        socket.on('message', (message: string, userId: string) => {
-            console.log(`Received message '${message}' from socket ${socket.id} in room ${room}`);
-            cc.createHelper(userId, room, message)
-            socket.to(room).emit('message', `${message}+me`);
+        socket.on('message', async (message: string, refreshToken: string) => {
+            console.log(`Received message '${message}'
+                from user with refresh token ${refreshToken}
+                in room ${room}`);
+            if( !(await cc.createHelper(refreshToken, room, message)).error) {
+                socket.to(room).emit('message', `${message}`);
+                console.log(`broadcasted ${message}`)
+            } else {
+                console.log(`invalid refreshToken`)
+            }
         });
 
         socket.on('disconnect', () => {

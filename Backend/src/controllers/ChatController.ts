@@ -3,10 +3,12 @@ import { AppDataSource } from "../data-source";
 import { Chat } from "../entities/Chat";
 import { User } from "../entities/User";
 import { failure, success } from "../utils/responseTypes";
+import { UserToken } from "../entities/UserToken";
 
 export class ChatController {
     private chatRepository =
         AppDataSource.getRepository(Chat);
+    private tokenRepository = AppDataSource.getRepository(UserToken);
 
     async allHelper(roomId: string) {
         return success(
@@ -42,28 +44,22 @@ export class ChatController {
     //     return success(chat);
     // }
 
-    async createHelper(usersId: string, roomId: string, message: string) {
-        const userId = parseInt(usersId);
+    async createHelper(refreshToken: string, roomId: string, message: string) {
+        const sender = await this.tokenRepository.findOneBy({
+            token: refreshToken,
+        });
+
+        if (!sender) return failure("unregistered sender");
 
         const chat = Object.assign(new Chat(), {
             roomId,
             message,
-            sender: { id: userId } as User,
+            sender,
         });
 
         await this.chatRepository.save(chat);
 
         return success("saved message");
-    }
-
-    /* Shouldn't need to create from endpoint, keeping until remove confirmed */
-
-    async create(request: Request, response: Response, next: NextFunction) {
-        const userId = request.params.userId;
-        const roomId = request.params.roomId;
-        const { message } = request.body;
-
-        return this.createHelper(userId, roomId, message)
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {

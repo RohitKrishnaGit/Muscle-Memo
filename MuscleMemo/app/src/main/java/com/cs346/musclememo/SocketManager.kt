@@ -47,7 +47,7 @@ class SocketManager {
         socket?.emit("join", roomId);
     }
 
-    fun sendMessage(message: String, userId: String) {
-        socket?.emit("message", message, userId)
+    fun sendMessage(message: String, refreshToken: String) {
+        socket?.emit("message", message, refreshToken)
     }
 }

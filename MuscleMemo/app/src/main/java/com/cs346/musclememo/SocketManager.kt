@@ -16,9 +16,7 @@ class SocketManager {
     }
 
     fun connect() {
-        println("connecting")
         socket?.connect()
-        println(socket?.connected())
     }
 
     fun disconnect() {
@@ -34,6 +32,10 @@ class SocketManager {
             val message = args[0] as String
             listener.invoke(message)
         }
+    }
+
+    fun joinRoom(roomNum: Number) {
+        socket?.emit("join", roomNum);
     }
 
     fun sendMessage(message: String) {

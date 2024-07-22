@@ -6,6 +6,10 @@ export const initChatService = (server: any) => {
     io.on('connection', (socket: any) => {
         console.log('A user connected');
 
+        socket.on('join', function(room: number) {
+            socket.join(room);
+        });
+
         socket.on('message', (message: string) => {
             console.log(message)
             io.emit('message', message);

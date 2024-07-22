@@ -1,5 +1,8 @@
 package com.cs346.musclememo.screens.viewmodels
 
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import com.cs346.musclememo.api.RetrofitInstance
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -21,6 +24,9 @@ import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.classes.Template
 import com.cs346.musclememo.classes.Workout
+import com.cs346.musclememo.screens.components.epochToDate
+import com.cs346.musclememo.screens.components.epochToMonthYear
+import com.cs346.musclememo.utils.AppPreferences
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -50,6 +56,13 @@ class WorkoutScreenViewModel: ViewModel() {
                 else
                     compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.name }
             )
+
+    val groupedWorkouts: Map<String, List<Workout>>
+        get() = workouts.value.sortedWith(
+            compareByDescending { it.date }
+        ).groupBy {
+            epochToMonthYear(it.date)
+        }
     var workoutVisible by mutableStateOf(false)
         private set
     // whether the choose exercise screen is visible or not
@@ -88,12 +101,46 @@ class WorkoutScreenViewModel: ViewModel() {
     var workoutScreenData by mutableStateOf(createWorkoutScreenData())
     var showChangeWorkoutNameDialog by mutableStateOf(false)
     var tempWorkoutName by mutableStateOf("")
+    var seconds by mutableIntStateOf(0)
+    var isHistoryRefreshing by mutableStateOf(false)
 
-    var seconds by mutableStateOf(0)
 
-    fun convertDate(date: String): String {
-        //TODO: proper conversion
-        return "Saturday, July 20th"
+    fun resetState(){
+        currentWorkout = Workout()
+        newExerciseRef = ExerciseRef(
+            name = "",
+            id = -1,
+            durationVSReps = true,
+            weight = true,
+            distance = false,
+            isCustom = true,
+        )
+        selectedExerciseIndex = -1
+        selectedExercise = null
+        workoutVisible = false
+        addExerciseVisible = false
+        isExerciseSearchMode = false
+        exerciseSearchText = ""
+        isSortedAlphabetically = true
+        showCancelWorkoutDialog = false
+        showDeleteExerciseDialog = false
+        showDeleteCustomExerciseDialog = false
+        showAddNewCustomExerciseDialog = false
+        showEditCustomExerciseDialog = false
+        dialogErrorMessage = ""
+        dialogButtonsEnabled = true
+        currentHistoryWorkout = null
+        showCurrentWorkout = false
+        workouts = mutableStateOf(listOf())
+        workoutIndex = 0
+        workoutScreenData = createWorkoutScreenData()
+        showChangeWorkoutNameDialog = false
+        tempWorkoutName = ""
+        seconds = 0
+        isHistoryRefreshing = false
+
+        getWorkoutsByUserId()
+        fetchCombinedExercises()
     }
 
     fun onBackPressed(){
@@ -404,7 +451,7 @@ class WorkoutScreenViewModel: ViewModel() {
         })
     }
 
-    fun getWorkoutsByUserId(){
+    fun getWorkoutsByUserId(onSuccess: () -> Unit = {}){
         val apiService = RetrofitInstance.workoutService
         val call = apiService.getWorkoutByUserId()
 
@@ -414,7 +461,7 @@ class WorkoutScreenViewModel: ViewModel() {
                 response: Response<ApiResponse<List<GetWorkoutResponse>>>
             ) {
                 if (response.isSuccessful) {
-                    response.body()?.data?.let { it ->
+                    response.body()?.data?.let {
                         val newWorkouts = mutableListOf<Workout>()
                         it.forEach { workout->
                             val newExercises = mutableListOf<ExerciseIteration>()
@@ -448,6 +495,7 @@ class WorkoutScreenViewModel: ViewModel() {
                             println(workout.id)
                         }
                         workouts.value = newWorkouts
+                        onSuccess()
                     }
                 }
                 else{
@@ -477,6 +525,16 @@ class WorkoutScreenViewModel: ViewModel() {
             override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
             }
         })
+    }
+
+    fun refreshHistory(){
+        isHistoryRefreshing = true
+        getWorkoutsByUserId(
+            onSuccess = {
+                isHistoryRefreshing = false
+                println("Done")
+            }
+        )
     }
 
     fun updateTempWorkoutName(name: String){
@@ -568,7 +626,9 @@ class WorkoutScreenViewModel: ViewModel() {
     )
 
     init {
-        getWorkoutsByUserId()
-        fetchCombinedExercises()
+        if (AppPreferences.accessToken != null) {
+            getWorkoutsByUserId()
+            fetchCombinedExercises()
+        }
     }
 }

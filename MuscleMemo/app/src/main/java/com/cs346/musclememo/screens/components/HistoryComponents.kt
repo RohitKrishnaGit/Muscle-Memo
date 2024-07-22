@@ -1,8 +1,10 @@
 package com.cs346.musclememo.screens.components
 
+import android.graphics.Paint.Align
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,45 +27,98 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cs346.musclememo.classes.CustomExerciseRef
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.classes.Workout
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 import com.cs346.musclememo.utils.AppPreferences
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
+@ExperimentalMaterial3Api
 fun DisplayHistory(
     viewModel: WorkoutScreenViewModel
 ){
     val listState = rememberLazyListState()
-    LazyColumn (
-        state = listState,
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        val groupedWorkouts = viewModel.workouts.value.groupBy {
-            it.date
-        }
-        items(items = viewModel.workouts.value){ workout ->
-            WorkoutHistoryCard(
-                workout = workout,
-                onClick = {
-                    viewModel.updateCurrentHistoryWorkout(workout)
-                    viewModel.updateShowCurrentHistoryWorkout(true)
+    val state = rememberPullToRefreshState()
+
+
+    PullToRefreshBox (
+        modifier = Modifier.fillMaxSize(),
+        state = state,
+        isRefreshing = viewModel.isHistoryRefreshing,
+        onRefresh = viewModel::refreshHistory,
+        ){
+        LazyColumn(
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            val groupedWorkouts = viewModel.groupedWorkouts
+
+            if (groupedWorkouts.isNotEmpty()){
+                groupedWorkouts.forEach{(date, workoutsForMonth) ->
+                    stickyHeader {
+                        Row (
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Text(text = date)
+                        }
+                    }
+                    items (items = workoutsForMonth) { workout ->
+                        WorkoutHistoryCard(
+                            workout = workout,
+                            onClick = {
+                                viewModel.updateCurrentHistoryWorkout(workout)
+                                viewModel.updateShowCurrentHistoryWorkout(true)
+                            }
+                        )
+                    }
                 }
-            )
+            }
+            else {
+                item {
+                    Spacer(modifier = Modifier.fillMaxSize())
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ){
+                        Text(text = "Finished workouts are displayed here!")
+                    }
+                }
+            }
+//            items(items = viewModel.workouts.value) { workout ->
+//                WorkoutHistoryCard(
+//                    workout = workout,
+//                    onClick = {
+//                        viewModel.updateCurrentHistoryWorkout(workout)
+//                        viewModel.updateShowCurrentHistoryWorkout(true)
+//                    }
+//                )
+//            }
+
         }
     }
 }

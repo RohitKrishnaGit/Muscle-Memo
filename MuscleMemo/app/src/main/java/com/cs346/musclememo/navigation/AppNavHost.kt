@@ -1,6 +1,7 @@
 package com.cs346.musclememo.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,9 +24,7 @@ fun AppNavHost (
     bottomBarState: MutableState<Boolean>,
     startDestination: String,
 ) {
-    val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
-        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
-    }
+    val workoutScreenViewModel = viewModel<WorkoutScreenViewModel>()
 
     NavHost (
         navController = navController,
@@ -33,6 +32,7 @@ fun AppNavHost (
     ) {
         composable(route = Screen.Login.route) {
             LoginScreen(onSuccessLogin = {
+                workoutScreenViewModel.resetState()
                 navController.navigate(NavItem.Workout.screen.route) { popUpTo(navController.graph.id) {inclusive = true} }
                 bottomBarState.value = true
             })
@@ -53,7 +53,7 @@ fun AppNavHost (
             FriendsScreen()
         }
         composable(route = Screen.Workout.route) {
-            WorkoutScreen(viewModel = viewModel<WorkoutScreenViewModel>(viewModelStoreOwner))
+            WorkoutScreen(viewModel = workoutScreenViewModel)
         }
         composable(route = Screen.FindBuddy.route) {
             FindBuddyScreen()

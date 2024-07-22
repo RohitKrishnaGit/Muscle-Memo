@@ -32,11 +32,11 @@ fun AppNavHost (
         startDestination = startDestination
     ) {
         composable(route = Screen.Login.route) {
-//            LoginScreen(onSuccessLogin = {
-//                navController.navigate(NavItem.Workout.screen.route) { popUpTo(navController.graph.id) {inclusive = true} }
-//                bottomBarState.value = true
-//            })
-            ChatTestScreen()
+            LoginScreen(onSuccessLogin = {
+                navController.navigate(NavItem.Workout.screen.route) { popUpTo(navController.graph.id) {inclusive = true} }
+                bottomBarState.value = true
+            })
+//            ChatTestScreen()
         }
         composable(route = Screen.Profile.route) {
             ProfileScreen( signOut = {

@@ -64,6 +64,7 @@ object RetrofitInstance: RetrofitInterface {
     val prVisibilityService: PrVisibilityService by lazy {
         retrofit.create(PrVisibilityService::class.java)
     }
+
     val templateService: TemplateService by lazy {
         retrofit.create(TemplateService::class.java)
 

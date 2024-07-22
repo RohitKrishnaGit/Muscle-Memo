@@ -180,3 +180,28 @@ export const removeUserSchema = object({
         }).regex(/(^\d+$)|(^me$)/, "id should be either numerical or me"),
     }),
 });
+
+export const requestPasswordResetSchema = object({
+    body: object({
+        email: string({ required_error: "email is required" }).email(),
+    }),
+});
+
+export const confirmPasswordResetSchema = object({
+    params: object({
+        code: string({
+            required_error: "code is required",
+        }),
+    }),
+});
+
+export const resetPasswordSchema = object({
+    params: object({
+        code: string({
+            required_error: "code is required",
+        }),
+    }),
+    body: object({
+        password: string({ required_error: "password is required" }),
+    }),
+});

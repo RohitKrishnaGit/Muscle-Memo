@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.api.services.ExerciseDataSet
 import com.cs346.musclememo.api.services.ExerciseRequest
@@ -51,8 +50,6 @@ class WorkoutScreenViewModel: ViewModel() {
                 else
                     compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.name }
             )
-    var nameEnabled by mutableStateOf(false)
-        private set
     var workoutVisible by mutableStateOf(false)
         private set
     // whether the choose exercise screen is visible or not
@@ -89,7 +86,10 @@ class WorkoutScreenViewModel: ViewModel() {
         WorkoutState.SUMMARY
     )
     var workoutScreenData by mutableStateOf(createWorkoutScreenData())
+    var showChangeWorkoutNameDialog by mutableStateOf(false)
+    var tempWorkoutName by mutableStateOf("")
 
+    var seconds by mutableStateOf(0)
 
     fun convertDate(date: String): String {
         //TODO: proper conversion
@@ -136,9 +136,10 @@ class WorkoutScreenViewModel: ViewModel() {
 
     fun onDialogConfirm(){
         if (showCancelWorkoutDialog){
-            onBackPressed()
             workoutVisible = false
             showCancelWorkoutDialog = false
+            workoutIndex = 0
+            workoutScreenData = createWorkoutScreenData()
         }
         else if (showDeleteExerciseDialog) {
             if (selectedExerciseIndex != -1) {
@@ -231,8 +232,8 @@ class WorkoutScreenViewModel: ViewModel() {
         RetrofitInstance.workoutService.createWorkout(
             CreateWorkoutRequest(
                 name = currentWorkout.name,
-                date = currentWorkout.date,
-                duration = currentWorkout.duration
+                date = System.currentTimeMillis(),
+                duration = seconds
             )
         ).enqueue(object :
             Callback<ApiResponse<CreateWorkoutResponse>> {
@@ -413,36 +414,38 @@ class WorkoutScreenViewModel: ViewModel() {
                 response: Response<ApiResponse<List<GetWorkoutResponse>>>
             ) {
                 if (response.isSuccessful) {
-                    response.body()?.data?.let {
+                    response.body()?.data?.let { it ->
                         val newWorkouts = mutableListOf<Workout>()
-                        it.forEach {
+                        it.forEach { workout->
                             val newExercises = mutableListOf<ExerciseIteration>()
-                            it.exercises.forEach{
+                            workout.exercises.forEach{ exercise ->
                                 val newSets = mutableListOf<ExerciseSet>()
-                                it.exerciseSet.forEach {
+                                exercise.exerciseSet.forEach { set ->
                                     newSets.add(ExerciseSet(
-                                        initialReps = it.reps,
-                                        initialDuration = it.duration,
-                                        initialWeight = it.weight,
-                                        initialDistance = it.distance
+                                        initialReps = set.reps,
+                                        initialDuration = set.duration,
+                                        initialWeight = set.weight,
+                                        initialDistance = set.distance
                                     ))
                                 }
                                 newExercises.add(
                                     ExerciseIteration(
-                                        exerciseRef = it.exerciseRef,
+                                        exerciseRef = exercise.exerciseRef,
                                         exerciseSet = newSets
                                     )
                                 )
                             }
+
                             newWorkouts.add(
                                 Workout(
-                                    id = it.workoutId,
-                                    initialName = it.name,
-                                    date = it.date,
-                                    duration = it.duration,
+                                    id = workout.id,
+                                    initialName = workout.name,
+                                    date = workout.date,
+                                    duration = workout.duration,
                                     exercises = newExercises
                                 )
                             )
+                            println(workout.id)
                         }
                         workouts.value = newWorkouts
                     }
@@ -461,11 +464,38 @@ class WorkoutScreenViewModel: ViewModel() {
         })
     }
 
+    fun deleteWorkout(id: Int, onSuccess: () -> Unit){
+        RetrofitInstance.workoutService.deleteWorkout(id).enqueue(object: Callback<ApiResponse<String>>{
+            override fun onResponse(
+                call: Call<ApiResponse<String>>,
+                response: Response<ApiResponse<String>>
+            ) {
+                getWorkoutsByUserId()
+                onSuccess()
+            }
+
+            override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
+            }
+        })
+    }
+
+    fun updateTempWorkoutName(name: String){
+        tempWorkoutName = name
+    }
+    fun updateShowChangeWorkoutNameDialog (state: Boolean){
+        showChangeWorkoutNameDialog = state
+    }
+    fun setWorkoutName(){
+        currentWorkout.name = tempWorkoutName
+        tempWorkoutName = ""
+        showChangeWorkoutNameDialog = false
+    }
     private fun createWorkoutScreenData(): WorkoutScreenData {
         return WorkoutScreenData(workoutIndex, workoutOrder[workoutIndex])
     }
     fun resetWorkout(){
         currentWorkout.setWorkout()
+        seconds = 0
     }
     private fun removeWorkoutExercise(exerciseIndex: Int){
         currentWorkout.removeExercise(exerciseIndex)
@@ -484,18 +514,6 @@ class WorkoutScreenViewModel: ViewModel() {
     }
     fun updateCurrentHistoryWorkout(workout: Workout){
         currentHistoryWorkout = workout
-    }
-    fun updateWorkoutName(state: Boolean, nameFocusRequester: FocusRequester){
-        nameEnabled = state
-        if (state) {
-            nameFocusRequester.requestFocus()
-            println("requested focus")
-        }
-        else
-            nameFocusRequester.freeFocus()
-    }
-    fun updateWorkoutName(name: String){
-        currentWorkout.name= name
     }
     fun updateShowCancelWorkoutDialog(visible: Boolean){
         showCancelWorkoutDialog = visible

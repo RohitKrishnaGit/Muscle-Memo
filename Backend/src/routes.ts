@@ -4,12 +4,12 @@ import { CustomExerciseRefController } from "./controllers/CustomExerciseRefCont
 import { ExerciseController } from "./controllers/ExerciseController";
 import { ExerciseRefController } from "./controllers/ExerciseRefController";
 import { NotificationController } from "./controllers/NotificationController";
+import { PublicWorkoutController } from "./controllers/PublicWorkoutController";
 import { TemplateController } from "./controllers/TemplateController";
 import { TokenController } from "./controllers/TokenController";
 import { UserController } from "./controllers/UserController";
 import { UserPrsController } from "./controllers/UserPRsController";
 import { WorkoutController } from "./controllers/WorkoutController";
-import { PublicWorkoutController } from "./controllers/PublicWorkoutController";
 import {
     applyUser,
     authenticateWithToken,
@@ -47,6 +47,14 @@ import {
     postPrVisibilitySchema,
 } from "./schemas/leaderboardPRSchema";
 import {
+    allPublicWorkoutSchema,
+    createPublicWorkoutSchema,
+    filterExperiencePublicWorkoutSchema,
+    filterGenderPublicWorkoutSchema,
+    onePublicWorkoutSchema,
+    removePublicWorkoutSchema,
+} from "./schemas/publicWorkoutSchema";
+import {
     allTemplateSchema,
     createTemplateSchema,
     oneTemplateSchema,
@@ -56,6 +64,7 @@ import { newTokenSchema } from "./schemas/tokenSchema";
 import {
     acceptFriendReqSchema,
     allUserSchema,
+    confirmPasswordResetSchema,
     createUserSchema,
     getFriendsSchema,
     incomingFriendReqSchema,
@@ -68,6 +77,8 @@ import {
     removeFriendSchema,
     removeUserSchema,
     reportUserSchema,
+    requestPasswordResetSchema,
+    resetPasswordSchema,
     sendFriendReqSchema,
     updateUserFirebaseTokenSchema,
     updateUserSchema,
@@ -78,6 +89,7 @@ import {
     oneWorkoutSchema,
     removeWorkoutSchema,
 } from "./schemas/workoutSchema";
+
 import { allPublicWorkoutSchema, createPublicWorkoutSchema, filterExperiencePublicWorkoutSchema, filterGenderPublicWorkoutSchema, onePublicWorkoutSchema, removePublicWorkoutSchema } from "./schemas/publicWorkoutSchema";
 import { createPublicKey } from "crypto";
 import { ChatController } from "./controllers/ChatController";
@@ -304,6 +316,30 @@ export const Routes = [
         controller: UserController,
         middleware: [validateSchema(reportUserSchema), authenticateWithToken],
         action: "reportUser",
+    },
+
+    {
+        method: "post",
+        route: "/users/reset-password/request",
+        controller: UserController,
+        middleware: [validateSchema(requestPasswordResetSchema)],
+        action: "requestPasswordReset",
+    },
+
+    {
+        method: "post",
+        route: "/users/reset-password/confirm/:code",
+        controller: UserController,
+        middleware: [validateSchema(confirmPasswordResetSchema)],
+        action: "confirmPasswordReset",
+    },
+
+    {
+        method: "post",
+        route: "/users/reset-password/:code",
+        controller: UserController,
+        middleware: [validateSchema(resetPasswordSchema)],
+        action: "resetPassword",
     },
 
     /* exerciseRef routes */

@@ -9,12 +9,19 @@ export class TemplateController {
 
     async all(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
-
-        return success(
-            this.templateRepository.findBy({
-                user: { id: userId },
+        const data = (
+            await this.templateRepository.find({
+                where: { user: { id: userId } },
+                relations: { exercises: { exerciseRef: true } },
             })
-        );
+        ).map((workout) => ({
+            ...workout,
+            exercises: workout.exercises.map((exercise) => ({
+                ...exercise,
+                exerciseSet: JSON.parse(exercise.exerciseSet),
+            })),
+        }));
+        return success(data);
     }
 
     async one(request: Request, response: Response, next: NextFunction) {

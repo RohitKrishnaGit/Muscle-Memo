@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 
 data class Exercise(
     val exerciseSet: MutableList<ExerciseSet> = mutableStateListOf<ExerciseSet>(ExerciseSet()),
-    val workoutId: Int,
+    val workoutId: Int? = null,
     val templateId: Int? = null,
     val exerciseRefId: Int? = null,
     val customExerciseRefId: Int? = null

@@ -46,7 +46,7 @@ export class ExerciseController {
         //Check for the references
 
         const exercise = Object.assign(new Exercise(), {
-            workout: { id: workoutId },
+            workout: { id: workoutId ?? null},
             exerciseRef: { id: exerciseRefId ?? null },
             customExerciseRef: { id: customExerciseRefId ?? null },
             exerciseSet: strExerciseSet,

@@ -1,20 +1,19 @@
 // lib/firebaseAdmin.js
-import admin from 'firebase-admin';
+import admin from "firebase-admin";
+import { getEnv } from "./environment";
 
 export const initialize = () => {
     if (!admin.apps.length) {
         admin.initializeApp({
             credential: admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-    }),
-    });
+                projectId: getEnv().FIREBASE_PROJECT_ID,
+                clientEmail: getEnv().FIREBASE_CLIENT_EMAIL,
+                privateKey: getEnv().FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+            }),
+        });
     }
-}
-
-export const getMessaging = () => {
-  return admin.messaging();
 };
 
-
+export const getMessaging = () => {
+    return admin.messaging();
+};

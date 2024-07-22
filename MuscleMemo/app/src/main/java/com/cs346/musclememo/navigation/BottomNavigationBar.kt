@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +44,12 @@ fun BottomNavigationBar (
         NavItem.Profile
     )
 
-    var selected = remember { mutableStateOf(2) }
+    val selected = remember { mutableStateOf(2) }
+    LaunchedEffect (bottomBarState.value) {
+        println("bottom")
+        if (bottomBarState.value)
+            selected.value = 2
+    }
 
     AnimatedVisibility(
         visible = bottomBarState.value,
@@ -53,7 +59,6 @@ fun BottomNavigationBar (
             BottomAppBar(
                 contentPadding = PaddingValues(0.dp)
             ) {
-                // todo: fix NavBarItem highlighting
                 Row {
                     items.forEachIndexed { index, item ->
                         NavBarItem(value = item, highlighted = (index == selected.value), modifier = Modifier.weight(1f)) {

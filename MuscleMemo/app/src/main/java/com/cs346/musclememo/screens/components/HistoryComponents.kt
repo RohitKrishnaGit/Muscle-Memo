@@ -48,7 +48,7 @@ fun DisplayHistory(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(items = viewModel.workouts){ workout ->
+        items(items = viewModel.workouts.value){ workout ->
             WorkoutHistoryCard(
                 workout = workout,
                 onClick = {

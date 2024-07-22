@@ -446,8 +446,8 @@ class WorkoutScreenViewModel: ViewModel() {
     )
 
 
-    private val _workouts = mutableStateListOf<Workout>()
-    val workouts : List<Workout> = _workouts
+    val workouts = mutableStateOf<List<Workout>>(listOf())
+
     var currentHistoryWorkout: Workout? = null
         private set
     var showCurrentWorkout by mutableStateOf(false)
@@ -467,11 +467,10 @@ class WorkoutScreenViewModel: ViewModel() {
     }
 
     init {
-        getWorkoutsByUserId()
         fetchCombinedExercises()
     }
 
-    private fun getWorkoutsByUserId(){
+    fun getWorkoutsByUserId(){
         val apiService = RetrofitInstance.workoutService
         val call = apiService.getWorkoutByUserId()
 
@@ -479,10 +478,7 @@ class WorkoutScreenViewModel: ViewModel() {
             override fun onResponse(call: Call<ApiResponse<List<Workout>>>, response: Response<ApiResponse<List<Workout>>>) {
                 if (response.isSuccessful) {
                     response.body()?.data?.let {
-                        for (workout in it) {
-                            println(workout)
-                            _workouts.add(workout)
-                        }
+                        workouts.value = it
                     }
                 }
                 else{

@@ -314,7 +314,7 @@ fun CurrentWorkout(
                     )
                 }
             }
-            
+
             // Display current Exercises
             LazyColumn(
                 state = listState,
@@ -418,10 +418,10 @@ private fun Summary(
                 Spacer(modifier = Modifier.weight(1f))
             }
             Spacer(modifier = Modifier.height(50.dp))
-            LazyColumn (
+            LazyColumn(
                 modifier = Modifier.weight(1f)
-            ){
-                item{
+            ) {
+                item {
                     WorkoutHistoryCard(
                         workout = viewModel.currentWorkout,
                         enabled = false,
@@ -431,7 +431,10 @@ private fun Summary(
             Spacer(modifier = Modifier.height(50.dp))
             Row {
                 Spacer(modifier = Modifier.weight(1f))
-                MMButton(onClick = { viewModel.updateScreenState(true) }, text = "Done")
+                MMButton(onClick = {
+                    viewModel.updateScreenState(true)
+                    viewModel.getWorkoutsByUserId()
+                }, text = "Done")
                 Spacer(modifier = Modifier.weight(1f))
             }
         }

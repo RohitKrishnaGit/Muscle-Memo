@@ -51,11 +51,8 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
-<<<<<<< HEAD
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
-=======
 socket-io-client = { module = "io.socket:socket.io-client", version.ref = "socketIoClient" }
->>>>>>> 7f463a9 (prelim work)
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

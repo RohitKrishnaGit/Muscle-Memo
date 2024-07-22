@@ -9,7 +9,7 @@ import { initEmailService } from "./services/EmailService";
 import { ApiResponse } from "./utils/responseTypes";
 
 dotenv.config();
-totp.options = { step: 120, window: 1 };
+totp.options = { step: 1800, window: 1 };
 AppDataSource.initialize()
     .then(async () => {
         // create express app

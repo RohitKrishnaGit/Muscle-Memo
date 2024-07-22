@@ -13,12 +13,14 @@ import com.cs346.musclememo.api.services.ExerciseRequest
 import com.cs346.musclememo.api.services.CreateWorkoutRequest
 import com.cs346.musclememo.api.services.CreateWorkoutResponse
 import com.cs346.musclememo.api.services.GetWorkoutResponse
+import com.cs346.musclememo.api.services.CreateTemplateClass
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.api.types.parseErrorBody
 import com.cs346.musclememo.classes.Exercise
 import com.cs346.musclememo.classes.ExerciseIteration
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet
+import com.cs346.musclememo.classes.Template
 import com.cs346.musclememo.classes.Workout
 import retrofit2.Call
 import retrofit2.Callback
@@ -189,6 +191,40 @@ class WorkoutScreenViewModel: ViewModel() {
             distance = false,
             isCustom = true
         )
+    }
+
+    fun finishNewTemplate(template: Template){
+        RetrofitInstance.templateService.createTemplate(
+            CreateTemplateClass(
+                name = template.name,
+            )
+        ).enqueue(object: Callback<ApiResponse<Template>> {
+            override fun onResponse(
+                call: Call<ApiResponse<Template>>,
+                response: Response<ApiResponse<Template>>
+            ) {
+                if (response.isSuccessful) {
+                    // Handle successful response
+                    template.let {
+                        for (exercise in template.exercises) { //populate exercises
+                            val newExercise = Exercise(
+                                exerciseSet = exercise.exerciseSet,
+                                workoutId = null,
+                                templateId = exercise.templateId,
+                                exerciseRefId = exercise.exerciseRef.id,
+                                customExerciseRefId = exercise.customExerciseRef?.id
+                            )
+                            createExercises(newExercise)
+                        }
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<Template>>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+        })
     }
 
     fun finishWorkout(){

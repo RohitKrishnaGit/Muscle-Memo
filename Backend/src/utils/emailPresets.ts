@@ -69,8 +69,8 @@ export const passwordResetHtml = (code: string | number) => {
 };
 
 export const reportHtml = (
-    reporter: number,
-    reportee: number,
+    reporter: string,
+    reportee: string,
     reason: string
 ) => {
     return `
@@ -126,7 +126,7 @@ export const reportHtml = (
                     An issue has been reported regarding a user. Below are the details of the reported user and the report:
                 </div>
                 <div class="user-info">
-                    <strong>Reported User Id:</strong> ${reportee}<br>
+                    <strong>Reported User:</strong> ${reportee}<br>
                     <strong>Reported By:</strong> ${reporter}<br>
                     <strong>Reason:</strong> ${reason}
                 </div>

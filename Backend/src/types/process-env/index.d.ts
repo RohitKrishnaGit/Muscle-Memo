@@ -1,9 +1,10 @@
 namespace NodeJS {
     interface ProcessEnv {
         NODE_ENV: string;
-        PORT: number;
+        PORT: string;
         ACCESS_TOKEN_PRIVATE_KEY: string;
         REFRESH_TOKEN_PRIVATE_KEY: string;
+        ACCESS_TOKEN_TIMEOUT?: string;
         FIREBASE_PROJECT_ID: string;
         FIREBASE_CLIENT_EMAIL: string;
         FIREBASE_PRIVATE_KEY: string;

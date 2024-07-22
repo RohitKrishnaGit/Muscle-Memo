@@ -18,13 +18,15 @@
 | 7/06/24 |         |            |          |            | 10        |        | Finish password hashing and implement authentication tokens |
 | 7/06/24 |         |            |          | 2          |           |        | Create account screen + login and account service           |
 | 7/06/24 |         |            |          |            | 1         |        | Fix up response formatting, deploy to server                |
-| 7/07/24 |         |            | 5        |            |           |        | Start work on leaderboard API, friends API & chat           |
+| 7/07/24 |         |            | 4        |            |           |        | Start work on leaderboard API and friends API.              |
+| 7/07/24 |         |            | 1        |            |           |        | Resaearch on which libraries to implement chat with         |
 | 7/08/24 |         |            | 1        |            |           |        | Update ExerciseRef table to store additonal data            |
 | 7/11/24 |         |            |          |            | 4         |        | Implement automatic token refreshing on frontend            |
 | 7/11/24 |         |            |          |            | 2         |        | Standardize response body on backend and frontend           |
 | 7/12/24 |         |            |          |            | 3         |        | Implement schema validation on backend request              |
 | 7/12/24 | 3       | 3          | 3        | 3          | 2         | 3      | Work on deliverable 4                                       |
-| 7/15/24 |         |            | 10       |            |           |        | Continue work on leaderboard API & chat. Finish friends API |
+| 7/15/24 |         |            | 9        |            |           |        | Continue work on leaderboard API. Finish friends API        |
+| 7/15/24 |         |            | 1        |            |           |        | Continue resaearch on which libraries to implement chat with|
 | 7/14/24 | 7       |            |          |            |           |        | History workout endpoint implementation                     |
 | 7/14/24 |         |            |          |            | 2         |        | Help with workout history feature                           |
 | 7/15/24 |         |            |          |            | 2         |        | Expose endpoints for users to get information about self    |
@@ -43,5 +45,10 @@
 | 7/20/24 |         |            | 1        |            |           |        | Update Workouts table to contain date and duration          |
 | 7/21/24 |         |            |          |            | 3         |        | Use google gmail to send emails                             |
 | 7/21/24 |         |            |          |            | 7         |        | Assist Rohit and Matthew with socket.io and frontend bugs   |
+| 7/21/24 |         |            | 1        |            |           |        | Fix migration scripts                                       |
+| 7/21/24 |         |            | 2        |            |           |        | Add remove and reject endpoints for friends                 |
+| 7/21/24 |         |            | 2        |            |           |        | Update Workouts table to contain date and duration          |
+| 7/21/24 |         |            | 2        |            |           |        | Add retrofit for leaderboards and PRs                       |
+| 7/21/24 |         |            | 8        |            |           |        | Implement chat for friends and groups (missing chat history)|
 | 7/22/24 |         |            |          |            | 1         |        | Implement user report feature in backend                    |
 | 7/22/24 |         |            |          |            | 2         |        | Implement password reset feature in backend                 |

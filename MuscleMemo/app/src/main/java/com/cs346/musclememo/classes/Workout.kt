@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 // each element is a map where the key is the exerciseId and the value is a list of sets of
 class Workout(
     var id: Int = 0,
-    val initialName: String = "",
+    val initialName: String = "New Workout",
     var exercises: MutableList<ExerciseIteration> = mutableStateListOf<ExerciseIteration>(),
     var userId: Int = 1,
     var date: Long = 0,

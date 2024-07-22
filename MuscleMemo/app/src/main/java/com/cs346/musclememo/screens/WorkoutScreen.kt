@@ -82,12 +82,11 @@ import com.cs346.musclememo.screens.components.WorkoutHistorySheet
 import com.cs346.musclememo.screens.components.getTransitionDirection
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 
-// TODO: switch with WorkoutScreen when changes are ready
 @Composable
 fun WorkoutScreen(
     viewModel: WorkoutScreenViewModel
 ) {
-    BackHandler(viewModel.chooseWorkoutVisible) {
+    BackHandler(viewModel.workoutVisible) {
         viewModel.onBackPressed()
     }
 
@@ -267,18 +266,13 @@ fun CurrentWorkout(
         ) {
             // top bar
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.1f)
                     .background(MaterialTheme.colorScheme.primary)
-                    .padding(
-                        start = 16.dp,
-                        end = 24.dp,
-                        top = 10.dp,
-                        bottom = 10.dp
-                    )
+                    .padding(horizontal = 24.dp)
             ) {
                 BasicTextField(
                     value = viewModel.currentWorkout.name,
@@ -297,15 +291,14 @@ fun CurrentWorkout(
                         .focusRequester(nameFocusRequester)
                         .onFocusChanged {
                             if (!it.isFocused) {
-                                viewModel.updateName(false)
+                                viewModel.updateWorkoutName(false, nameFocusRequester)
                                 keyboardController?.hide()
                             }
                         }
                 )
                 IconButton(onClick = {
                     println("hi")
-                    viewModel.updateName(true)
-                    nameFocusRequester.requestFocus()
+                    viewModel.updateWorkoutName(true, nameFocusRequester)
                 }) {
                     Icon(
                         Icons.Filled.Edit,
@@ -331,9 +324,7 @@ fun CurrentWorkout(
                             }
                         )
                         ExerciseSets(
-                            viewModel = viewModel,
                             sets = exerciseIt.exerciseSet,
-                            exerciseIndex = index,
                             deleteSet = { setIndex ->
                                 viewModel.removeSet(index, setIndex)
                             },

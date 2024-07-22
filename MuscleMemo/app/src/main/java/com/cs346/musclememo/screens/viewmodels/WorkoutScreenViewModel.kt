@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.api.services.ExerciseDataSet
 import com.cs346.musclememo.api.services.ExerciseRequest
@@ -36,14 +37,21 @@ class WorkoutScreenViewModel: ViewModel() {
     var selectedExercise by mutableStateOf<ExerciseRef?>(null)
 
     private val _exerciseRefs = mutableStateListOf<ExerciseRef>()
+    val filteredExercises: List<ExerciseRef>
+        get() = _exerciseRefs
+            .filter { it.name.contains(exerciseSearchText, ignoreCase = true) }
+            .sortedWith(
+                if (isSortedAlphabetically)
+                    compareBy(String.CASE_INSENSITIVE_ORDER) { it.name }
+                else
+                    compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.name }
+            )
     var nameEnabled by mutableStateOf(false)
         private set
     var workoutVisible by mutableStateOf(false)
         private set
     // whether the choose exercise screen is visible or not
     var addExerciseVisible by mutableStateOf(false)
-        private set
-    var chooseWorkoutVisible by mutableStateOf(false)
         private set
     // controls the header for choosing an exercise screen
     var isExerciseSearchMode by mutableStateOf(false)
@@ -64,43 +72,39 @@ class WorkoutScreenViewModel: ViewModel() {
         private set
     var dialogButtonsEnabled by mutableStateOf(true)
         private set
+    var currentHistoryWorkout: Workout? = null
+        private set
+    var showCurrentWorkout by mutableStateOf(false)
+        private set
+    val workouts = mutableStateOf<List<Workout>>(listOf())
+    private var workoutIndex = 0
+    private val workoutOrder: List<WorkoutState> = listOf(
+        WorkoutState.NEW_WORKOUT,
+        WorkoutState.CURRENT_WORKOUT,
+        WorkoutState.SUMMARY
+    )
+    var workoutScreenData by mutableStateOf(createWorkoutScreenData())
+
+
+    fun convertDate(date: String): String {
+        //TODO: proper conversion
+        return "Saturday, July 20th"
+    }
 
     fun onBackPressed(){
         if (workoutVisible){
-            updateScreenState(false)
-            if (workoutIndex == 0)
+            if (workoutScreenData.screen == WorkoutState.NEW_WORKOUT){
                 workoutVisible = false
+            }
+            else if (addExerciseVisible){
+                addExerciseVisible = false
+            }
         }
         else if (showCurrentWorkout) {
             showCurrentWorkout = false
             currentHistoryWorkout = null
         }
     }
-
-    fun updateName(state: Boolean){
-        nameEnabled = state
-    }
-
-    fun updateScreenState(next: Boolean){
-        if (next){
-            if (workoutIndex == 2) {
-                workoutIndex = 0
-                workoutVisible = false
-            }
-            else
-                workoutIndex++
-        }
-        else {
-            if (workoutIndex != 0 && workoutIndex != 2)
-                workoutIndex--
-        }
-        workoutScreenData = createWorkoutScreenData()
-    }
-
-    fun updateWorkoutName(name: String){
-        currentWorkout.name= name
-    }
-
     fun showErrorDialog(): Boolean{
         return showCancelWorkoutDialog || showDeleteExerciseDialog || showDeleteCustomExerciseDialog
     }
@@ -157,36 +161,20 @@ class WorkoutScreenViewModel: ViewModel() {
         }
     }
 
-    fun updateShowCancelWorkoutDialog(visible: Boolean){
-        showCancelWorkoutDialog = visible
-    }
-
-    fun updateShowRemoveExerciseDialog(visible: Boolean){
-        showDeleteExerciseDialog = visible
-    }
-
-    fun updateShowAddNewCustomExerciseDialog(visible: Boolean){
-        showAddNewCustomExerciseDialog = visible
-    }
-
-    fun updateShowEditCustomExerciseDialog(visible: Boolean){
-        showEditCustomExerciseDialog = visible
-    }
-
-    fun updateShowDeleteCustomExerciseDialog(visible: Boolean){
-        showDeleteCustomExerciseDialog = visible
-    }
-
-    fun updateDialogErrorMessage(message: String){
-        dialogErrorMessage = message
-    }
-
-    fun updateDialogButtonsEnabled(enabled: Boolean){
-        dialogButtonsEnabled = enabled
-    }
-
-    fun updateNewExerciseRef(exerciseRef: ExerciseRef){
-        newExerciseRef = exerciseRef
+    fun updateScreenState(next: Boolean){
+        if (next){
+            if (workoutIndex == 2) {
+                workoutIndex = 0
+                workoutVisible = false
+            }
+            else
+                workoutIndex++
+        }
+        else {
+            if (workoutIndex != 0 && workoutIndex != 2)
+                workoutIndex--
+        }
+        workoutScreenData = createWorkoutScreenData()
     }
 
     fun resetNewExerciseRef() {
@@ -199,32 +187,6 @@ class WorkoutScreenViewModel: ViewModel() {
             isCustom = true
         )
     }
-    fun setWorkoutScreenVisible(visible: Boolean) {
-        workoutVisible = visible
-    }
-    fun setAddExerciseScreenVisible(visible: Boolean) {
-        addExerciseVisible = visible
-    }
-    fun updateExerciseSearchMode(isSearchMode: Boolean){
-        isExerciseSearchMode = isSearchMode
-    }
-    fun updateExerciseSearchText(newText: String) {
-        exerciseSearchText = newText
-    }
-
-    fun toggleSort() {
-        isSortedAlphabetically = !isSortedAlphabetically
-    }
-
-    val filteredExercises: List<ExerciseRef>
-        get() = _exerciseRefs
-            .filter { it.name.contains(exerciseSearchText, ignoreCase = true) }
-            .sortedWith(
-                if (isSortedAlphabetically)
-                    compareBy(String.CASE_INSENSITIVE_ORDER) { it.name }
-                else
-                    compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.name }
-            )
 
     fun finishWorkout(){
         RetrofitInstance.workoutService.createWorkout(
@@ -402,74 +364,6 @@ class WorkoutScreenViewModel: ViewModel() {
         })
     }
 
-    fun resetWorkout(){
-        currentWorkout.setWorkout()
-    }
-
-    private fun removeExercise(exerciseIndex: Int){
-        currentWorkout.removeExercise(exerciseIndex)
-    }
-
-    fun addNewExercise(exerciseRef: ExerciseRef){
-        currentWorkout.addNewExercise(exerciseRef)
-    }
-
-    fun addSet(exerciseIndex: Int) {
-        currentWorkout.addSet(exerciseIndex)
-    }
-
-    fun removeSet(exerciseIndex: Int, setIndex: Int) {
-        currentWorkout.removeSet(exerciseIndex, setIndex)
-    }
-
-    private var workoutIndex = 0
-    private val workoutOrder: List<WorkoutState> = listOf(
-        WorkoutState.NEW_WORKOUT,
-        WorkoutState.CURRENT_WORKOUT,
-        WorkoutState.SUMMARY
-    )
-    var workoutScreenData by mutableStateOf(createWorkoutScreenData())
-
-    private fun createWorkoutScreenData(): WorkoutScreenData {
-        return WorkoutScreenData(workoutIndex, workoutOrder[workoutIndex])
-    }
-
-    enum class WorkoutState {
-        NEW_WORKOUT,
-        CURRENT_WORKOUT,
-        SUMMARY
-    }
-
-    data class WorkoutScreenData (
-        val screenIndex: Int,
-        val screen: WorkoutState
-    )
-
-
-    val workouts = mutableStateOf<List<Workout>>(listOf())
-
-    var currentHistoryWorkout: Workout? = null
-        private set
-    var showCurrentWorkout by mutableStateOf(false)
-        private set
-
-    fun updateShowCurrentHistoryWorkout(state: Boolean){
-        showCurrentWorkout = state
-    }
-
-    fun updateCurrentHistoryWorkout(workout: Workout){
-        currentHistoryWorkout = workout
-    }
-
-    fun convertDate(date: String): String {
-        //TODO: proper conversion
-        return "Saturday, July 20th"
-    }
-
-    init {
-        fetchCombinedExercises()
-    }
-
     fun getWorkoutsByUserId(){
         val apiService = RetrofitInstance.workoutService
         val call = apiService.getWorkoutByUserId()
@@ -489,5 +383,96 @@ class WorkoutScreenViewModel: ViewModel() {
                 println("Failure: ${t.message}")
             }
         })
+    }
+
+    private fun createWorkoutScreenData(): WorkoutScreenData {
+        return WorkoutScreenData(workoutIndex, workoutOrder[workoutIndex])
+    }
+    fun resetWorkout(){
+        currentWorkout.setWorkout()
+    }
+    private fun removeExercise(exerciseIndex: Int){
+        currentWorkout.removeExercise(exerciseIndex)
+    }
+    fun addNewExercise(exerciseRef: ExerciseRef){
+        currentWorkout.addNewExercise(exerciseRef)
+    }
+    fun addSet(exerciseIndex: Int) {
+        currentWorkout.addSet(exerciseIndex)
+    }
+    fun removeSet(exerciseIndex: Int, setIndex: Int) {
+        currentWorkout.removeSet(exerciseIndex, setIndex)
+    }
+    fun updateShowCurrentHistoryWorkout(state: Boolean){
+        showCurrentWorkout = state
+    }
+    fun updateCurrentHistoryWorkout(workout: Workout){
+        currentHistoryWorkout = workout
+    }
+    fun updateWorkoutName(state: Boolean, nameFocusRequester: FocusRequester){
+        nameEnabled = state
+        if (state)
+            nameFocusRequester.requestFocus()
+        else
+            nameFocusRequester.freeFocus()
+    }
+    fun updateWorkoutName(name: String){
+        currentWorkout.name= name
+    }
+    fun updateShowCancelWorkoutDialog(visible: Boolean){
+        showCancelWorkoutDialog = visible
+    }
+    fun updateShowRemoveExerciseDialog(visible: Boolean){
+        showDeleteExerciseDialog = visible
+    }
+    fun updateShowAddNewCustomExerciseDialog(visible: Boolean){
+        showAddNewCustomExerciseDialog = visible
+    }
+    fun updateShowEditCustomExerciseDialog(visible: Boolean){
+        showEditCustomExerciseDialog = visible
+    }
+    fun updateShowDeleteCustomExerciseDialog(visible: Boolean){
+        showDeleteCustomExerciseDialog = visible
+    }
+    fun updateDialogErrorMessage(message: String){
+        dialogErrorMessage = message
+    }
+    fun updateDialogButtonsEnabled(enabled: Boolean){
+        dialogButtonsEnabled = enabled
+    }
+    fun updateNewExerciseRef(exerciseRef: ExerciseRef){
+        newExerciseRef = exerciseRef
+    }
+
+    fun setWorkoutScreenVisible(visible: Boolean) {
+        workoutVisible = visible
+    }
+    fun setAddExerciseScreenVisible(visible: Boolean) {
+        addExerciseVisible = visible
+    }
+    fun updateExerciseSearchMode(isSearchMode: Boolean){
+        isExerciseSearchMode = isSearchMode
+    }
+    fun updateExerciseSearchText(newText: String) {
+        exerciseSearchText = newText
+    }
+    fun toggleSort() {
+        isSortedAlphabetically = !isSortedAlphabetically
+    }
+
+    enum class WorkoutState {
+        NEW_WORKOUT,
+        CURRENT_WORKOUT,
+        SUMMARY
+    }
+
+    data class WorkoutScreenData (
+        val screenIndex: Int,
+        val screen: WorkoutState
+    )
+
+    init {
+        getWorkoutsByUserId()
+        fetchCombinedExercises()
     }
 }

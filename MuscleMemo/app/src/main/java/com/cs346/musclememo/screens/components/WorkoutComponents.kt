@@ -72,9 +72,7 @@ fun ExerciseTitle(
 
 @Composable
 fun ExerciseSets(
-    viewModel: WorkoutScreenViewModel,
     sets: MutableList<ExerciseSet>,
-    exerciseIndex: Int,
     deleteSet: (Int) -> Unit,
     addSet: () -> Unit
 ) {

@@ -5,24 +5,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.cs346.musclememo.api.services.ExerciseDataSet
+import com.cs346.musclememo.api.services.ExerciseRequest
+import com.cs346.musclememo.api.services.WorkoutRequest
+import com.cs346.musclememo.api.services.WorkoutResponse
 import com.cs346.musclememo.api.types.ApiResponse
+import com.cs346.musclememo.api.types.parseErrorBody
 import com.cs346.musclememo.classes.Exercise
 import com.cs346.musclememo.classes.ExerciseRef
-import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.classes.Workout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class WorkoutScreenViewModel : ViewModel() {
+class WorkoutScreenViewModel: ViewModel() {
     var currentWorkout by mutableStateOf(Workout())
         private set
-
-    var tempWorkoutName by mutableStateOf("")
-
     var newExerciseRef by mutableStateOf(ExerciseRef(
         name = "",
         id = -1,
@@ -32,69 +32,129 @@ class WorkoutScreenViewModel : ViewModel() {
         isCustom = true,
     ))
         private set
+    var selectedExerciseIndex by mutableIntStateOf(-1)
+    var selectedExercise by mutableStateOf<ExerciseRef?>(null)
 
     private val _exerciseRefs = mutableStateListOf<ExerciseRef>()
-    val exerciseRefs : List<ExerciseRef> = _exerciseRefs
-
+    var nameEnabled by mutableStateOf(false)
+        private set
     var workoutVisible by mutableStateOf(false)
         private set
-
     // whether the choose exercise screen is visible or not
     var addExerciseVisible by mutableStateOf(false)
         private set
-
-    var summaryVisible by mutableStateOf(false)
-        private set
-
     var chooseWorkoutVisible by mutableStateOf(false)
         private set
-
-    fun onBackPressed(){
-        if (chooseWorkoutVisible){
-            chooseWorkoutVisible = false
-        }
-    }
-
-    fun updateChooseWorkoutVisible (visible: Boolean){
-        chooseWorkoutVisible = visible
-    }
-
     // controls the header for choosing an exercise screen
     var isExerciseSearchMode by mutableStateOf(false)
         private set
-
     // text for the search bar
     var exerciseSearchText by mutableStateOf("")
-
     // controls whether the exercise list is sorted alphabetically or reverse alphabetically
     var isSortedAlphabetically by mutableStateOf(true)
-
-    var showChangeWorkoutNameDialog by mutableStateOf(false)
-        private set
-
-    var showCancelWorkoutDialog by mutableStateOf(false)
-        private set
-
-    var showDeleteExerciseDialog by mutableStateOf(false)
-        private set
-
-    var showAddNewCustomExerciseDialog by mutableStateOf(false)
-        private set
-
-    var showEditCustomExerciseDialog by mutableStateOf(false)
-        private set
-
+    private var showCancelWorkoutDialog by mutableStateOf(false)
+    private var showDeleteExerciseDialog by mutableStateOf(false)
     var showDeleteCustomExerciseDialog by mutableStateOf(false)
         private set
-
-    var dialogErrorMessage by mutableStateOf("")
+    var showAddNewCustomExerciseDialog by mutableStateOf(false)
         private set
-
+    var showEditCustomExerciseDialog by mutableStateOf(false)
+        private set
+    var dialogErrorMessage by mutableStateOf<String?>("")
+        private set
     var dialogButtonsEnabled by mutableStateOf(true)
         private set
 
-    fun updateShowChangeWorkoutNameDialog(visible: Boolean){
-        showChangeWorkoutNameDialog = visible
+    fun onBackPressed(){
+        if (workoutVisible){
+            updateScreenState(false)
+            if (workoutIndex == 0)
+                workoutVisible = false
+        }
+        else if (showCurrentWorkout) {
+            showCurrentWorkout = false
+            currentHistoryWorkout = null
+        }
+    }
+
+    fun updateName(state: Boolean){
+        nameEnabled = state
+    }
+
+    fun updateScreenState(next: Boolean){
+        if (next){
+            if (workoutIndex == 2) {
+                workoutIndex = 0
+                workoutVisible = false
+            }
+            else
+                workoutIndex++
+        }
+        else {
+            if (workoutIndex != 0 && workoutIndex != 2)
+                workoutIndex--
+        }
+        workoutScreenData = createWorkoutScreenData()
+    }
+
+    fun updateWorkoutName(name: String){
+        currentWorkout.name= name
+    }
+
+    fun showErrorDialog(): Boolean{
+        return showCancelWorkoutDialog || showDeleteExerciseDialog || showDeleteCustomExerciseDialog
+    }
+
+    fun getDialogText(): String{
+        return if (showCancelWorkoutDialog)
+            "Cancel Workout"
+        else if (showDeleteExerciseDialog || showDeleteCustomExerciseDialog)
+            "Delete Exercise"
+        else
+            ""
+    }
+
+    fun getDialogBodyText(): String{
+        return if (showCancelWorkoutDialog)
+            "Are you sure you want to cancel this workout?"
+        else if (showDeleteExerciseDialog)
+            "Are you sure you want to delete this exercise?"
+        else if (showDeleteCustomExerciseDialog)
+            "Are you sure you want to delete ${selectedExercise?.name}?"
+        else
+            ""
+    }
+
+    fun onDialogConfirm(){
+        if (showCancelWorkoutDialog){
+            onBackPressed()
+            workoutVisible = false
+            showCancelWorkoutDialog = false
+        }
+        else if (showDeleteExerciseDialog) {
+            if (selectedExerciseIndex != -1) {
+                removeExercise(selectedExerciseIndex)
+                selectedExerciseIndex = -1
+            }
+            showDeleteExerciseDialog = false
+        }
+        else if (showDeleteCustomExerciseDialog){
+            selectedExercise?.let { deleteCustomExercise(it) }
+        }
+    }
+
+    fun onDialogDismiss(){
+        if (showCancelWorkoutDialog)
+            showCancelWorkoutDialog = false
+        else if (showDeleteExerciseDialog){
+            selectedExerciseIndex = -1
+            showDeleteExerciseDialog = false
+        }
+        else if (showDeleteCustomExerciseDialog){
+            selectedExercise = null
+            dialogErrorMessage = null
+            showDeleteCustomExerciseDialog = false
+        }
     }
 
     fun updateShowCancelWorkoutDialog(visible: Boolean){
@@ -139,23 +199,15 @@ class WorkoutScreenViewModel : ViewModel() {
             isCustom = true
         )
     }
-
-    fun setSummaryScreenVisible (visible: Boolean){
-        summaryVisible = visible
-    }
-
     fun setWorkoutScreenVisible(visible: Boolean) {
         workoutVisible = visible
     }
-
     fun setAddExerciseScreenVisible(visible: Boolean) {
         addExerciseVisible = visible
     }
-
     fun updateExerciseSearchMode(isSearchMode: Boolean){
         isExerciseSearchMode = isSearchMode
     }
-
     fun updateExerciseSearchText(newText: String) {
         exerciseSearchText = newText
     }
@@ -174,27 +226,28 @@ class WorkoutScreenViewModel : ViewModel() {
                     compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.name }
             )
 
-    fun createWorkout(workout: Workout){
-        val apiService = RetrofitInstance.workoutService
-        val call = apiService.createWorkout(workout)
-
-        val exercises = workout.exercises
-
-        var workoutId: Int
-
-        call.enqueue(object : Callback<ApiResponse<Workout>> {
-            override fun onResponse(call: Call<ApiResponse<Workout>>, response: Response<ApiResponse<Workout>>) {
+    fun finishWorkout(){
+        RetrofitInstance.workoutService.createWorkout(
+            WorkoutRequest(
+                name = currentWorkout.name,
+                date = currentWorkout.date,
+                duration = currentWorkout.duration
+            )
+        ).enqueue(object :
+            Callback<ApiResponse<WorkoutResponse>> {
+            override fun onResponse(
+                call: Call<ApiResponse<WorkoutResponse>>,
+                response: Response<ApiResponse<WorkoutResponse>>
+            ) {
                 if (response.isSuccessful) {
                     // Handle successful response
-                    val createdWorkout = response.body()?.data
-                    println(createdWorkout)
-                    createdWorkout?.let {
-                        workoutId = it.id
-                        for (exercise in exercises){ //populate exercises
+                    val workoutResponse = response.body()?.data
+                    workoutResponse?.let {
+                        val workoutId = it.workoutId
+                        for (exercise in currentWorkout.exercises){ //populate exercises
                             val newExercise = Exercise(exerciseSet = exercise.exerciseSet, workoutId = workoutId, templateId = exercise.templateId, exerciseRefId = exercise.exerciseRef.id, customExerciseRefId = exercise.customExerciseRef?.id)
                             createExercises(newExercise)
                         }
-                        println(workoutId)
                     }
                     println("Workout created successfully" )
                 } else {
@@ -203,23 +256,31 @@ class WorkoutScreenViewModel : ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<ApiResponse<Workout>>, t: Throwable) {
-                // Handle failure
+            override fun onFailure(call: Call<ApiResponse<WorkoutResponse>>, t: Throwable) {
                 println("Failure: ${t.message}")
             }
-
-        })
-
+        }
+        )
     }
 
     private fun createExercises(exercise: Exercise){
         val apiService = RetrofitInstance.exerciseService
-        val call = apiService.createExercise(exercise)
+        val exerciseDataSet = mutableListOf<ExerciseDataSet>()
+        exercise.exerciseSet.forEach{
+            exerciseDataSet.add(ExerciseDataSet(it.weight, it.reps, it.duration, it.distance))
+        }
+
+        val call = apiService.createExercise(ExerciseRequest(
+                workoutId = exercise.workoutId,
+                exerciseRefId = exercise.exerciseRefId,
+                customExerciseRefId = exercise.customExerciseRefId,
+                exerciseSet = exerciseDataSet
+            )
+        )
         call.enqueue(object: Callback<ApiResponse<Boolean>>{
             override fun onResponse(call: Call<ApiResponse<Boolean>>, response: Response<ApiResponse<Boolean>>) {
                 if (response.isSuccessful) {
                     // Handle successful response
-                    val createdWorkout = response.body()
                     println("Exercise created successfully" )
                 } else {
                     // Handle error response
@@ -234,7 +295,7 @@ class WorkoutScreenViewModel : ViewModel() {
         })
     }
 
-    fun fetchCombinedExercises(){
+    private fun fetchCombinedExercises(){
         _exerciseRefs.clear()
         RetrofitInstance.exerciseService.getCombinedExerciseRefs().enqueue(object: Callback<ApiResponse<List<ExerciseRef>>>{
             override fun onResponse(
@@ -287,7 +348,7 @@ class WorkoutScreenViewModel : ViewModel() {
         })
     }
 
-    fun deleteCustomExercise(customExerciseRef: ExerciseRef) {
+    private fun deleteCustomExercise(customExerciseRef: ExerciseRef) {
         RetrofitInstance.customExerciseService.deleteExercise(customExerciseRef.id.toString()).enqueue(object : Callback<ApiResponse<String>> {
             override fun onResponse(
                 call: Call<ApiResponse<String>>,
@@ -341,15 +402,11 @@ class WorkoutScreenViewModel : ViewModel() {
         })
     }
 
-    fun setWorkoutName(name : String){
-        currentWorkout.setWorkoutName(name)
-    }
-
     fun resetWorkout(){
         currentWorkout.setWorkout()
     }
 
-    fun removeExercise(exerciseIndex: Int){
+    private fun removeExercise(exerciseIndex: Int){
         currentWorkout.removeExercise(exerciseIndex)
     }
 
@@ -361,26 +418,15 @@ class WorkoutScreenViewModel : ViewModel() {
         currentWorkout.addSet(exerciseIndex)
     }
 
-    fun editSet(weight: Int?, reps: Int?, exerciseIndex : Int, setIndex: Int) {
-        currentWorkout.exercises[exerciseIndex].exerciseSet[setIndex] = ExerciseSet(weight, reps)
-    }
-
     fun removeSet(exerciseIndex: Int, setIndex: Int) {
         currentWorkout.removeSet(exerciseIndex, setIndex)
-    }
-
-    fun finishWorkout(){
-        createWorkout(currentWorkout)
-    }
-
-    init {
-        fetchCombinedExercises()
     }
 
     private var workoutIndex = 0
     private val workoutOrder: List<WorkoutState> = listOf(
         WorkoutState.NEW_WORKOUT,
-        WorkoutState.CURRENT_WORKOUT
+        WorkoutState.CURRENT_WORKOUT,
+        WorkoutState.SUMMARY
     )
     var workoutScreenData by mutableStateOf(createWorkoutScreenData())
 
@@ -390,11 +436,62 @@ class WorkoutScreenViewModel : ViewModel() {
 
     enum class WorkoutState {
         NEW_WORKOUT,
-        CURRENT_WORKOUT
+        CURRENT_WORKOUT,
+        SUMMARY
     }
 
     data class WorkoutScreenData (
         val screenIndex: Int,
         val screen: WorkoutState
     )
+
+
+    private val _workouts = mutableStateListOf<Workout>()
+    val workouts : List<Workout> = _workouts
+    var currentHistoryWorkout: Workout? = null
+        private set
+    var showCurrentWorkout by mutableStateOf(false)
+        private set
+
+    fun updateShowCurrentHistoryWorkout(state: Boolean){
+        showCurrentWorkout = state
+    }
+
+    fun updateCurrentHistoryWorkout(workout: Workout){
+        currentHistoryWorkout = workout
+    }
+
+    fun convertDate(date: String): String {
+        //TODO: proper conversion
+        return "Saturday, July 20th"
+    }
+
+    init {
+        getWorkoutsByUserId()
+        fetchCombinedExercises()
+    }
+
+    private fun getWorkoutsByUserId(){
+        val apiService = RetrofitInstance.workoutService
+        val call = apiService.getWorkoutByUserId()
+
+        call.enqueue(object : Callback<ApiResponse<List<Workout>>> {
+            override fun onResponse(call: Call<ApiResponse<List<Workout>>>, response: Response<ApiResponse<List<Workout>>>) {
+                if (response.isSuccessful) {
+                    response.body()?.data?.let {
+                        for (workout in it) {
+                            println(workout)
+                            _workouts.add(workout)
+                        }
+                    }
+                }
+                else{
+                    println(response.parseErrorBody())
+                }
+            }
+            override fun onFailure(call: Call<ApiResponse<List<Workout>>>, t: Throwable) {
+                println("Failure: ${t.message}")
+            }
+        })
+    }
 }

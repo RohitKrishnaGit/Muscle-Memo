@@ -7,11 +7,14 @@ import retrofit2.http.POST
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Path
+import kotlin.time.Duration
 
+data class WorkoutRequest (val name: String, val date: Long, val duration: Int, val userId: String = "me")
+data class WorkoutResponse (val workoutId: Int)
 
-public interface  WorkoutService {
+interface  WorkoutService {
     @POST("/workouts")
-    fun createWorkout(@Body workout: Workout): Call<ApiResponse<Workout>>
+    fun createWorkout(@Body workoutRequest: WorkoutRequest): Call<ApiResponse<WorkoutResponse>>
 
     @GET("/workouts/me")
     fun getWorkoutByUserId (): Call<ApiResponse<List<Workout>>>

@@ -35,8 +35,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet
+import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 
 @Composable
 fun ExerciseTitle(
@@ -49,7 +51,7 @@ fun ExerciseTitle(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(start = 16.dp, end = 8.dp)
+            .padding(start = 24.dp, end = 24.dp)
     ) {
         Text(
             text = exerciseRef.name,
@@ -70,15 +72,19 @@ fun ExerciseTitle(
 
 @Composable
 fun ExerciseSets(
+    viewModel: WorkoutScreenViewModel,
     sets: MutableList<ExerciseSet>,
+    exerciseIndex: Int,
     deleteSet: (Int) -> Unit,
-    addSet: () -> Unit,
-    editSet: (Int?, Int?, Int) -> Unit
+    addSet: () -> Unit
 ) {
+
+    val focusManager = LocalFocusManager.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp)
+            .padding(start = 24.dp, end = 24.dp)
     ) {
         val setFields = listOf(
             Pair("Set", 1f),
@@ -111,10 +117,6 @@ fun ExerciseSets(
         Spacer(modifier = Modifier.height(8.dp))
 
         sets.forEachIndexed { setIndex, set ->
-            var weight by remember { mutableStateOf(set.weight?.toString() ?: "") }
-            var reps by remember { mutableStateOf(set.reps?.toString() ?: "") }
-            val focusManager = LocalFocusManager.current
-
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -132,9 +134,10 @@ fun ExerciseSets(
                 }
 
                 OutlinedTextField(
-                    value = weight,
+                    value = set.weight?.toString() ?: "",
                     onValueChange = { newValue ->
-                        weight = newValue
+                        set.weight = newValue.toIntOrNull()
+                        println(newValue)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
                     modifier = Modifier
@@ -143,16 +146,15 @@ fun ExerciseSets(
                 )
 
                 OutlinedTextField(
-                    value = reps,
+                    value = set.reps?.toString() ?: "",
                     onValueChange = { newValue ->
-                        reps = newValue
+                        set.reps = newValue.toIntOrNull()
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
                     modifier = Modifier
                         .weight(setFields[2].second)
                         .padding(start = 8.dp, end = 8.dp),
                     keyboardActions = KeyboardActions(onDone = {
-                        editSet(weight.toIntOrNull(), reps.toIntOrNull(), setIndex)
                         focusManager.clearFocus()
                     }
                     )
@@ -173,24 +175,5 @@ fun ExerciseSets(
             text = "Add Set",
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-    }
-}
-
-@Composable
-fun DisplayExercises(
-    exerciseRefs : List<ExerciseRef>
-){
-    val listState = rememberLazyListState()
-    LazyColumn (
-        state = listState,
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        items(items = exerciseRefs){
-            Row{
-                Text(text = it.id.toString() + " ")
-                Text(text = it.name)
-            }
-        }
     }
 }

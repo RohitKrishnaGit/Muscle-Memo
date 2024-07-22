@@ -7,6 +7,7 @@ import { initialize } from "./firebaseAdmin";
 import { Routes } from "./routes";
 import { initEmailService } from "./services/EmailService";
 import { ApiResponse } from "./utils/responseTypes";
+import { initChatService } from "./services/ChatService";
 
 initEnv();
 totp.options = { step: 1800, window: 1 };
@@ -69,7 +70,7 @@ AppDataSource.initialize()
         // ...
 
         // start express server
-        app.listen(port);
+        initChatService(app.listen(port));
 
         console.log("Express server has started on port 3000.");
     })

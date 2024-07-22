@@ -5,19 +5,17 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import androidx.compose.material3.Surface
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,38 +25,23 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
-import com.cs346.musclememo.api.RetrofitInstance
-import com.cs346.musclememo.api.services.FirebaseToken
-import com.cs346.musclememo.api.types.ApiResponse
-import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.navigation.AppNavHost
 import com.cs346.musclememo.navigation.BottomNavigationBar
 import com.cs346.musclememo.navigation.Screen
 import com.cs346.musclememo.utils.AppPreferences
 import com.example.compose.MuscleMemoTheme
 import com.google.firebase.messaging.FirebaseMessaging
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppPreferences.setup(applicationContext)
-        val permission = Manifest.permission.POST_NOTIFICATIONS
-//        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-//            requestPermissionLauncher.launch(permission)
-//        }
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val token = task.result
                 println("FCM Registration token: $token")
                 AppPreferences.firebaseToken = token
-            } else {
-                //Log.w(TAG, "Fetching FCM registration token failed", task.exception)
             }
         }
         // Get the FCM token

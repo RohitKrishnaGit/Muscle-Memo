@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,17 +25,18 @@ fun ChatTestScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
+        LaunchedEffect(Unit) {
+            sm.connect()
+            sm.joinRoom(3)
+            sm.onMessageReceived { msg -> println(msg) }
+        }
         MMButton(
             onClick = {
-                sm.connect()
-
-                Thread.sleep(1000) // Give some time for connection to establish
-
                 sm.sendMessage("Hello, everyone!")
 
                 Thread.sleep(3000) // Allow time to receive messages
 
-                sm.disconnect()
+                //sm.disconnect()
             },
             text = "Start A New Workout",
             maxWidth = true

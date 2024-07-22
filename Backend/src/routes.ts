@@ -9,6 +9,7 @@ import { TokenController } from "./controllers/TokenController";
 import { UserController } from "./controllers/UserController";
 import { UserPrsController } from "./controllers/UserPRsController";
 import { WorkoutController } from "./controllers/WorkoutController";
+import { PublicWorkoutController } from "./controllers/PublicWorkoutController";
 import {
     applyUser,
     authenticateWithToken,
@@ -76,6 +77,8 @@ import {
     oneWorkoutSchema,
     removeWorkoutSchema,
 } from "./schemas/workoutSchema";
+import { allPublicWorkoutSchema, createPublicWorkoutSchema, filterExperiencePublicWorkoutSchema, filterGenderPublicWorkoutSchema, onePublicWorkoutSchema, removePublicWorkoutSchema } from "./schemas/publicWorkoutSchema";
+import { createPublicKey } from "crypto";
 
 export const Routes = [
     /* User routes */
@@ -675,5 +678,87 @@ export const Routes = [
         controller: NotificationController,
         middleware: [],
         action: "notification",
+    },
+
+    /* Public workouts routes */
+    {
+        method: "get",
+        route: "/publicWorkouts/:userId/:id",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(onePublicWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "one",
+    },
+    {
+        method: "post",
+        route: "/publicWorkouts/:userId",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(createPublicWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "create",
+    },
+    {
+        method: "delete",
+        route: "/publicWorkouts/:userId/:id",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(removePublicWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "remove",
+    },
+    {
+        method: "get",
+        route: "/publicWorkouts/:userId",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(allPublicWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "all",
+    },
+    {
+        method: "get",
+        route: "/publicWorkouts/filterGender",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(filterGenderPublicWorkoutSchema),
+            authenticateWithToken,
+        ],
+        action: "filterGender",
+    },
+    {
+        method: "get",
+        route: "/publicWorkouts/filterExperience",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(filterExperiencePublicWorkoutSchema),
+            authenticateWithToken,
+        ],
+        action: "filterExperience",
     },
 ];

@@ -12,8 +12,11 @@ export class ChatController {
 
     async allHelper(roomId: string) {
         return success(
-            this.chatRepository.findBy({
-                roomId,
+            this.chatRepository.find({
+                where: { roomId },
+                relations: {
+                    sender: true,
+                },
             })
         );
     }

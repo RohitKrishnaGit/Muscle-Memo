@@ -151,7 +151,7 @@ fun ValidPasswordRequirement(
     ) {
         Icon(if (valid) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank, "Box", tint = color)
         Spacer(modifier = Modifier.width(10.dp))
-        Text(text = text, color = color, fontSize = 13.sp)
+        Text(text = text, color = color, fontSize = 12.sp)
     }
 }
 

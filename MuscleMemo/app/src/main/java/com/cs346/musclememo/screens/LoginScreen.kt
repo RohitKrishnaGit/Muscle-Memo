@@ -299,7 +299,7 @@ fun PasswordSignup(
 
         ValidPasswordRequirement(text = "Minimum 8 characters long", valid = viewModel.minLength())
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         PasswordTextField(
             password = viewModel.passwordCheck,

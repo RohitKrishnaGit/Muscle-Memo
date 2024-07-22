@@ -38,7 +38,10 @@
 | 7/16/24 | 5       |            |          |            |           |        | Update Users and add endpoints for gender and experience    |
 | 7/17/24 | 3       | 3          | 3        | 3          | 3         | 3      | Work on deliverable 5                                       |
 | 7/20/24 |         |            |          |            | 7         |        | Assist Rohit and Eric with descriptions and push notifs     |
-| 7/21/24 |         |            |          |            | 3         |        | Use google gmail to send emails                             |
 | 7/20/24 |         |            | 7        |            |           |        | Finish leaderboard endpoint and update friends endpoint     |
 | 7/20/24 |         |            | 2        |            |           |        | Add descriptions to all exerciseRefs                        |
 | 7/20/24 |         |            | 1        |            |           |        | Update Workouts table to contain date and duration          |
+| 7/21/24 |         |            |          |            | 3         |        | Use google gmail to send emails                             |
+| 7/21/24 |         |            |          |            | 7         |        | Assist Rohit and Matthew with socket.io and frontend bugs   |
+| 7/22/24 |         |            |          |            | 1         |        | Implement user report feature in backend                    |
+| 7/22/24 |         |            |          |            | 2         |        | Implement password reset feature in backend                 |

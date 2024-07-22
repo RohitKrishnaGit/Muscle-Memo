@@ -43,7 +43,7 @@ export class User {
     @Column({ default: "[]" })
     firebaseTokens: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     profilePicture: string;
 
     @ManyToMany(() => User, (user) => user.outgoingFriendRequests)
@@ -86,6 +86,9 @@ export class User {
         }
     )
     allowedStatistics: Relation<AllowedStatistics>;
+
+    @Column({ select: false, type: "text", nullable: true })
+    passwordResetToken?: string | null;
 
     @Column({ select: false, default: Role.USER })
     role: Role;

@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from "express";
+import { totp } from "otplib";
 import { AppDataSource } from "../data-source";
 import { AllowedStatistics } from "../entities/AllowedStatistics";
 import { User } from "../entities/User";
 import { UserPrs } from "../entities/UserPrs";
 import { UserToken } from "../entities/UserToken";
 import { sendEmail } from "../services/EmailService";
-import { reportHtml } from "../utils/emailPresets";
+import { passwordResetHtml, reportHtml } from "../utils/emailPresets";
 import { generatePasswordHash, validatePassword } from "../utils/password";
 import { failure, success } from "../utils/responseTypes";
 import { generateTokens } from "../utils/token";
@@ -476,5 +477,66 @@ export class UserController {
         );
 
         return success("User Reported");
+    }
+
+    async requestPasswordReset(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
+        const { email } = request.body;
+
+        const user = await this.userRepository.findOneBy({ email });
+        if (!user) return failure("Email not found");
+
+        const code = totp.generate(`${user.id}-${user.email}`);
+
+        await this.userRepository.save({ ...user, passwordResetToken: code });
+
+        sendEmail(email, "Password Reset", passwordResetHtml(code));
+
+        return success("Code sent");
+    }
+    async confirmPasswordReset(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
+        const code = request.params.code;
+
+        const user = await this.userRepository.findOneBy({
+            passwordResetToken: code,
+        });
+        if (!user) return failure("User not found");
+
+        const isValid = totp.verify({
+            token: code,
+            secret: `${user.id}-${user.email}`,
+        });
+
+        if (!isValid) return failure("Code is invalid");
+
+        return success("Code is valid");
+    }
+    async resetPassword(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
+        const code = request.params.code;
+        const { password } = request.body;
+
+        const user = await this.userRepository.findOneBy({
+            passwordResetToken: code,
+        });
+        if (!user) return failure("User not found");
+
+        await this.userRepository.save({
+            ...user,
+            password: await generatePasswordHash(password),
+            passwordResetToken: null,
+        });
+
+        return success("Password Updated");
     }
 }

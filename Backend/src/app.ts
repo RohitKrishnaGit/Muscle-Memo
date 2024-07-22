@@ -1,6 +1,7 @@
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
+import { totp } from "otplib";
 import { AppDataSource } from "./data-source";
 import { initialize } from "./firebaseAdmin";
 import { Routes } from "./routes";
@@ -8,6 +9,7 @@ import { initEmailService } from "./services/EmailService";
 import { ApiResponse } from "./utils/responseTypes";
 
 dotenv.config();
+totp.options = { step: 120, window: 1 };
 AppDataSource.initialize()
     .then(async () => {
         // create express app

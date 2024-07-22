@@ -71,6 +71,8 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.firebase.messaging.ktx)
     implementation(libs.core.ktx)
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.storage.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -82,6 +84,7 @@ dependencies {
     // Import the Firebase BoM
     implementation(libs.firebase.bom)
     implementation(libs.firebase.messaging)
+    implementation (libs.google.firebase.storage)
 
 
     // TODO: Add the dependencies for Firebase products you want to use

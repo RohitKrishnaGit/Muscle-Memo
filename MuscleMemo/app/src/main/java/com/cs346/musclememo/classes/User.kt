@@ -7,8 +7,9 @@ data class User (
     val username : String,
     val email : String,
     val workouts: MutableList<Workout>?,
-    val profilePicture: Uri?,
+    val profilePicture: String?,
     val gender: String,
     val experience: String,
     val firebaseTokens: String = "[]"
+
 )

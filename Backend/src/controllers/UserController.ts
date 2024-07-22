@@ -339,7 +339,7 @@ export class UserController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { username, email, password, gender, experience } = request.body;
+        const { username, email, password, gender, experience, profilePicture} = request.body;
 
         const userExists = !!(await this.userRepository.findOneBy({ email }));
 
@@ -355,6 +355,7 @@ export class UserController {
             experience,
             userPrs: new UserPrs(),
             allowedStatistics: new AllowedStatistics(),
+            profilePicture
         });
 
         await this.userRepository.save(user);
@@ -379,7 +380,7 @@ export class UserController {
     }
 
     async update(request: Request, response: Response, next: NextFunction) {
-        const { username, gender, experience } = request.body;
+        const { username, gender, experience, profilePicture } = request.body;
         const id = parseInt(request.params.userId);
         let userToUpdate = await this.userRepository.findOneBy({
             id,
@@ -391,6 +392,7 @@ export class UserController {
                 username,
                 gender,
                 experience,
+                profilePicture
             })
         );
     }

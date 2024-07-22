@@ -43,6 +43,9 @@ export class User {
     @Column({ default: "[]" })
     firebaseTokens: string;
 
+    @Column({nullable: true})
+    profilePicture: string;
+
     @ManyToMany(() => User, (user) => user.outgoingFriendRequests)
     incomingFriendRequests: Relation<User[]>;
 

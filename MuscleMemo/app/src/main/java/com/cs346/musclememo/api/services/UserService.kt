@@ -5,6 +5,7 @@ import com.cs346.musclememo.classes.User
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 
@@ -28,4 +29,7 @@ interface UserService {
 
     @PUT("/users/update/firebase/me")
     fun updateUserTokens(@Body token: FirebaseToken): Call<ApiResponse<User>>
+
+    @GET("/users/me")
+    fun getMyUser(): Call<ApiResponse<User>>
 }

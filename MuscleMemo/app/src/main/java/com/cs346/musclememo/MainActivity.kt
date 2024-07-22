@@ -141,7 +141,6 @@ fun MainScreen() {
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {

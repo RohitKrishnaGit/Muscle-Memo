@@ -1,8 +1,10 @@
 package com.cs346.musclememo.screens.components
 
+import android.graphics.Paint.Align
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +53,7 @@ import com.cs346.musclememo.utils.AppPreferences
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 @ExperimentalMaterial3Api
 fun DisplayHistory(
@@ -71,21 +74,33 @@ fun DisplayHistory(
             verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val groupedWorkouts = viewModel.workouts.value.groupBy {
-                it.date
-            }
-            items(items = viewModel.workouts.value) { workout ->
-                WorkoutHistoryCard(
-                    workout = workout,
-                    onClick = {
-                        viewModel.updateCurrentHistoryWorkout(workout)
-                        viewModel.updateShowCurrentHistoryWorkout(true)
+            val groupedWorkouts = viewModel.groupedWorkouts
+
+            if (groupedWorkouts.isNotEmpty()){
+                groupedWorkouts.forEach{(date, workoutsForMonth) ->
+                    stickyHeader {
+                        Row (
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Text(text = date)
+                        }
                     }
-                )
+                    items (items = workoutsForMonth) { workout ->
+                        WorkoutHistoryCard(
+                            workout = workout,
+                            onClick = {
+                                viewModel.updateCurrentHistoryWorkout(workout)
+                                viewModel.updateShowCurrentHistoryWorkout(true)
+                            }
+                        )
+                    }
+                }
             }
-            if (viewModel.workouts.value.isEmpty()){
+            else {
                 item {
-                    Spacer(modifier = Modifier.fillMaxHeight(0.5f))
+                    Spacer(modifier = Modifier.fillMaxSize())
                     Row (
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
@@ -94,6 +109,16 @@ fun DisplayHistory(
                     }
                 }
             }
+//            items(items = viewModel.workouts.value) { workout ->
+//                WorkoutHistoryCard(
+//                    workout = workout,
+//                    onClick = {
+//                        viewModel.updateCurrentHistoryWorkout(workout)
+//                        viewModel.updateShowCurrentHistoryWorkout(true)
+//                    }
+//                )
+//            }
+
         }
     }
 }

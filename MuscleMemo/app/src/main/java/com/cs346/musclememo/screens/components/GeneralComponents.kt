@@ -161,6 +161,16 @@ fun epochToDate(
     val instant = Instant.ofEpochMilli(date)
     val zoneId = ZoneId.systemDefault() // Use the system default time zone
     val localDateTime = instant.atZone(zoneId).toLocalDateTime()
-    val formatter = if (time) DateTimeFormatter.ofPattern("dd/MM/yyyy 'at' hh:mm:ss a") else DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val formatter = if (time) DateTimeFormatter.ofPattern("dd/MM/yyyy 'at' hh:mm a") else DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    return localDateTime.format(formatter)
+}
+
+fun epochToMonthYear(
+    date: Long
+): String {
+    val instant = Instant.ofEpochMilli(date)
+    val zoneId = ZoneId.systemDefault() // Use the system default time zone
+    val localDateTime = instant.atZone(zoneId).toLocalDateTime()
+    val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
     return localDateTime.format(formatter)
 }

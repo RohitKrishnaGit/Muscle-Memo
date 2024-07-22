@@ -24,6 +24,8 @@ import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.classes.Template
 import com.cs346.musclememo.classes.Workout
+import com.cs346.musclememo.screens.components.epochToDate
+import com.cs346.musclememo.screens.components.epochToMonthYear
 import com.cs346.musclememo.utils.AppPreferences
 import retrofit2.Call
 import retrofit2.Callback
@@ -54,6 +56,13 @@ class WorkoutScreenViewModel: ViewModel() {
                 else
                     compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.name }
             )
+
+    val groupedWorkouts: Map<String, List<Workout>>
+        get() = workouts.value.sortedWith(
+            compareByDescending { it.date }
+        ).groupBy {
+            epochToMonthYear(it.date)
+        }
     var workoutVisible by mutableStateOf(false)
         private set
     // whether the choose exercise screen is visible or not
@@ -93,6 +102,7 @@ class WorkoutScreenViewModel: ViewModel() {
     var showChangeWorkoutNameDialog by mutableStateOf(false)
     var tempWorkoutName by mutableStateOf("")
     var seconds by mutableIntStateOf(0)
+    var isHistoryRefreshing by mutableStateOf(false)
 
 
     fun resetState(){
@@ -127,6 +137,7 @@ class WorkoutScreenViewModel: ViewModel() {
         showChangeWorkoutNameDialog = false
         tempWorkoutName = ""
         seconds = 0
+        isHistoryRefreshing = false
 
         getWorkoutsByUserId()
         fetchCombinedExercises()
@@ -515,8 +526,6 @@ class WorkoutScreenViewModel: ViewModel() {
             }
         })
     }
-
-    var isHistoryRefreshing by mutableStateOf(false)
 
     fun refreshHistory(){
         isHistoryRefreshing = true

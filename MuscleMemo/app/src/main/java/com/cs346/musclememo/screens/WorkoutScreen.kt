@@ -11,7 +11,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,8 +27,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -39,6 +36,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -51,6 +49,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,13 +58,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -78,7 +71,10 @@ import com.cs346.musclememo.screens.components.TopAppBar
 import com.cs346.musclememo.screens.components.WorkoutHistoryCard
 import com.cs346.musclememo.screens.components.WorkoutHistorySheet
 import com.cs346.musclememo.screens.components.getTransitionDirection
+import com.cs346.musclememo.screens.components.toHourMinuteSeconds
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun WorkoutScreen(
@@ -123,9 +119,9 @@ fun WorkoutScreen(
     )
 
     WorkoutHistorySheet(
+        viewModel = viewModel,
         workout = viewModel.currentHistoryWorkout,
-        visible = viewModel.showCurrentWorkout,
-        onBackPressed = viewModel::onBackPressed
+        visible = viewModel.showCurrentWorkout
     )
 }
 
@@ -233,12 +229,34 @@ fun NewWorkout(viewModel: WorkoutScreenViewModel) {
 fun CurrentWorkout(
     viewModel: WorkoutScreenViewModel
 ) {
-    //TODO: free focus on every button
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val interactionSource = remember { MutableInteractionSource() }
-    val nameFocusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState()
+    LaunchedEffect(Unit) {
+        while(true) {
+            delay(1.seconds)
+            viewModel.seconds++
+        }
+    }
+
+    MMDialog(
+        showDialog = viewModel.showChangeWorkoutNameDialog,
+        title = "Change Workout Name",
+        onConfirm = {
+            viewModel.setWorkoutName()
+        },
+        onDismissRequest = { viewModel.updateShowChangeWorkoutNameDialog(false) },
+        body = {
+            TextField(
+                value = viewModel.tempWorkoutName,
+                onValueChange = viewModel::updateTempWorkoutName,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                label = { Text("Workout Name") }
+            )
+            Text(viewModel.getDialogBodyText())
+        },
+        confirmButtonText = "Save",
+        cancelButtonText = "Cancel",
+        errorText = viewModel.dialogErrorMessage
+    )
 
     MMDialog(
         showDialog = viewModel.showErrorDialog(),
@@ -254,12 +272,6 @@ fun CurrentWorkout(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) {
-                nameFocusRequester.freeFocus()
-            }
     ) {
         Column(
             modifier = Modifier
@@ -275,31 +287,9 @@ fun CurrentWorkout(
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(horizontal = 24.dp)
             ) {
-                BasicTextField(
-                    value = viewModel.currentWorkout.name,
-                    onValueChange = { viewModel.updateWorkoutName(it) },
-                    textStyle = TextStyle(fontSize = 20.sp),
-                    enabled = viewModel.nameEnabled,
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            focusManager.clearFocus()
-                        }
-                    ),
-                    modifier = Modifier
-                        .focusRequester(nameFocusRequester)
-                        .onFocusChanged {
-                            if (!it.isFocused) {
-                                viewModel.updateWorkoutName(false, nameFocusRequester)
-                                keyboardController?.hide()
-                            }
-                        }
-                )
+                Text(text = viewModel.currentWorkout.name, fontSize = 24.sp, color = MaterialTheme.colorScheme.onPrimary)
                 IconButton(onClick = {
-                    println("hi")
-                    viewModel.updateWorkoutName(true, nameFocusRequester)
+                    viewModel.updateShowChangeWorkoutNameDialog(true)
                 }) {
                     Icon(
                         Icons.Filled.Edit,
@@ -307,6 +297,10 @@ fun CurrentWorkout(
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(Icons.Default.Timer, null, tint = MaterialTheme.colorScheme.onPrimary)
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = toHourMinuteSeconds(viewModel.seconds), color = MaterialTheme.colorScheme.onPrimary)
             }
 
             // Display current Exercises
@@ -357,7 +351,6 @@ fun CurrentWorkout(
                         ) {
                             MMButton(
                                 onClick = {
-                                    //TODO: replace
                                     viewModel.updateShowCancelWorkoutDialog(true)
                                 },
                                 text = "Cancel Workout",
@@ -368,7 +361,6 @@ fun CurrentWorkout(
                             Spacer(modifier = Modifier.width(16.dp))
                             MMButton(
                                 onClick = {
-                                    //TODO: replace
                                     viewModel.finishWorkout()
                                     viewModel.updateScreenState(true)
                                 },

@@ -11,9 +11,9 @@ object AppPreferences {
 
     fun setup(context: Context) {
         sharedPreferences = context.getSharedPreferences("MuscleMemo.sharedprefs", MODE_PRIVATE)
-        if (systemOfMeasurementDistance == "")
+        if (systemOfMeasurementDistance == null)
             systemOfMeasurementDistance = "km"
-        if (systemOfMeasurementWeight == "")
+        if (systemOfMeasurementWeight == null)
             systemOfMeasurementWeight = "kg"
     }
 

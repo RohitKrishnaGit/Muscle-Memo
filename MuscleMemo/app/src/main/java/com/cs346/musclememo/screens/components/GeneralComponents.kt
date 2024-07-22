@@ -1,6 +1,5 @@
 package com.cs346.musclememo.screens.components
 
-import android.graphics.drawable.Icon
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,6 +27,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.cs346.musclememo.utils.AppPreferences
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
 
 @Composable
 fun TopAppBar(
@@ -129,4 +134,33 @@ fun getTransitionDirection(
         // above, negative fullWidth to enter, and fullWidth to exit.
         AnimatedContentTransitionScope.SlideDirection.Right
     }
+}
+
+fun getWeight(weight: Int?): Int?{
+    return if (AppPreferences.systemOfMeasurementWeight == "lbs" && weight != null)
+        (weight.times(2.205)).toInt()
+    else
+        weight
+}
+
+fun getDistance(distance: Int?): Int? {
+    return if (AppPreferences.systemOfMeasurementWeight == "miles" && distance != null)
+        (distance.div(1.609)).toInt()
+    else
+        distance
+}
+
+fun toHourMinuteSeconds(time: Int): String{
+    return String.format(Locale.getDefault(),"%02d:%02d:%02d", time / 3600, (time % 3600) / 60, time % 60)
+}
+
+fun epochToDate(
+    date: Long,
+    time: Boolean = false
+): String {
+    val instant = Instant.ofEpochMilli(date)
+    val zoneId = ZoneId.systemDefault() // Use the system default time zone
+    val localDateTime = instant.atZone(zoneId).toLocalDateTime()
+    val formatter = if (time) DateTimeFormatter.ofPattern("dd/MM/yyyy 'at' hh:mm:ss a") else DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    return localDateTime.format(formatter)
 }

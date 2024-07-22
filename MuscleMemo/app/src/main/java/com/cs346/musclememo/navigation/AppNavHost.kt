@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.cs346.musclememo.screens.ChatTestScreen
 import com.cs346.musclememo.screens.FindBuddyScreen
 import com.cs346.musclememo.screens.FriendsScreen
 import com.cs346.musclememo.screens.HistoryScreen
@@ -37,6 +38,7 @@ fun AppNavHost (
                 bottomBarState.value = true
             }
             )
+            //ChatTestScreen()
         }
         composable(route = Screen.Profile.route) {
             ProfileScreen( signOut = {

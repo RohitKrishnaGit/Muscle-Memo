@@ -27,14 +27,12 @@ fun ChatTestScreen() {
     ){
         LaunchedEffect(Unit) {
             sm.connect()
-            sm.joinRoom(3)
+            sm.joinRoom("3")
             sm.onMessageReceived { msg -> println(msg) }
         }
         MMButton(
             onClick = {
                 sm.sendMessage("Hello, everyone!")
-
-                Thread.sleep(3000) // Allow time to receive messages
 
                 //sm.disconnect()
             },

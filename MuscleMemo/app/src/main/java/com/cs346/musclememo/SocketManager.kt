@@ -34,12 +34,11 @@ class SocketManager {
         }
     }
 
-    fun joinRoom(roomNum: Number) {
-        socket?.emit("join", roomNum);
+    fun joinRoom(roomId: String) {
+        socket?.emit("join", roomId);
     }
 
     fun sendMessage(message: String) {
-
         socket?.emit("message", message)
     }
 }

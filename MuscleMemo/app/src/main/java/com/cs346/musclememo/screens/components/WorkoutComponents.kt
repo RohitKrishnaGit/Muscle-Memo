@@ -35,8 +35,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet
+import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 
 @Composable
 fun ExerciseTitle(
@@ -49,7 +51,7 @@ fun ExerciseTitle(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(start = 16.dp, end = 8.dp)
+            .padding(start = 24.dp, end = 24.dp)
     ) {
         Text(
             text = exerciseRef.name,
@@ -70,22 +72,36 @@ fun ExerciseTitle(
 
 @Composable
 fun ExerciseSets(
+    exerciseRef: ExerciseRef,
     sets: MutableList<ExerciseSet>,
     deleteSet: (Int) -> Unit,
-    addSet: () -> Unit,
-    editSet: (Int?, Int?, Int) -> Unit
+    addSet: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp)
+            .padding(start = 24.dp, end = 24.dp)
     ) {
-        val setFields = listOf(
-            Pair("Set", 1f),
-            Pair("Weight (kg)", 4f),
-            Pair("Reps", 4f),
-            Pair("", 1f)
-        )
+        data class FieldAttributes(val spacing: Float, val text: String)
+
+        val dividedSpacing = 8f / (1 + (if (exerciseRef.weight) 1 else 0) + (if (exerciseRef.distance) 1 else 0))
+
+        val setFields = mutableMapOf<String, FieldAttributes>().apply {
+            put("set", FieldAttributes(1f, "Set"))
+
+            if (exerciseRef.weight)
+                put("weight", FieldAttributes(dividedSpacing, "Weight (kg)"))
+
+            if (exerciseRef.distance)
+                put("distance", FieldAttributes(dividedSpacing, "Distance (m)"))
+
+            if (exerciseRef.durationVSReps)
+                put("duration", FieldAttributes(dividedSpacing, "Duration (s)"))
+            else
+                put("reps", FieldAttributes(dividedSpacing, "Reps"))
+
+            put("button", FieldAttributes(1f, ""))
+        }
 
         if (sets.isNotEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -93,13 +109,13 @@ fun ExerciseSets(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
             ) {
-                for ((text, weight) in setFields) {
+                for (entry in setFields) {
                     Box(
-                        modifier = Modifier.weight(weight),
+                        modifier = Modifier.weight(entry.value.spacing),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = text,
+                            text = entry.value.text,
                             color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                         )
@@ -111,17 +127,13 @@ fun ExerciseSets(
         Spacer(modifier = Modifier.height(8.dp))
 
         sets.forEachIndexed { setIndex, set ->
-            var weight by remember { mutableStateOf(set.weight?.toString() ?: "") }
-            var reps by remember { mutableStateOf(set.reps?.toString() ?: "") }
-            val focusManager = LocalFocusManager.current
-
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
                     modifier = Modifier
-                        .weight(setFields[0].second),
+                        .weight(setFields["set"]?.spacing ?: 1f),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
@@ -131,36 +143,63 @@ fun ExerciseSets(
                     )
                 }
 
-                OutlinedTextField(
-                    value = weight,
-                    onValueChange = { newValue ->
-                        weight = newValue
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-                    modifier = Modifier
-                        .weight(setFields[1].second)
-                        .padding(start = 8.dp),
-                )
-
-                OutlinedTextField(
-                    value = reps,
-                    onValueChange = { newValue ->
-                        reps = newValue
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-                    modifier = Modifier
-                        .weight(setFields[2].second)
-                        .padding(start = 8.dp, end = 8.dp),
-                    keyboardActions = KeyboardActions(onDone = {
-                        editSet(weight.toIntOrNull(), reps.toIntOrNull(), setIndex)
-                        focusManager.clearFocus()
-                    }
+                if (exerciseRef.weight) {
+                    OutlinedTextField(
+                        value = set.weight?.toString() ?: "",
+                        onValueChange = { newValue ->
+                            set.weight = newValue.toIntOrNull()
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                        modifier = Modifier
+                            .weight(setFields["weight"]?.spacing ?: 1f)
+                            .padding(start = 8.dp),
                     )
-                )
+                }
+
+                if (exerciseRef.distance) {
+                    OutlinedTextField(
+                        value = set.distance?.toString() ?: "",
+                        onValueChange = { newValue ->
+                            set.distance = newValue.toIntOrNull()
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                        modifier = Modifier
+                            .weight(setFields["distance"]?.spacing ?: 1f)
+                            .padding(start = 8.dp),
+                    )
+                }
+
+                if (exerciseRef.durationVSReps) {
+                    OutlinedTextField(
+                        value = set.duration?.toString() ?: "",
+                        onValueChange = { newValue ->
+                            set.duration = newValue.toIntOrNull()
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                        modifier = Modifier
+                            .weight(setFields["duration"]?.spacing ?: 1f)
+                            .padding(start = 8.dp),
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = set.reps?.toString() ?: "",
+                        onValueChange = { newValue ->
+                            set.reps = newValue.toIntOrNull()
+
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done
+                        ),
+                        modifier = Modifier
+                            .weight(setFields["reps"]?.spacing ?: 1f)
+                            .padding(start = 8.dp),
+                    )
+                }
 
                 IconButton(
                     onClick = { deleteSet(setIndex) },
-                    modifier = Modifier.weight(setFields[3].second)
+                    modifier = Modifier.weight(setFields["button"]?.spacing ?: 1f)
                 ) {
                     Icon(Icons.Filled.Close, contentDescription = "Delete Set")
                 }
@@ -173,24 +212,5 @@ fun ExerciseSets(
             text = "Add Set",
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-    }
-}
-
-@Composable
-fun DisplayExercises(
-    exerciseRefs : List<ExerciseRef>
-){
-    val listState = rememberLazyListState()
-    LazyColumn (
-        state = listState,
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        items(items = exerciseRefs){
-            Row{
-                Text(text = it.id.toString() + " ")
-                Text(text = it.name)
-            }
-        }
     }
 }

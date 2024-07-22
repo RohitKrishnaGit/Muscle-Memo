@@ -36,12 +36,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cs346.musclememo.classes.Workout
-import com.cs346.musclememo.screens.viewmodels.HistoryScreenViewModel
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 
 @Composable
 fun DisplayHistory(
-    viewModel: HistoryScreenViewModel
+    viewModel: WorkoutScreenViewModel
 ){
     val listState = rememberLazyListState()
     LazyColumn (
@@ -49,12 +48,12 @@ fun DisplayHistory(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(items = viewModel.workouts){ workout ->
+        items(items = viewModel.workouts.value){ workout ->
             WorkoutHistoryCard(
                 workout = workout,
                 onClick = {
-                    viewModel.updateCurrentWorkout(workout)
-                    viewModel.updateShowCurrentWorkout(true)
+                    viewModel.updateCurrentHistoryWorkout(workout)
+                    viewModel.updateShowCurrentHistoryWorkout(true)
                 }
             )
         }
@@ -64,14 +63,15 @@ fun DisplayHistory(
 @Composable
 fun WorkoutHistoryCard (
     workout: Workout,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ){
     Row {
         Spacer(modifier = Modifier.weight(1f))
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .clickable(onClick = onClick)
+                .fillMaxWidth()
+                .clickable(enabled = enabled, onClick = onClick)
         ) {
             Column (
                 modifier = Modifier

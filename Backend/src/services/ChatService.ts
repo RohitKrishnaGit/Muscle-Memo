@@ -1,7 +1,9 @@
+import { ChatController } from "../controllers/ChatController";
 const socketIO = require('socket.io');
 
 export const initChatService = (server: any) => {
     const io = socketIO(server);
+    const cc = new ChatController();
 
     io.on('connection', (socket: any) => {
         let room = "default";
@@ -11,11 +13,12 @@ export const initChatService = (server: any) => {
             room = roomId;
             socket.join(room);
             console.log(`Socket ${socket.id} joined room ${room}`);
-            io.emit('message', `${room}`);
+            io.to(socket.id).emit('history', 'fetch history');
         });
 
-        socket.on('message', (message: string) => {
+        socket.on('message', (message: string, userId: string) => {
             console.log(`Received message '${message}' from socket ${socket.id} in room ${room}`);
+            cc.createHelper(userId, room, message)
             socket.to(room).emit('message', `${message}+me`);
         });
 

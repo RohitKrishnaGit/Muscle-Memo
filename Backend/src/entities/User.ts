@@ -14,6 +14,7 @@ import { Template } from "./Template";
 import { UserPrs } from "./UserPrs";
 import { UserToken } from "./UserToken";
 import { Workout } from "./Workout";
+import { Chat } from "./Chat";
 
 export enum Role {
     ADMIN,
@@ -72,6 +73,9 @@ export class User {
 
     @OneToMany(() => UserToken, (userToken) => userToken.user)
     tokens: Relation<UserToken[]>;
+
+    @OneToMany(() => Chat, (chat) => chat.sender,)
+    sentMessages?: Relation<Chat[]>;
 
     @OneToOne(() => UserPrs, (UserPrs) => UserPrs.user, {
         cascade: true,

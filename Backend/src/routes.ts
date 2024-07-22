@@ -80,6 +80,8 @@ import {
 } from "./schemas/workoutSchema";
 import { allPublicWorkoutSchema, createPublicWorkoutSchema, filterExperiencePublicWorkoutSchema, filterGenderPublicWorkoutSchema, onePublicWorkoutSchema, removePublicWorkoutSchema } from "./schemas/publicWorkoutSchema";
 import { createPublicKey } from "crypto";
+import { ChatController } from "./controllers/ChatController";
+import { allChatsSchema, removeChatsSchema } from "./schemas/chatSchema";
 
 export const Routes = [
     /* User routes */
@@ -769,5 +771,27 @@ export const Routes = [
             authenticateWithToken,
         ],
         action: "filterExperience",
+    },
+
+    /* Chat routes */
+    {
+        method: "get",
+        route: "/chat/:roomId",
+        controller: ChatController,
+        middleware: [
+            validateSchema(allChatsSchema),
+            authenticateWithToken,
+        ],
+        action: "all",
+    },
+    {
+        method: "delete",
+        route: "/chat/:roomId",
+        controller: ChatController,
+        middleware: [
+            validateSchema(removeChatsSchema),
+            authenticateWithToken,
+        ],
+        action: "remove",
     },
 ];

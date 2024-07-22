@@ -34,11 +34,20 @@ class SocketManager {
         }
     }
 
+    fun onHistoryRequest(listener: (String) -> Unit) {
+        socket?.on("history") { args ->
+            val message = args[0] as String
+            listener.invoke(message)
+            /* use this to fetch history using "all" endpoint & display
+            * see example in ChatTestScreen for onMessageReceived */
+        }
+    }
+
     fun joinRoom(roomId: String) {
         socket?.emit("join", roomId);
     }
 
-    fun sendMessage(message: String) {
-        socket?.emit("message", message)
+    fun sendMessage(message: String, userId: String) {
+        socket?.emit("message", message, userId)
     }
 }

@@ -66,7 +66,7 @@ class LoginScreenViewModel : ViewModel() {
     var sliderPosition by mutableFloatStateOf(0f)
         private set
 
-    var profilePicture by mutableStateOf<Uri?>(null)
+    var profilePicture by mutableStateOf<String?>(null)
         private set
 
     fun updateCustomGender(gender: String) {
@@ -74,10 +74,11 @@ class LoginScreenViewModel : ViewModel() {
     }
 
     fun updateProfilePicture(uri: Uri?) {
-        profilePicture = uri
-        if (profilePicture != null){
+        if (uri != null){
             var imageUploader = ImageUploadService()
-            imageUploader.uploadImage(profilePicture!!)
+            imageUploader.uploadImage({ res ->
+                profilePicture = res
+            }, uri)
         }
 
 
@@ -252,6 +253,7 @@ class LoginScreenViewModel : ViewModel() {
                 email,
                 if (gender === "Custom") customGender else gender,
                 sliderToExperience(sliderPosition),
+                profilePicture,
             )
         ).enqueue(object :
             Callback<ApiResponse<String>> {

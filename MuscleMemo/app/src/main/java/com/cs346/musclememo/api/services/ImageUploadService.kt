@@ -5,7 +5,7 @@ import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
 class ImageUploadService {
-     fun uploadImage(uri: Uri): String {
+     fun uploadImage(onSuccess: (imageUrl: String)-> Unit, uri: Uri): String {
         val profilePicture = uri
          var downloadUrl = ""
         profilePicture.let {
@@ -18,6 +18,7 @@ class ImageUploadService {
                     // Get the download URL
                     ref.downloadUrl.addOnSuccessListener { uri ->
                         downloadUrl = uri.toString()
+                        onSuccess(downloadUrl)
                         // Handle the download URL (e.g., save it to your database or use it in your app)
                     }
                 }

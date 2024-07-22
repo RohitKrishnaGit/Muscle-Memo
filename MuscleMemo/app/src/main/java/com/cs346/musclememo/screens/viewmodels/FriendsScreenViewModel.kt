@@ -34,6 +34,9 @@ class FriendsScreenViewModel : ViewModel() {
     var friendProfileVisible by mutableStateOf(false)
         private set
 
+    var friendChatVisible by mutableStateOf(false)
+        private set
+
     fun updateShowAddFriendDialog(visible: Boolean) {
         showAddFriendDialog = visible
     }
@@ -58,7 +61,11 @@ class FriendsScreenViewModel : ViewModel() {
         friendProfileVisible = visible
     }
 
-    fun selectFriend(friendId: Int) {
+    fun updateFriendChatVisible(visible: Boolean) {
+        friendChatVisible = visible
+    }
+
+    fun selectFriend(friendId: Int, onComplete: (Boolean) -> Unit) {
         val apiService = RetrofitInstance.friendService
         val call = apiService.getFriendById(friendId)
 
@@ -67,19 +74,33 @@ class FriendsScreenViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     response.body()?.data?.let { friend ->
                         selectedFriend = friend
-                        updateFriendProfileVisible(true)
+                        onComplete(true)
+                    } ?: run {
+                        onComplete(false)
                     }
                 } else {
                     // Handle error response
-                    updateFriendProfileVisible(false)
+                    onComplete(false)
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
                 // Handle call failure
-                updateFriendProfileVisible(false)
+                onComplete(false)
             }
         })
+    }
+
+    fun selectFriendProfile(friendId: Int) {
+        selectFriend(friendId) { success ->
+            updateFriendProfileVisible(success)
+        }
+    }
+
+    fun selectFriendChat(friendId: Int) {
+        selectFriend(friendId) { success ->
+            updateFriendChatVisible(success)
+        }
     }
 
     private val _friends = mutableStateListOf<Friend>()

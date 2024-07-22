@@ -105,7 +105,45 @@ fun FriendsScreen() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     itemsIndexed(items = friends) { index, friend ->
-                        FriendCard(friend = friend, viewModel = viewModel, idx = index) { viewModel.selectFriend(friend.id) }
+                        FriendCard(friend = friend, viewModel = viewModel, idx = index) { viewModel.selectFriendProfile(friend.id) }
+                    }
+                }
+            }
+        }
+
+        AnimatedVisibility(
+            visible = viewModel.friendChatVisible,
+            enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn(),
+            exit = slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) + fadeOut()
+        ) {
+            viewModel.selectedFriend?.let { friend ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface)
+                ) {
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.secondary)
+                                .heightIn(min = 60.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            IconButton(onClick = { viewModel.updateFriendChatVisible(false) }) {
+                                Icon(
+                                    Icons.Filled.Close,
+                                    contentDescription = "Close",
+                                    tint = Color.White
+                                )
+                            }
+                            Text(
+                                "Friend Chat",
+                                modifier = Modifier.padding(end = 8.dp),
+                                color = Color.White,
+                                fontSize = 20.sp
+                            )
+                        }
                     }
                 }
             }

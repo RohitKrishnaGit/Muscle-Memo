@@ -32,6 +32,14 @@ fun FriendCard(friend: Friend, viewModel: FriendsScreenViewModel, idx: Int, onCl
             ) {
                 Button(
                     onClick = {
+                        viewModel.selectFriendChat(friend.id)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                ) {
+                    Text("Chat", color = Color.White)
+                }
+                Button(
+                    onClick = {
                         viewModel.removeFriend(friend.id)
                         viewModel.removeFriendIdx(idx)
                     },

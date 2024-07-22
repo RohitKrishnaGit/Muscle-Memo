@@ -19,7 +19,8 @@ fun MMDialog(
     body: @Composable () -> Unit,
     confirmButtonText: String = "Confirm",
     cancelButtonText: String = "Cancel",
-    errorText: String? = null
+    errorText: String? = null,
+    successText: String? = null
 ) {
     if (showDialog) {
         AlertDialog(
@@ -32,6 +33,13 @@ fun MMDialog(
                         Text(
                             text = it,
                             color = Color.Red,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                    successText?.takeIf { it.isNotEmpty() }?.let {
+                        Text(
+                            text = it,
+                            color = Color.Green,
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }

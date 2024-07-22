@@ -277,6 +277,14 @@ export const Routes = [
     },
 
     {
+        method: "get",
+        route: "/users/username/:username",
+        controller: UserController,
+        middleware: [validateSchema(allUserSchema)],
+        action: "findUsername",
+    },
+
+    {
         method: "put",
         route: "/users/update/firebase/:userId",
         controller: UserController,

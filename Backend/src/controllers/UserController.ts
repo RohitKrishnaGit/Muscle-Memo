@@ -452,4 +452,21 @@ export class UserController {
         }
         return success(false);
     }
+
+    async findUsername(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
+        const username = request.params.username;
+        let users = await this.userRepository.find({
+            where: {
+                username: username,
+            },
+        });
+        if (users.length != 0) {
+            return success(users[0].id);
+        }
+        return failure("User not found");
+    }
 }

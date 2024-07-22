@@ -11,7 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 data class ExerciseDataSet (val weight: Int?, val reps: Int?, val duration: Int?, val distance: Int?)
-data class ExerciseRequest (val workoutId: Int, val exerciseRefId: Int?, val customExerciseRefId: Int?, val exerciseSet: List<ExerciseDataSet>)
+data class ExerciseRequest (val workoutId: Int?, val exerciseRefId: Int?, val customExerciseRefId: Int?, val exerciseSet: List<ExerciseDataSet>)
 
 interface ExerciseService {
     @GET("/exerciseRefs")

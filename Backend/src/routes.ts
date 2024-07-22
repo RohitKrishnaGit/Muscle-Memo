@@ -90,7 +90,6 @@ import {
     removeWorkoutSchema,
 } from "./schemas/workoutSchema";
 
-import { allPublicWorkoutSchema, createPublicWorkoutSchema, filterExperiencePublicWorkoutSchema, filterGenderPublicWorkoutSchema, onePublicWorkoutSchema, removePublicWorkoutSchema } from "./schemas/publicWorkoutSchema";
 import { createPublicKey } from "crypto";
 import { ChatController } from "./controllers/ChatController";
 import { allChatsSchema, removeChatsSchema } from "./schemas/chatSchema";

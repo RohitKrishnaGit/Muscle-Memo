@@ -1,9 +1,12 @@
 import { NextFunction, Request, Response } from "express";
+import { totp } from "otplib";
 import { AppDataSource } from "../data-source";
 import { AllowedStatistics } from "../entities/AllowedStatistics";
 import { User } from "../entities/User";
 import { UserPrs } from "../entities/UserPrs";
 import { UserToken } from "../entities/UserToken";
+import { sendEmail } from "../services/EmailService";
+import { passwordResetHtml, reportHtml } from "../utils/emailPresets";
 import { generatePasswordHash, validatePassword } from "../utils/password";
 import { failure, success } from "../utils/responseTypes";
 import { generateTokens } from "../utils/token";
@@ -354,7 +357,14 @@ export class UserController {
     }
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const { username, email, password, gender, experience } = request.body;
+        const {
+            username,
+            email,
+            password,
+            gender,
+            experience,
+            profilePicture,
+        } = request.body;
 
         const userExists = !!(await this.userRepository.findOneBy({ email }));
 
@@ -370,6 +380,7 @@ export class UserController {
             experience,
             userPrs: new UserPrs(),
             allowedStatistics: new AllowedStatistics(),
+            profilePicture,
         });
 
         await this.userRepository.save(user);
@@ -394,7 +405,7 @@ export class UserController {
     }
 
     async update(request: Request, response: Response, next: NextFunction) {
-        const { username, gender, experience } = request.body;
+        const { username, gender, experience, profilePicture } = request.body;
         const id = parseInt(request.params.userId);
         let userToUpdate = await this.userRepository.findOneBy({
             id,
@@ -406,6 +417,7 @@ export class UserController {
                 username,
                 gender,
                 experience,
+                profilePicture,
             })
         );
     }
@@ -453,6 +465,35 @@ export class UserController {
         return success(false);
     }
 
+    async reportUser(request: Request, response: Response, next: NextFunction) {
+        const { reportedUserId, reason } = request.body;
+        const reporterId = request.user?.id;
+
+        if (!reporterId) return failure("Access Token Error");
+
+        const reporter = await this.userRepository.findOneBy({
+            id: reporterId,
+        });
+        const reportee = await this.userRepository.findOneBy({
+            id: reportedUserId,
+        });
+
+        if (!reporter) return failure("Reporting user does not exist");
+        if (!reportee) return failure("Reported user does not exist");
+
+        await sendEmail(
+            "musclememo.help@gmail.com",
+            "User Reported",
+            reportHtml(
+                `${reporter.username} (${reporter.email})`,
+                `${reportee.username} (${reportee.email})`,
+                reason
+            )
+        );
+
+        return success("User Reported");
+    }
+
     async findUsername(
         request: Request,
         response: Response,
@@ -468,5 +509,66 @@ export class UserController {
             return success(users[0].id);
         }
         return failure("User not found");
+    }
+
+    async requestPasswordReset(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
+        const { email } = request.body;
+
+        const user = await this.userRepository.findOneBy({ email });
+        if (!user) return failure("Email not found");
+
+        const code = totp.generate(`${user.id}-${user.email}`);
+
+        await this.userRepository.save({ ...user, passwordResetToken: code });
+
+        sendEmail(email, "Password Reset", passwordResetHtml(code));
+
+        return success("Code sent");
+    }
+    async confirmPasswordReset(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
+        const code = request.params.code;
+
+        const user = await this.userRepository.findOneBy({
+            passwordResetToken: code,
+        });
+        if (!user) return failure("User not found");
+
+        const isValid = totp.verify({
+            token: code,
+            secret: `${user.id}-${user.email}`,
+        });
+
+        if (!isValid) return failure("Code is invalid");
+
+        return success("Code is valid");
+    }
+    async resetPassword(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
+        const code = request.params.code;
+        const { password } = request.body;
+
+        const user = await this.userRepository.findOneBy({
+            passwordResetToken: code,
+        });
+        if (!user) return failure("User not found");
+
+        await this.userRepository.save({
+            ...user,
+            password: await generatePasswordHash(password),
+            passwordResetToken: null,
+        });
+
+        return success("Password Updated");
     }
 }

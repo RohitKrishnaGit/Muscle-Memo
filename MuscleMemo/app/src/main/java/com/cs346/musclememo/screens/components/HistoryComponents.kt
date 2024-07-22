@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -35,13 +36,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cs346.musclememo.classes.CustomExerciseRef
+import com.cs346.musclememo.classes.ExerciseRef
+import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.classes.Workout
-import com.cs346.musclememo.screens.viewmodels.HistoryScreenViewModel
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
+import com.cs346.musclememo.utils.AppPreferences
+import java.text.SimpleDateFormat
 
 @Composable
 fun DisplayHistory(
-    viewModel: HistoryScreenViewModel
+    viewModel: WorkoutScreenViewModel
 ){
     val listState = rememberLazyListState()
     LazyColumn (
@@ -49,12 +54,15 @@ fun DisplayHistory(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(items = viewModel.workouts){ workout ->
+        val groupedWorkouts = viewModel.workouts.value.groupBy {
+            it.date
+        }
+        items(items = viewModel.workouts.value){ workout ->
             WorkoutHistoryCard(
                 workout = workout,
                 onClick = {
-                    viewModel.updateCurrentWorkout(workout)
-                    viewModel.updateShowCurrentWorkout(true)
+                    viewModel.updateCurrentHistoryWorkout(workout)
+                    viewModel.updateShowCurrentHistoryWorkout(true)
                 }
             )
         }
@@ -64,14 +72,15 @@ fun DisplayHistory(
 @Composable
 fun WorkoutHistoryCard (
     workout: Workout,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ){
     Row {
         Spacer(modifier = Modifier.weight(1f))
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .clickable(onClick = onClick)
+                .fillMaxWidth()
+                .clickable(enabled = enabled, onClick = onClick)
         ) {
             Column (
                 modifier = Modifier
@@ -82,8 +91,7 @@ fun WorkoutHistoryCard (
             ) {
                 Text(text = workout.name, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 Spacer(modifier = Modifier.height(5.dp))
-                // TODO: enter time and date, only display day
-                DisplayDateDuration("7/20/2024", "23:04")
+                DisplayDateDuration(workout.date, workout.duration, false)
                 Spacer(modifier = Modifier.height(5.dp))
                 workout.exercises.forEach { exercise ->
                     Column {
@@ -99,9 +107,9 @@ fun WorkoutHistoryCard (
 
 @Composable
 fun WorkoutHistorySheet(
+    viewModel: WorkoutScreenViewModel,
     workout: Workout?,
-    visible: Boolean,
-    onBackPressed: () -> Unit
+    visible: Boolean
 ){
     AnimatedVisibility(
         visible = visible,
@@ -117,24 +125,60 @@ fun WorkoutHistorySheet(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top
             ) {
-                TopAppBar(text = workout?.name ?: "Untitled") {
-                    onBackPressed()
-                }
-                Column (
+                Row (
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 24.dp)
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ){
-                    // TODO: Add date and duration
-                    DisplayDateDuration("Saturday, July 20th", "23:04")
-                    Spacer(modifier = Modifier.height(20.dp))
-                    workout?.exercises?.forEach { exercise ->
-                        Column {
-                            Text(text = exercise.exerciseRef.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                            exercise.exerciseSet.forEachIndexed { index, set ->
-                                Text(text = (index+1).toString() + " - " + set.reps.toString() + " x " + set.weight.toString() + " kg")
+                    IconButton(onClick = viewModel::onBackPressed) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "")
+                    }
+                    Text(text = workout?.name ?: "Untitled")
+                    IconButton(onClick = {
+                        if (workout != null) {
+                            println(workout.id)
+                            viewModel.deleteWorkout(id = workout.id,
+                                onSuccess = {
+                                    viewModel.onBackPressed()
+                                }
+                            )
+                        } else
+                            println("workout is null")
+                    }) {
+                        Icon(Icons.Default.Delete, "")
+                    }
+                }
+
+                if (workout != null){
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 24.dp)
+                    ) {
+                        // TODO: Add date and duration
+                        DisplayDateDuration(workout.date, workout.duration, true)
+                        Spacer(modifier = Modifier.height(10.dp))
+                        workout.exercises.forEach { exercise ->
+                            Column {
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    text = exercise.exerciseRef.name,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 22.sp
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                                exercise.exerciseSet.forEachIndexed { index, set ->
+                                    Text(
+                                        text = (index + 1).toString() + " - " + getSetDisplay(
+                                            exercise.exerciseRef,
+                                            set
+                                        ), fontSize = 18.sp
+                                    )
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                }
                             }
-                            Spacer(modifier = Modifier.height(5.dp))
                         }
                     }
                 }
@@ -143,10 +187,27 @@ fun WorkoutHistorySheet(
     }
 }
 
+fun getSetDisplay(
+    exerciseRef: ExerciseRef,
+    set: ExerciseSet
+): String {
+    var setDisplay = ""
+    setDisplay += if (exerciseRef.durationVSReps)
+        (set.duration?.toString() ?: "N/A") + " min"
+    else
+        (set.reps?.toString() ?: "N/A") + if (!exerciseRef.weight && !exerciseRef.distance) " reps" else ""
+    if (exerciseRef.weight)
+        setDisplay += " x " + (getWeight(set.weight)?.toString() ?: "N/A") + " " + AppPreferences.systemOfMeasurementWeight
+    if (exerciseRef.distance)
+        setDisplay += " x " + (getDistance(set.distance)?.toString() ?: "N/A") + " " + AppPreferences.systemOfMeasurementDistance
+    return setDisplay
+}
+
 @Composable
 fun DisplayDateDuration(
-    date: String,
-    time: String
+    date: Long,
+    duration: Int,
+    time: Boolean
 ){
     Row (
         modifier = Modifier.fillMaxWidth(),
@@ -154,10 +215,10 @@ fun DisplayDateDuration(
     ) {
         Icon(Icons.Default.CalendarMonth, null)
         Spacer(modifier = Modifier.width(5.dp))
-        Text(text = date)
+        Text(text = epochToDate(date, time), fontSize = 12.sp)
         Spacer(modifier = Modifier.width(20.dp))
         Icon(Icons.Default.Timer, null)
         Spacer(modifier = Modifier.width(5.dp))
-        Text(text = time)
+        Text(text = toHourMinuteSeconds(duration), fontSize = 12.sp)
     }
 }

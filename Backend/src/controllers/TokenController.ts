@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { getEnv } from "../environment";
 import { failure, success } from "../utils/responseTypes";
 import { verifyRefreshToken } from "../utils/token";
 
@@ -19,8 +20,8 @@ export class TokenController {
             const payload = { id: tokenDetails.id, role: tokenDetails.role };
             const accessToken = jwt.sign(
                 payload,
-                process.env.ACCESS_TOKEN_PRIVATE_KEY,
-                { expiresIn: 30000 } // TODO: Change to 300
+                getEnv().ACCESS_TOKEN_PRIVATE_KEY,
+                { expiresIn: getEnv().ACCESS_TOKEN_TIMEOUT }
             );
             return success(accessToken);
         } catch (err) {

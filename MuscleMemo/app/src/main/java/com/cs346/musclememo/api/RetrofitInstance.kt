@@ -10,9 +10,13 @@ import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 
 import com.cs346.musclememo.api.services.ExerciseService
+import com.cs346.musclememo.api.services.PrVisibilityService
+import com.cs346.musclememo.api.services.UserPrsService
+import com.cs346.musclememo.api.services.TemplateService
 import com.cs346.musclememo.api.services.WorkoutService
 import com.cs346.musclememo.api.services.FriendService
 import com.cs346.musclememo.classes.Friend
+import com.cs346.musclememo.classes.Template
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -57,5 +61,18 @@ object RetrofitInstance: RetrofitInterface {
 
     val signupService: SignupService by lazy {
         retrofit.create(SignupService::class.java)
+    }
+
+    val userPrsService: UserPrsService by lazy {
+        retrofit.create(UserPrsService::class.java)
+    }
+
+    val prVisibilityService: PrVisibilityService by lazy {
+        retrofit.create(PrVisibilityService::class.java)
+    }
+    
+    val templateService: TemplateService by lazy {
+        retrofit.create(TemplateService::class.java)
+
     }
 }

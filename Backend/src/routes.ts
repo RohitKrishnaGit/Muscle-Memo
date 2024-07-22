@@ -4,6 +4,7 @@ import { CustomExerciseRefController } from "./controllers/CustomExerciseRefCont
 import { ExerciseController } from "./controllers/ExerciseController";
 import { ExerciseRefController } from "./controllers/ExerciseRefController";
 import { NotificationController } from "./controllers/NotificationController";
+import { PublicWorkoutController } from "./controllers/PublicWorkoutController";
 import { TemplateController } from "./controllers/TemplateController";
 import { TokenController } from "./controllers/TokenController";
 import { UserController } from "./controllers/UserController";
@@ -46,6 +47,14 @@ import {
     postPrVisibilitySchema,
 } from "./schemas/leaderboardPRSchema";
 import {
+    allPublicWorkoutSchema,
+    createPublicWorkoutSchema,
+    filterExperiencePublicWorkoutSchema,
+    filterGenderPublicWorkoutSchema,
+    onePublicWorkoutSchema,
+    removePublicWorkoutSchema,
+} from "./schemas/publicWorkoutSchema";
+import {
     allTemplateSchema,
     createTemplateSchema,
     oneTemplateSchema,
@@ -55,6 +64,7 @@ import { newTokenSchema } from "./schemas/tokenSchema";
 import {
     acceptFriendReqSchema,
     allUserSchema,
+    confirmPasswordResetSchema,
     createUserSchema,
     getFriendsSchema,
     incomingFriendReqSchema,
@@ -66,6 +76,9 @@ import {
     rejectFriendReqSchema,
     removeFriendSchema,
     removeUserSchema,
+    reportUserSchema,
+    requestPasswordResetSchema,
+    resetPasswordSchema,
     sendFriendReqSchema,
     updateUserFirebaseTokenSchema,
     updateUserSchema,
@@ -298,6 +311,38 @@ export const Routes = [
             ),
         ],
         action: "updateFirebaseToken",
+    },
+
+    {
+        method: "post",
+        route: "/users/report",
+        controller: UserController,
+        middleware: [validateSchema(reportUserSchema), authenticateWithToken],
+        action: "reportUser",
+    },
+
+    {
+        method: "post",
+        route: "/users/reset-password/request",
+        controller: UserController,
+        middleware: [validateSchema(requestPasswordResetSchema)],
+        action: "requestPasswordReset",
+    },
+
+    {
+        method: "post",
+        route: "/users/reset-password/confirm/:code",
+        controller: UserController,
+        middleware: [validateSchema(confirmPasswordResetSchema)],
+        action: "confirmPasswordReset",
+    },
+
+    {
+        method: "post",
+        route: "/users/reset-password/:code",
+        controller: UserController,
+        middleware: [validateSchema(resetPasswordSchema)],
+        action: "resetPassword",
     },
 
     /* exerciseRef routes */
@@ -683,5 +728,87 @@ export const Routes = [
         controller: NotificationController,
         middleware: [],
         action: "notification",
+    },
+
+    /* Public workouts routes */
+    {
+        method: "get",
+        route: "/publicWorkouts/:userId/:id",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(onePublicWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "one",
+    },
+    {
+        method: "post",
+        route: "/publicWorkouts/:userId",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(createPublicWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "create",
+    },
+    {
+        method: "delete",
+        route: "/publicWorkouts/:userId/:id",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(removePublicWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "remove",
+    },
+    {
+        method: "get",
+        route: "/publicWorkouts/:userId",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(allPublicWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "all",
+    },
+    {
+        method: "get",
+        route: "/publicWorkouts/filterGender",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(filterGenderPublicWorkoutSchema),
+            authenticateWithToken,
+        ],
+        action: "filterGender",
+    },
+    {
+        method: "get",
+        route: "/publicWorkouts/filterExperience",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(filterExperiencePublicWorkoutSchema),
+            authenticateWithToken,
+        ],
+        action: "filterExperience",
     },
 ];

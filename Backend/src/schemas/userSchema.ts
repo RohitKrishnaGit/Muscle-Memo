@@ -107,6 +107,18 @@ export const updateUserSchema = object({
         username: string().optional(),
         gender: string().optional(),
         experience: string().optional(),
+        profilePicture: string().optional(),
+    }),
+});
+
+export const reportUserSchema = object({
+    body: object({
+        reportedUserId: number({
+            required_error: "reportedUserId is required",
+        }),
+        reason: string({
+            required_error: "reason is required",
+        }),
     }),
 });
 
@@ -166,5 +178,30 @@ export const removeUserSchema = object({
         id: string({
             required_error: "id is required",
         }).regex(/(^\d+$)|(^me$)/, "id should be either numerical or me"),
+    }),
+});
+
+export const requestPasswordResetSchema = object({
+    body: object({
+        email: string({ required_error: "email is required" }).email(),
+    }),
+});
+
+export const confirmPasswordResetSchema = object({
+    params: object({
+        code: string({
+            required_error: "code is required",
+        }),
+    }),
+});
+
+export const resetPasswordSchema = object({
+    params: object({
+        code: string({
+            required_error: "code is required",
+        }),
+    }),
+    body: object({
+        password: string({ required_error: "password is required" }),
     }),
 });

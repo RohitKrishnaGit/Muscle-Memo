@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, request } from "express";
 import jwt from "jsonwebtoken";
 import { get } from "lodash";
 import { Role } from "../entities/User";
+import { getEnv } from "../environment";
 
 // Middleware to make sure that the request is from an authenticated user
 export const authenticateWithToken = (
@@ -20,7 +21,7 @@ export const authenticateWithToken = (
     try {
         const tokenDetails = jwt.verify(
             token,
-            process.env.ACCESS_TOKEN_PRIVATE_KEY
+            getEnv().ACCESS_TOKEN_PRIVATE_KEY
         );
         req.user = (
             typeof tokenDetails === "string"

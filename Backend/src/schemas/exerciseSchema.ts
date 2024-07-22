@@ -21,9 +21,7 @@ export const oneExerciseSchema = object({
 
 export const createExerciseSchema = object({
     body: object({
-        workoutId: number({
-            required_error: "workoutId is required",
-        }),
+        workoutId: number().optional(),
         exerciseRefId: number().optional(),
         customExerciseRefId: number().optional(),
         templateId: number().optional(),

@@ -128,7 +128,6 @@ fun MainScreen() {
     ) {
         LaunchedEffect(Unit) {
             AppPreferences.listen(returnToLogin)
-            AppPreferences.unListen(returnToLogin)
         }
         Scaffold(
             bottomBar = { BottomNavigationBar(bottomBarState = bottomBarState, navHostController = navController) }
@@ -140,7 +139,6 @@ fun MainScreen() {
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

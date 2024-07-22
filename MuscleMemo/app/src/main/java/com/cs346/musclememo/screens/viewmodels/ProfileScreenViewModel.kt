@@ -7,12 +7,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.api.RetrofitInstance
+import com.cs346.musclememo.api.services.ImageUploadService
 import com.cs346.musclememo.api.services.LogoutRequest
+import com.cs346.musclememo.api.services.UserService
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.utils.AppPreferences
 import com.cs346.musclememo.utils.Conversions.experienceToSlider
 import com.cs346.musclememo.utils.Conversions.sliderToExperience
+import com.google.android.gms.common.api.Api
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,7 +33,7 @@ class ProfileScreenViewModel : ViewModel() {
     val listOfTheme = listOf("Auto", "Dark", "Light")
     var showThemeOptions by mutableStateOf(false)
         private set
-    var newProfilePicture by mutableStateOf<Uri?>(null)
+    var newProfilePicture by mutableStateOf<String?>(null)
         private set
     var newUsername by mutableStateOf("")
         private set
@@ -44,6 +47,28 @@ class ProfileScreenViewModel : ViewModel() {
         private set
     var editEnabled by mutableStateOf(false)
         private set
+
+    init {
+        RetrofitInstance.userService.getMyUser().enqueue(object: Callback<ApiResponse<User>>{
+            override fun onResponse(
+                call: Call<ApiResponse<User>>,
+                response: Response<ApiResponse<User>>
+            ) {
+                if (response.isSuccessful){
+                    val fetchedUser = response.body()?.data
+                    fetchedUser?.let{
+                        user = it
+
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+        })
+    }
 
     private fun customGender(): String{
         if (user.gender != "Male" && user.gender != "Female" && user.gender != "Rather Not Say")
@@ -101,7 +126,12 @@ class ProfileScreenViewModel : ViewModel() {
     }
 
     fun updateNewProfilePicture (uri: Uri?){
-        newProfilePicture = uri
+        if (uri != null){
+            val imageUploader = ImageUploadService()
+            imageUploader.uploadImage({ res ->
+                newProfilePicture = res
+            }, uri)
+        }
     }
 
     fun getTheme(): String {
@@ -146,7 +176,17 @@ class ProfileScreenViewModel : ViewModel() {
     fun updateUser(){
         user = getNewUser()
         refreshNewUser()
-        //TODO: call endpoints from here with attributes in user
+        RetrofitInstance.userService.updateUser(user).enqueue(object: Callback<ApiResponse<User>>{
+            override fun onResponse(
+                call: Call<ApiResponse<User>>,
+                response: Response<ApiResponse<User>>
+            ) {}
+
+            override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+        })
     }
 
     fun logout (){

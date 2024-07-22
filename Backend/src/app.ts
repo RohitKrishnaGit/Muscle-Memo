@@ -1,20 +1,22 @@
 import bodyParser from "body-parser";
-import dotenv from "dotenv";
 import express, { Request, Response } from "express";
+import { totp } from "otplib";
 import { AppDataSource } from "./data-source";
+import { getEnv, initEnv } from "./environment";
 import { initialize } from "./firebaseAdmin";
 import { Routes } from "./routes";
 import { initEmailService } from "./services/EmailService";
 import { ApiResponse } from "./utils/responseTypes";
 
-dotenv.config();
+initEnv();
+totp.options = { step: 1800, window: 1 };
 AppDataSource.initialize()
     .then(async () => {
         // create express app
         const app = express();
         initialize();
         initEmailService();
-        const port = process.env.PORT || 3000;
+        const port = getEnv().PORT || 3000;
         app.use(bodyParser.json());
 
         // register express routes from defined application routes

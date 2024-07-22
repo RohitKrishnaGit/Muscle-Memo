@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { AppDataSource } from "../data-source";
 import { User } from "../entities/User";
 import { UserToken } from "../entities/UserToken";
+import { getEnv } from "../environment";
 
 const userTokenRepository = AppDataSource.getRepository(UserToken);
 
@@ -10,12 +11,13 @@ export const generateTokens = async (user: User) => {
         const payload = { id: user.id, role: user.role };
         const accessToken = jwt.sign(
             payload,
-            process.env.ACCESS_TOKEN_PRIVATE_KEY,
-            { expiresIn: 30000 } // TODO: Change to 300
+            getEnv().ACCESS_TOKEN_PRIVATE_KEY,
+            { expiresIn: getEnv().ACCESS_TOKEN_TIMEOUT }
         );
+        console.log(typeof getEnv().ACCESS_TOKEN_TIMEOUT);
         const refreshToken = jwt.sign(
             payload,
-            process.env.REFRESH_TOKEN_PRIVATE_KEY
+            getEnv().REFRESH_TOKEN_PRIVATE_KEY
         );
 
         const newToken = Object.assign(new UserToken(), {
@@ -31,7 +33,7 @@ export const generateTokens = async (user: User) => {
 };
 
 export const verifyRefreshToken = async (refreshToken: string) => {
-    const privateKey: string = process.env.REFRESH_TOKEN_PRIVATE_KEY;
+    const privateKey: string = getEnv().REFRESH_TOKEN_PRIVATE_KEY;
 
     const token = await userTokenRepository.findOneBy({ token: refreshToken });
     if (!token) {

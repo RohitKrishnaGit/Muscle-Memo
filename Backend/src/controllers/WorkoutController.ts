@@ -49,7 +49,9 @@ export class WorkoutController {
             user: { id: userId } as User,
         });
 
-        return success(this.workoutRepository.save(workout));
+        const newWorkout = await this.workoutRepository.save(workout);
+
+        return success({ workoutId: newWorkout.id });
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {

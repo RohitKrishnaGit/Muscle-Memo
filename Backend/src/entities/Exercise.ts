@@ -15,7 +15,9 @@ export class Exercise {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Workout, (workout) => workout.exercises)
+    @ManyToOne(() => Workout, (workout) => workout.exercises, {
+        nullable: true,
+    })
     workout: Relation<Workout>;
 
     @ManyToOne(() => Template, (template) => template.exercises, {

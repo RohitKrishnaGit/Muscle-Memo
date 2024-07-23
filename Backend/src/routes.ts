@@ -737,11 +737,16 @@ export const Routes = [
     /* Public workouts routes */
     {
         method: "get",
-        route: "/publicWorkouts/filter",
+        route: "/publicWorkouts/filter/:userId",
         controller: PublicWorkoutController,
         middleware: [
             validateSchema(filterPublicWorkoutSchema),
             authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
         ],
         action: "filter",
     },

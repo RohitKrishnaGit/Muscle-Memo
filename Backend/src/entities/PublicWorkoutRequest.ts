@@ -16,6 +16,8 @@ export class PublicWorkoutRequest {
     @ManyToOne(() => User)
     sender: Relation<User>;
 
-    @ManyToOne(() => PublicWorkout)
+    @ManyToOne(() => PublicWorkout, (publicWorkout) => publicWorkout.publicWorkoutRequests, {
+        onDelete: 'CASCADE',
+    })
     publicWorkout: Relation<PublicWorkout>;
 }

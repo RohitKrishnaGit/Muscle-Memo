@@ -1,5 +1,6 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { User } from "./User";
+import { PublicWorkoutRequest } from "./PublicWorkoutRequest";
 
 @Entity()
 export class PublicWorkout {
@@ -29,6 +30,11 @@ export class PublicWorkout {
 
     @ManyToOne(() => User, (user) => user.publicWorkouts)
     creator: User;
+
+    @OneToMany(() => PublicWorkoutRequest, (publicWorkoutRequest) => publicWorkoutRequest.publicWorkout, {
+        cascade: true
+    })
+    publicWorkoutRequests: Relation<PublicWorkoutRequest[]>;
 
     @ManyToMany(() => User, {
         cascade: true,

@@ -93,6 +93,8 @@ import { ChatController } from "./controllers/ChatController";
 import { allChatsSchema, removeChatsSchema } from "./schemas/chatSchema";
 import { sendNotificationSchema } from "./schemas/notificationSchema";
 import { FriendsController } from "./controllers/FriendsController";
+import { PublicWorkoutRequestController } from "./controllers/PublicWorkoutRequestController";
+import { incomingPublicWorkoutRequestsSchema, outgoingPublicWorkoutRequestsSchema, sendPublicWorkoutRequestSchema, acceptPublicWorkoutRequestSchema, rejectPublicWorkoutRequestSchema } from "./schemas/publicWorkoutRequestSchema";
 
 export const Routes = [
 
@@ -804,6 +806,83 @@ export const Routes = [
         action: "all",
     },
 
+     /* Public workout requests routes */
+    {
+        method: "get",
+        route: "/publicWorkoutRequests/:userId/incomingPublicWorkoutRequests",
+        controller: PublicWorkoutRequestController,
+        middleware: [
+            validateSchema(incomingPublicWorkoutRequestsSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "getIncomingPublicWorkoutRequests",
+    },
+    {
+        method: "get",
+        route: "/users/:userId/outgoingFriendRequests",
+        controller: PublicWorkoutRequestController,
+        middleware: [
+            validateSchema(outgoingPublicWorkoutRequestsSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "getOutgoingFriendRequests",
+    },
+    {
+        method: "post",
+        route: "/users/:userId/sendPublicWorkoutRequest",
+        controller: PublicWorkoutRequestController,
+        middleware: [
+            validateSchema(sendPublicWorkoutRequestSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "sendPublicWorkoutRequest",
+    },
+    {
+        method: "post",
+        route: "/users/:userId/:id/acceptPublicWorkoutRequest",
+        controller: PublicWorkoutRequestController,
+        middleware: [
+            validateSchema(acceptPublicWorkoutRequestSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "acceptPublicWorkoutRequest",
+    },
+    {
+        method: "post",
+        route: "/users/:userId/:id/rejectPublicWorkoutRequest",
+        controller: PublicWorkoutRequestController,
+        middleware: [
+            validateSchema(rejectPublicWorkoutRequestSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "rejectPublicWorkoutRequest",
+    },
+    
     /* Chat routes */
     {
         method: "get",

@@ -16,7 +16,10 @@ export class PublicWorkout {
     description: string;
 
     @Column()
-    location: string;
+    latitude: string;
+
+    @Column()
+    longitude: string;
 
     @Column({ nullable: true })
     gender?: string;

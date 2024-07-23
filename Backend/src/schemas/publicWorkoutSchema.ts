@@ -32,8 +32,11 @@ export const createPublicWorkoutSchema = object({
         date: number({
             required_error: "date is required",
         }),
-        location: string({
-            required_error: "location is required",
+        latitude: string({
+            required_error: "latitude is required",
+        }),
+        longitude: string({
+            required_error: "longitude is required",
         }),
         description: string({
             required_error: "description is required",
@@ -62,5 +65,11 @@ export const filterPublicWorkoutSchema = object({
     body: object({
         gender: string().optional(),
         experience: string().optional(),
+        latitude: string({
+            required_error: "latitude is required",
+        }),
+        longitude: string({
+            required_error: "longitude is required",
+        }),
     }),
 });

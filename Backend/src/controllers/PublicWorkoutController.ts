@@ -3,6 +3,8 @@ import { AppDataSource } from "../data-source";
 import { PublicWorkout } from "../entities/PublicWorkout";
 import { User } from "../entities/User";
 import { failure, success } from "../utils/responseTypes";
+import { geoFire } from "../utils/location";
+import { ArrayContains } from "typeorm";
 
 export class PublicWorkoutController {
     private publicWorkoutRepository =
@@ -35,13 +37,13 @@ export class PublicWorkoutController {
 
     async create(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
-        const { name, date, location, description, gender, experience } =
-            request.body;
+        const { name, date, latitude, longitude, description, gender, experience } = request.body;
 
         const publicWorkout = Object.assign(new PublicWorkout(), {
             name,
             date,
-            location,
+            latitude,
+            longitude,
             description,
             gender,
             experience,
@@ -52,17 +54,44 @@ export class PublicWorkoutController {
             publicWorkout
         );
 
+        geoFire.set(newPublicWorkout.id.toString(), [+latitude, +longitude]).then(function () {
+            console.log("Provided key has been added to GeoFire");
+        }, function (error) {
+            console.log("Error: " + error);
+        });
+
         return success({ publicWorkoutId: newPublicWorkout.id });
     }
 
     async filter(request: Request, response: Response, next: NextFunction) {
-        const { gender, experience } = request.body;
+        const { gender, experience, latitude, longitude } = request.body;
+
+        const nearby: string[] = []
+
+        const geoQuery = geoFire.query({
+            center: [+latitude, +longitude],
+            radius: 9.5
+        });
+
+        geoQuery.on("key_entered", function (key: any, location: any, distance: any) {
+            nearby.push(key)
+        });
+        
+        const sleep = (ms:number) => {
+            return new Promise ((resolve) => {
+                setTimeout(resolve, ms)
+            })
+        }
+
+        await sleep(50)
+
+        const publicWorkouts = await this.publicWorkoutRepository.findBy({
+            gender,
+            experience,
+        })
 
         return success(
-            this.publicWorkoutRepository.findBy({
-                gender,
-                experience,
-            })
+            publicWorkouts.filter((publicWorkout) => nearby.includes(publicWorkout.id.toString()))
         );
     }
 

@@ -1,9 +1,4 @@
-import {
-    Column,
-    Entity,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-} from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User";
 
 @Entity()
@@ -23,11 +18,11 @@ export class PublicWorkout {
     @Column()
     location: string;
 
-    @Column()
-    gender: string;
+    @Column({ nullable: true })
+    gender?: string;
 
-    @Column()
-    experience: string;
+    @Column({ nullable: true })
+    experience?: string;
 
     @ManyToOne(() => User, (user) => user.workouts)
     creator: User;

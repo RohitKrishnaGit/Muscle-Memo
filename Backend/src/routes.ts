@@ -49,8 +49,7 @@ import {
 import {
     allPublicWorkoutSchema,
     createPublicWorkoutSchema,
-    filterExperiencePublicWorkoutSchema,
-    filterGenderPublicWorkoutSchema,
+    filterPublicWorkoutSchema,
     onePublicWorkoutSchema,
     removePublicWorkoutSchema,
 } from "./schemas/publicWorkoutSchema";
@@ -90,7 +89,6 @@ import {
     removeWorkoutSchema,
 } from "./schemas/workoutSchema";
 
-import { createPublicKey } from "crypto";
 import { ChatController } from "./controllers/ChatController";
 import { allChatsSchema, removeChatsSchema } from "./schemas/chatSchema";
 import { sendNotificationSchema } from "./schemas/notificationSchema";
@@ -733,6 +731,16 @@ export const Routes = [
     /* Public workouts routes */
     {
         method: "get",
+        route: "/publicWorkouts/filter",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(filterPublicWorkoutSchema),
+            authenticateWithToken,
+        ],
+        action: "filter",
+    },
+    {
+        method: "get",
         route: "/publicWorkouts/:userId/:id",
         controller: PublicWorkoutController,
         middleware: [
@@ -791,46 +799,20 @@ export const Routes = [
         ],
         action: "all",
     },
-    {
-        method: "get",
-        route: "/publicWorkouts/filterGender",
-        controller: PublicWorkoutController,
-        middleware: [
-            validateSchema(filterGenderPublicWorkoutSchema),
-            authenticateWithToken,
-        ],
-        action: "filterGender",
-    },
-    {
-        method: "get",
-        route: "/publicWorkouts/filterExperience",
-        controller: PublicWorkoutController,
-        middleware: [
-            validateSchema(filterExperiencePublicWorkoutSchema),
-            authenticateWithToken,
-        ],
-        action: "filterExperience",
-    },
 
     /* Chat routes */
     {
         method: "get",
         route: "/chat/:roomId",
         controller: ChatController,
-        middleware: [
-            validateSchema(allChatsSchema),
-            authenticateWithToken,
-        ],
+        middleware: [validateSchema(allChatsSchema), authenticateWithToken],
         action: "all",
     },
     {
         method: "delete",
         route: "/chat/:roomId",
         controller: ChatController,
-        middleware: [
-            validateSchema(removeChatsSchema),
-            authenticateWithToken,
-        ],
+        middleware: [validateSchema(removeChatsSchema), authenticateWithToken],
         action: "remove",
     },
 ];

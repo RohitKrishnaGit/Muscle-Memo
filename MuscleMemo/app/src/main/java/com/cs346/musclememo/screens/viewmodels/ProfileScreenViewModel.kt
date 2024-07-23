@@ -237,7 +237,9 @@ class ProfileScreenViewModel : ViewModel() {
                 call: Call<ApiResponse<List<ExerciseRef>>>,
                 response: Response<ApiResponse<List<ExerciseRef>>>
             ) {
-                exerciseRefs = response.body()?.data!!
+                if (response.isSuccessful) {
+                    exerciseRefs = response.body()?.data!!
+                }
             }
 
             override fun onFailure(call: Call<ApiResponse<List<ExerciseRef>>>, t: Throwable) {

@@ -1,6 +1,5 @@
 package com.cs346.musclememo
 
-import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -84,8 +84,7 @@ fun MainScreen() {
 
     val returnToLogin by rememberUpdatedState (
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, _ ->
-            val refreshToken = sharedPreferences.getString("REFRESH_TOKEN", "")
-            if (refreshToken == null) {
+            if (AppPreferences.refreshToken == null) {
                 navController.navigate(Screen.Login.route) {
                     popUpTo(navController.graph.id) {
                         inclusive = true
@@ -102,16 +101,19 @@ fun MainScreen() {
         }
     }
 
-    LaunchedEffect(Unit) {
+    DisposableEffect(Unit) {
         AppPreferences.listen(themeListener)
+        AppPreferences.listen(returnToLogin)
+
+        onDispose {
+            AppPreferences.unListen(themeListener)
+            AppPreferences.unListen(returnToLogin)
+        }
     }
 
     MuscleMemoTheme (
         darkTheme = isDarkTheme.value ?: isSystemInDarkTheme()
     ) {
-        LaunchedEffect(Unit) {
-            AppPreferences.listen(returnToLogin)
-        }
         Scaffold(
             bottomBar = { BottomNavigationBar(bottomBarState = bottomBarState, navHostController = navController) }
         ) { innerPadding ->

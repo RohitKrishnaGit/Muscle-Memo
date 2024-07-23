@@ -48,9 +48,7 @@ export class ChatController {
     // }
 
     async createHelper(refreshToken: string, roomId: string, message: string) {
-        const sender = await this.tokenRepository.findOneBy({
-            token: refreshToken,
-        });
+        const sender = this.tokenToUserHelper(refreshToken)
 
         if (!sender) return failure("unregistered sender");
 
@@ -82,5 +80,17 @@ export class ChatController {
         );
 
         return success("chats have been removed");
+    }
+
+    async tokenToUserHelper(token: string) {
+        const tokenObj = await this.tokenRepository.findOne({
+            where: { token },
+            relations: {
+                user: true
+            }
+        });
+
+        if (!tokenObj) return null;
+        return tokenObj.user;
     }
 }

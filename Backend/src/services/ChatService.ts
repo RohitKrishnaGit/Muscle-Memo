@@ -1,35 +1,66 @@
 import { ChatController } from "../controllers/ChatController";
+import { NotificationController } from "../controllers/NotificationController";
+import { User } from "../entities/User";
 const socketIO = require('socket.io');
 
 export const initChatService = (server: any) => {
     const io = socketIO(server);
     const cc = new ChatController();
+    const nc = new NotificationController();
 
-    io.on('connection', (socket: any) => {
+    type UserDict = {
+        [userId: number]: boolean
+    }
+    let userRoomMap: {[room: string]: UserDict} = {};
+
+    io.on('connection', async (socket: any) => {
         let room = "default";
-        console.log('A user connected');
+        let user: User;
+        
 
-        socket.on('join', function(roomId: string) {
+        socket.on('join', async function(roomId: string, refreshToken: string) {
+            const tempUser = await cc.tokenToUserHelper(refreshToken)
+            if (!tempUser) {
+                console.log(`invalid refreshToken`)
+                return;
+            }
+            user = tempUser;
+
+            console.log(`${user.username} connected`);
             room = roomId;
             socket.join(room);
             console.log(`Socket ${socket.id} joined room ${room}`);
+            userRoomMap = {
+                ...userRoomMap ?? {},
+                [room]: {
+                    ...userRoomMap[room] ?? {},
+                    [user.id]: true
+                }
+            }
             io.to(socket.id).emit('history', 'fetch history');
         });
 
-        socket.on('message', async (message: string, refreshToken: string) => {
+        socket.on('message', async (message: string) => {
             console.log(`Received message '${message}'
-                from user with refresh token ${refreshToken}
+                from user ${user.id}
                 in room ${room}`);
-            if( !(await cc.createHelper(refreshToken, room, message)).error) {
-                socket.to(room).emit('message', `${message}`);
-                console.log(`broadcasted ${message}`)
-            } else {
-                console.log(`invalid refreshToken`)
+            socket.to(room).emit('message', `${message}`);
+            for (let userKey in userRoomMap[room]) {
+                let value = userRoomMap[room][userKey];
+                
+                if (!value) {
+                    for (let fcmToken in JSON.parse(user.firebaseTokens)) {
+                        console.log(`sent notification to ${userKey}`)
+                        nc.notificationHelper(fcmToken,`From: ${user.username}`,message)
+                    }
+                }
             }
+            console.log(`broadcasted ${message}`);
         });
 
-        socket.on('disconnect', () => {
-            console.log('A user disconnected');
+        socket.on('disconnect', async () => {
+            console.log(`user ${user.id} disconnected`);
+            userRoomMap[room][user.id] = false;
         });
     });
 }

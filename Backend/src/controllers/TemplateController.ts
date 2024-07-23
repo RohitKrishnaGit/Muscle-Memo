@@ -47,7 +47,9 @@ export class TemplateController {
             user: { id: userId } as User,
         });
 
-        return success(this.templateRepository.save(template));
+        const newTemplate = await this.templateRepository.save(template);
+
+        return success({ templateId: newTemplate.id });
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {

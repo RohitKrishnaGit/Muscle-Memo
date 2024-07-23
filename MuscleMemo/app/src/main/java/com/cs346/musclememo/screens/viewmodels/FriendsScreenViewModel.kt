@@ -37,12 +37,9 @@ data class Sender(
 
 class FriendsScreenViewModel : ViewModel() {
     val sm = SocketManager()
-    private val _friends = mutableStateListOf<Friend>()
-    private val _incomingRequests = mutableStateListOf<Friend>()
+    val friends = mutableStateListOf<Friend>()
+    val incomingRequests = mutableStateListOf<Friend>()
     var currentUser: User? by mutableStateOf(null)
-
-    val friends: List<Friend> = _friends
-    val incomingRequests: List<Friend> = _incomingRequests
 
     init {
         getIncomingFriendRequests()
@@ -154,6 +151,7 @@ class FriendsScreenViewModel : ViewModel() {
         sm.joinRoom(roomId, AppPreferences.refreshToken.toString())
         sm.onMessageReceived { msg ->
             println(msg)
+            getChatHistory(roomId)
         }
         sm.onHistoryRequest { getChatHistory(roomId) }
     }
@@ -207,8 +205,8 @@ class FriendsScreenViewModel : ViewModel() {
             ) {
                 if (response.isSuccessful) {
                     response.body()?.data?.let {
-                        _incomingRequests.clear()
-                        _incomingRequests.addAll(it)
+                        incomingRequests.clear()
+                        incomingRequests.addAll(it)
                     }
                 }
             }
@@ -261,7 +259,7 @@ class FriendsScreenViewModel : ViewModel() {
                     response.body()?.data?.let {
                         for (friend in it) {
                             println(friend)
-                            _friends.add(friend)
+                            friends.add(friend)
                         }
                     }
                 }
@@ -285,7 +283,7 @@ class FriendsScreenViewModel : ViewModel() {
                 response: Response<ApiResponse<Void>>
             ) {
                 if (response.isSuccessful) {
-                    _friends.removeAll { it.id == friendId }
+                    friends.removeAll { it.id == friendId }
                 }
             }
 
@@ -306,9 +304,10 @@ class FriendsScreenViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     response.body()?.data?.let { newFriends ->
                         // Remove from incoming requests
-                        _incomingRequests.removeAll { it.id == friendId }
+                        incomingRequests.removeAll { it.id == friendId }
                         // Add to friends list
-                        _friends.addAll(newFriends)
+                        friends.addAll(newFriends)
+                        println(friends)
                         println("Friend request accepted: $friendId")
                     }
                 } else {
@@ -333,7 +332,7 @@ class FriendsScreenViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     response.body()?.data?.let { newFriends ->
                         // Remove from incoming requests
-                        _incomingRequests.removeAll { it.id == friendId }
+                        incomingRequests.removeAll { it.id == friendId }
                     }
                 } else {
                     println("Failed to reject friend request: ${response.message()}")
@@ -371,22 +370,22 @@ class FriendsScreenViewModel : ViewModel() {
     }
 
     fun removeIncomingFriendRequest(requestIndex: Int) {
-        if (requestIndex in _incomingRequests.indices) {
-            _incomingRequests.removeAt(requestIndex)
+        if (requestIndex in incomingRequests.indices) {
+            incomingRequests.removeAt(requestIndex)
         } else {
             println("Invalid index: $requestIndex")
         }
     }
 
     fun removeFriendIdx(friendIndex: Int) {
-        if (friendIndex in _friends.indices) {
-            _friends.removeAt(friendIndex)
+        if (friendIndex in friends.indices) {
+            friends.removeAt(friendIndex)
         } else {
             println("Invalid index: $friendIndex")
         }
     }
 
-    fun sendFriendRequest(friendCode: String) {
+    fun sendFriendRequest(friendCode: String, onSuccess: () -> Unit) {
         if (friendCode.isEmpty() || !friendCode.isDigitsOnly()) {
             dialogErrorMessage = "Please enter a valid friend code"
             return
@@ -401,7 +400,7 @@ class FriendsScreenViewModel : ViewModel() {
             override fun onResponse(call: Call<ApiResponse<Any>>, response: Response<ApiResponse<Any>>) {
                 if (response.isSuccessful) {
                     println("Friend request sent successfully to User ID: $friendCode")
-                    dialogSuccessMessage = "Friend request sent"
+                    onSuccess()
                 } else {
                     dialogErrorMessage = "Failed to send friend request: ${response.parseErrorBody()?.message}"
                 }

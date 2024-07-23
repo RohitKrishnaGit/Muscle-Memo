@@ -15,6 +15,8 @@ import { UserPrs } from "./UserPrs";
 import { UserToken } from "./UserToken";
 import { Workout } from "./Workout";
 import { Chat } from "./Chat";
+import { PublicWorkout } from "./PublicWorkout";
+import { PublicWorkoutRequest } from "./PublicWorkoutRequest";
 
 export enum Role {
     ADMIN,
@@ -61,6 +63,11 @@ export class User {
     })
     @JoinTable()
     friends: Relation<User[]>;
+
+    @ManyToMany(() => PublicWorkout, {
+        cascade: true,
+    })
+    publicWorkouts?: Relation<PublicWorkout[]>;
 
     @OneToMany(() => Workout, (workout) => workout.user)
     workouts?: Relation<Workout[]>;

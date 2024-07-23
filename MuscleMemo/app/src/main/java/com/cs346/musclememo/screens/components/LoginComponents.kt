@@ -84,7 +84,11 @@ fun PasswordTextField(
 @Composable
 fun InputSheet (
     title: String,
+    subTitle: String,
     setVisible: () -> Unit,
+    next: () -> Unit,
+    buttonText: String = "Next",
+    errorMessage: String,
     content: @Composable() (() -> Unit)
 ) {
     Box (
@@ -101,35 +105,26 @@ fun InputSheet (
             Box(modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp)) {
-                content()
-            }
-        }
-    }
-}
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    Text(text = subTitle, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(20.dp))
+                    content()
 
-@Composable
-fun SignupSheet(
-    title: String,
-    setVisible: () -> Unit,
-    next: () -> Unit,
-    last: Boolean = false,
-    content: @Composable() (() -> Unit)
-) {
-    InputSheet(title = "Sign up", setVisible = setVisible) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Top
-        ) {
-            Text(text = title, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(20.dp))
-            content()
-
-            Spacer(modifier = Modifier.height(20.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.weight(1f))
-                Button(onClick = next) {
-                    Text(text = if (last) "Sign up" else "Next")
+                    Spacer(modifier = Modifier.height(20.dp))
+                    if (errorMessage != "") {
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
+                    }
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Button(onClick = next) {
+                            Text(text = buttonText)
+                        }
+                    }
                 }
             }
         }

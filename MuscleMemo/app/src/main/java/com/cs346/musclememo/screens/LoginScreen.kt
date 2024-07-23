@@ -42,7 +42,6 @@ import com.cs346.musclememo.screens.components.ChooseExperience
 import com.cs346.musclememo.screens.components.ChooseGender
 import com.cs346.musclememo.screens.components.InputSheet
 import com.cs346.musclememo.screens.components.PasswordTextField
-import com.cs346.musclememo.screens.components.SignupSheet
 import com.cs346.musclememo.screens.components.ValidPasswordRequirement
 import com.cs346.musclememo.screens.viewmodels.LoginScreenViewModel
 import com.cs346.musclememo.utils.getTransitionDirection
@@ -98,83 +97,9 @@ fun LoginScreen(
 fun LoginAccountSheet(
     viewModel: LoginScreenViewModel,
     onSuccessLogin: () -> Unit
-){
-    AnimatedVisibility(
-        visible = viewModel.loginVisible,
-        enter = slideInHorizontally(initialOffsetX = { it }),
-        exit = slideOutHorizontally(targetOffsetX = { it })
-    ) {
-        InputSheet(
-            title = "Log in",
-            setVisible = viewModel::onBackPressed
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Top
-            ) {
-                Text(text = "Welcome Back", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                // Email
-                Spacer(modifier = Modifier.height(20.dp))
-                OutlinedTextField(
-                    value = viewModel.email,
-                    onValueChange = {
-                        viewModel.updateEmail(it)
-                    },
-                    label = {
-                        Text(text = "Email")
-                    },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    modifier = Modifier.fillMaxWidth(1f)
-                )
-
-                // Password
-                Spacer(modifier = Modifier.height(16.dp))
-                PasswordTextField(
-                    password = viewModel.password,
-                    onValueChange = { viewModel.updatePassword(it) },
-                    modifier = Modifier.fillMaxWidth(1f),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    )
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Forgot Password?", modifier = Modifier.clickable {
-
-                })
-                // Login Button
-                if (viewModel.errorMessage != "") {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    //Invalid Login
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(viewModel.errorMessage)
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(onClick = {
-                        viewModel.loginAttempt(onSuccess = onSuccessLogin)
-                    }) {
-                        Text(text = "Log in", fontSize = 20.sp)
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-fun CreateAccountSheet(
-    viewModel: LoginScreenViewModel
 ) {
     AnimatedVisibility(
-        visible = viewModel.signupVisible,
+        visible = viewModel.loginVisible,
         enter = slideInHorizontally(initialOffsetX = { it }),
         exit = slideOutHorizontally(targetOffsetX = { it })
     ) {
@@ -199,19 +124,167 @@ fun CreateAccountSheet(
             label = "surveyScreenDataAnimation"
         ) { targetState ->
             when (targetState.question) {
-                LoginScreenViewModel.LoginState.USERNAME_EMAIL -> {
+                LoginScreenViewModel.LoginState.LOGIN -> {
+                    Login(viewModel = viewModel, onSuccessLogin = onSuccessLogin)
+                }
+                LoginScreenViewModel.LoginState.EMAIL_VERIFICATION -> {
+                    EmailVerification(viewModel = viewModel)
+                }
+                LoginScreenViewModel.LoginState.CODE_VERIFICATION -> {
+                    CodeVerification(viewModel = viewModel)
+                }
+                LoginScreenViewModel.LoginState.RESET_PASSWORD -> {
+                    CreatePassword(
+                        viewModel = viewModel,
+                        title = "Reset Password",
+                        next = {
+                            viewModel.updateLoginState(true)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CodeVerification(viewModel: LoginScreenViewModel) {
+    InputSheet(
+        title = "Reset Password",
+        subTitle = "Enter your code",
+        setVisible = viewModel::onBackPressed,
+        errorMessage = viewModel.errorMessage,
+        next = { viewModel.updateLoginState(true)}
+    ) {
+        Text(text = "A code has been sent to your email")
+        Spacer(modifier = Modifier.height(5.dp))
+        OutlinedTextField(
+            value = viewModel.verificationCode,
+            onValueChange = { viewModel.updateVerificationCode(it) },
+            label = {
+                Text(text = "Code")
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Email),
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun EmailVerification(viewModel: LoginScreenViewModel) {
+    InputSheet(
+        title = "Reset Password",
+        subTitle = "Enter your email",
+        setVisible = viewModel::onBackPressed,
+        errorMessage = viewModel.errorMessage,
+        next = { viewModel.updateLoginState(true)}
+    ) {
+        OutlinedTextField(
+            value = viewModel.email,
+            onValueChange = { viewModel.updateEmail(it) },
+            label = {
+                Text(text = "Email")
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Email),
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun Login (
+    viewModel: LoginScreenViewModel, 
+    onSuccessLogin: () -> Unit
+){
+    InputSheet(
+        title = "Log in",
+        subTitle = "Welcome Back",
+        setVisible = viewModel::onBackPressed,
+        buttonText = "Log in",
+        errorMessage = viewModel.errorMessage,
+        next = { viewModel.loginAttempt(onSuccess = onSuccessLogin) }
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
+        ) {
+            OutlinedTextField(
+                value = viewModel.email,
+                onValueChange = {
+                    viewModel.updateEmail(it)
+                },
+                label = {
+                    Text(text = "Email")
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth(1f)
+            )
+
+            // Password
+            Spacer(modifier = Modifier.height(16.dp))
+            PasswordTextField(
+                password = viewModel.password,
+                onValueChange = { viewModel.updatePassword(it) },
+                modifier = Modifier.fillMaxWidth(1f),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                )
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = "Forgot Password?", modifier = Modifier.clickable {
+                viewModel.updateLoginState(true)
+            })
+
+        }
+    }
+}
+
+
+@Composable
+fun CreateAccountSheet(
+    viewModel: LoginScreenViewModel
+) {
+    AnimatedVisibility(
+        visible = viewModel.signupVisible,
+        enter = slideInHorizontally(initialOffsetX = { it }),
+        exit = slideOutHorizontally(targetOffsetX = { it })
+    ) {
+        AnimatedContent(
+            targetState = viewModel.signupScreenData,
+            transitionSpec = {
+                val animationSpec: TweenSpec<IntOffset> = tween(300)
+
+                val direction = getTransitionDirection(
+                    initialIndex = initialState.signupIndex,
+                    targetIndex = targetState.signupIndex,
+                )
+
+                slideIntoContainer(
+                    towards = direction,
+                    animationSpec = animationSpec,
+                ) togetherWith slideOutOfContainer(
+                    towards = direction,
+                    animationSpec = animationSpec
+                )
+            },
+            label = "surveyScreenDataAnimation"
+        ) { targetState ->
+            when (targetState.question) {
+                LoginScreenViewModel.SignupState.USERNAME_EMAIL -> {
                     UsernameEmailSignup(viewModel)
                 }
 
-                LoginScreenViewModel.LoginState.PASSWORD -> {
-                    PasswordSignup(viewModel)
+                LoginScreenViewModel.SignupState.PASSWORD -> {
+                    CreatePassword(viewModel = viewModel, title = "Sign up", next = {viewModel.updateSignupState(true)})
                 }
 
-                LoginScreenViewModel.LoginState.BASIC_INFO -> {
+                LoginScreenViewModel.SignupState.BASIC_INFO -> {
                     BasicInformationSignup(viewModel)
                 }
                 
-                LoginScreenViewModel.LoginState.PFP -> {
+                LoginScreenViewModel.SignupState.PFP -> {
                     ChooseProfilePictureSignup(viewModel)
                 }
             }
@@ -223,11 +296,13 @@ fun CreateAccountSheet(
 fun UsernameEmailSignup(
     viewModel: LoginScreenViewModel
 ) {
-    SignupSheet(
-        title = "Create an Account",
+    InputSheet(
+        title = "Sign Up",
+        subTitle = "Create an Account",
         setVisible = viewModel::onBackPressed,
+        errorMessage = viewModel.errorMessage,
         next = {
-        viewModel.updateLoginState(
+        viewModel.updateSignupState(
             true
         )
     }) {
@@ -251,29 +326,27 @@ fun UsernameEmailSignup(
             label = {
                 Text(text = "Email")
             },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(1f)
         )
-        if (viewModel.errorMessage != ""){
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(text = viewModel.errorMessage, color = MaterialTheme.colorScheme.error)
-        }
+
     }
 
 }
 
 @Composable
-fun PasswordSignup(
-    viewModel: LoginScreenViewModel
+fun CreatePassword(
+    viewModel: LoginScreenViewModel,
+    title: String,
+    next: () -> Unit
 ) {
-    SignupSheet(
-        title = "Choose a Password",
+    InputSheet(
+        title = title,
+        subTitle = "Choose a Password",
         setVisible = viewModel::onBackPressed,
-        next = {
-            viewModel.updateLoginState(
-                true
-            )
-        }) {
+        errorMessage = viewModel.errorMessage,
+        next = next
+    ) {
         PasswordTextField(
             password = viewModel.password,
             onValueChange = { viewModel.updatePassword(it) },
@@ -306,10 +379,6 @@ fun PasswordSignup(
             text = "Confirm Password"
         )
 
-        if (viewModel.errorMessage != ""){
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(text = viewModel.errorMessage, color = MaterialTheme.colorScheme.error)
-        }
     }
 }
 
@@ -317,11 +386,13 @@ fun PasswordSignup(
 fun BasicInformationSignup(
     viewModel: LoginScreenViewModel
 ){
-    SignupSheet(
-        title = "Tell Us About Yourself",
+    InputSheet(
+        title = "Sign Up",
+        subTitle = "Tell Us About Yourself",
         setVisible = viewModel::onBackPressed,
+        errorMessage = viewModel.errorMessage,
         next = {
-            viewModel.updateLoginState(true)
+            viewModel.updateSignupState(true)
         }
     ) {
         Text("What is your gender?")
@@ -354,13 +425,15 @@ fun BasicInformationSignup(
 fun ChooseProfilePictureSignup(
     viewModel: LoginScreenViewModel
 ){
-    SignupSheet(
-        title = "Express Yourself (Optional)",
+    InputSheet(
+        title = "Sign Up",
+        subTitle = "Express Yourself",
         setVisible = viewModel::onBackPressed ,
+        errorMessage = viewModel.errorMessage,
         next = { viewModel.createAccountAttempt() },
-        last = true
+        buttonText = "Sign up"
     ) {
-            Text(text = "Set a profile picture")
+            Text(text = "Set a profile picture (Optional)")
             Spacer(modifier = Modifier.height(40.dp))
             Row (
                 modifier = Modifier.fillMaxWidth()

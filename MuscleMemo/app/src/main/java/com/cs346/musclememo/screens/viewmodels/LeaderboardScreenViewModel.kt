@@ -20,20 +20,43 @@ class LeaderboardScreenViewModel : ViewModel() {
 
     val leaderboardEntries: List<LeaderboardEntry>
         get() = if (leaderboardType == "Friends") friendsLeaderboardEntries.toList() else globalLeaderboardEntries.toList()
-    val currentExerciseRef by mutableStateOf(ExerciseRef(id = 1))
+    var currentExerciseRef by mutableStateOf(ExerciseRef(id = 1))
+    var exerciseRefs by mutableStateOf<List<ExerciseRef>>(listOf())
+    val sortedExerciseRefs: List<ExerciseRef>
+        get() = exerciseRefs.filter { it.name.contains(exerciseSearchText, ignoreCase = true) }
+                .sortedWith(
+                if (isSortedAlphabetically)
+                    compareBy(String.CASE_INSENSITIVE_ORDER) { it.name }
+                else
+                    compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.name }
+                )
+
+    //TODO: get user PRS
+    val userCompletedExerciseRefs: List<ExerciseRef>
+        get() = exerciseRefs
 
     var leaderboardType by mutableStateOf("Global")
     var chooseExerciseVisible by mutableStateOf(false)
 
+    var exerciseSearchText by mutableStateOf("")
+    var isSortedAlphabetically by mutableStateOf(true)
+
+    fun updateCurrentExerciseRef(ref: ExerciseRef){
+        currentExerciseRef = ref
+    }
+
+    fun toggleSort(){
+        isSortedAlphabetically = !isSortedAlphabetically
+    }
+    fun updateExerciseSearchText (text: String){
+        exerciseSearchText = text
+    }
     fun updateChooseExerciseVisible(state: Boolean){
         chooseExerciseVisible = state
     }
     fun updateLeaderboardType(type: String){
         leaderboardType = type
     }
-
-
-
     fun fetchLeaderboardResults(){
         RetrofitInstance.userPrsService.getTopN(currentExerciseRef.id.toString(), "50").enqueue(object:
             Callback<ApiResponse<List<Records>>>{
@@ -89,7 +112,27 @@ class LeaderboardScreenViewModel : ViewModel() {
 
         })
     }
+
+    fun getExerciseRefs(){
+        RetrofitInstance.exerciseService.getExerciseRef().enqueue(object: Callback<ApiResponse<List<ExerciseRef>>>{
+            override fun onResponse(
+                call: Call<ApiResponse<List<ExerciseRef>>>,
+                response: Response<ApiResponse<List<ExerciseRef>>>
+            ) {
+                if (response.isSuccessful) {
+                    exerciseRefs = response.body()?.data!!
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<List<ExerciseRef>>>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+        })
+    }
+
     init {
         fetchLeaderboardResults()
+        getExerciseRefs()
     }
 }

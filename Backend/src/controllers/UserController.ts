@@ -96,6 +96,10 @@ export class UserController {
         const userId = parseInt(request.params.userId);
         const { friendId } = request.body;
 
+        console.log({ friendId });
+
+        console.log(request.body);
+
         const user = await this.userRepository.findOne({
             where: { id: userId },
             relations: {
@@ -103,9 +107,13 @@ export class UserController {
             },
         });
 
+        console.log({ user });
+
         const friend = await this.userRepository.findOneBy({
             id: friendId,
         });
+
+        console.log({ friend });
 
         if (!user) {
             return failure("unregistered user");
@@ -280,12 +288,17 @@ export class UserController {
     async login(request: Request, response: Response, next: NextFunction) {
         const { email, password } = request.body;
 
+        console.log("jdiowajdiowa");
+        console.log({ email, password });
+
         const user = await this.userRepository.findOne({
             where: {
                 email,
             },
             select: ["id", "password", "role"],
         });
+
+        console.log({ user });
 
         if (!user) {
             return failure("Invalid email or password", 401);
@@ -295,6 +308,8 @@ export class UserController {
             password,
             user.password
         );
+
+        console.log(verifiedPassword);
 
         if (!verifiedPassword) {
             return failure("Invalid email or password", 401);
@@ -477,6 +492,23 @@ export class UserController {
         );
 
         return success("User Reported");
+    }
+
+    async findUsername(
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) {
+        const username = request.params.username;
+        let users = await this.userRepository.find({
+            where: {
+                username: username,
+            },
+        });
+        if (users.length != 0) {
+            return success(users[0].id);
+        }
+        return failure("User not found");
     }
 
     async requestPasswordReset(

@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.gson)
+    implementation(libs.material3)
 
     // Retrofit
     implementation (libs.retrofit)
@@ -81,6 +82,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
     // Import the Firebase BoM
     implementation(libs.firebase.bom)
     implementation(libs.firebase.messaging)
@@ -89,6 +91,10 @@ dependencies {
 
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
+
+
+    // Import Socket.io
+    implementation(libs.socket.io.client)
 
 
 

@@ -13,14 +13,19 @@ import com.cs346.musclememo.api.services.CreateWorkoutRequest
 import com.cs346.musclememo.api.services.CreateWorkoutResponse
 import com.cs346.musclememo.api.services.GetWorkoutResponse
 import com.cs346.musclememo.api.services.CreateTemplateClass
+import com.cs346.musclememo.api.services.UpdateUserPrRequest
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.api.types.parseErrorBody
-import com.cs346.musclememo.classes.Exercise
 import com.cs346.musclememo.classes.ExerciseIteration
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.classes.Template
 import com.cs346.musclememo.classes.Workout
+import com.cs346.musclememo.utils.AppPreferences
+import com.cs346.musclememo.utils.calculateScore
+import com.cs346.musclememo.utils.epochToMonthYear
+import com.cs346.musclememo.utils.translateDistance
+import com.cs346.musclememo.utils.translateWeight
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -50,6 +55,13 @@ class WorkoutScreenViewModel: ViewModel() {
                 else
                     compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.name }
             )
+
+    val groupedWorkouts: Map<String, List<Workout>>
+        get() = workouts.value.sortedWith(
+            compareByDescending { it.date }
+        ).groupBy {
+            epochToMonthYear(it.date)
+        }
     var workoutVisible by mutableStateOf(false)
         private set
     // whether the choose exercise screen is visible or not
@@ -88,12 +100,48 @@ class WorkoutScreenViewModel: ViewModel() {
     var workoutScreenData by mutableStateOf(createWorkoutScreenData())
     var showChangeWorkoutNameDialog by mutableStateOf(false)
     var tempWorkoutName by mutableStateOf("")
+    var seconds by mutableIntStateOf(0)
+    var isHistoryRefreshing by mutableStateOf(false)
 
-    var seconds by mutableStateOf(0)
+    var mePrs by mutableStateOf<Map<String, Int>?>(null)
+    var mePrsId by mutableIntStateOf(0)
 
-    fun convertDate(date: String): String {
-        //TODO: proper conversion
-        return "Saturday, July 20th"
+    fun resetState(){
+        currentWorkout = Workout()
+        newExerciseRef = ExerciseRef(
+            name = "",
+            id = -1,
+            durationVSReps = true,
+            weight = true,
+            distance = false,
+            isCustom = true,
+        )
+        selectedExerciseIndex = -1
+        selectedExercise = null
+        workoutVisible = false
+        addExerciseVisible = false
+        isExerciseSearchMode = false
+        exerciseSearchText = ""
+        isSortedAlphabetically = true
+        showCancelWorkoutDialog = false
+        showDeleteExerciseDialog = false
+        showDeleteCustomExerciseDialog = false
+        showAddNewCustomExerciseDialog = false
+        showEditCustomExerciseDialog = false
+        dialogErrorMessage = ""
+        dialogButtonsEnabled = true
+        currentHistoryWorkout = null
+        showCurrentWorkout = false
+        workouts = mutableStateOf(listOf())
+        workoutIndex = 0
+        workoutScreenData = createWorkoutScreenData()
+        showChangeWorkoutNameDialog = false
+        tempWorkoutName = ""
+        seconds = 0
+        isHistoryRefreshing = false
+
+        getWorkoutsByUserId()
+        fetchCombinedExercises()
     }
 
     fun onBackPressed(){
@@ -208,14 +256,8 @@ class WorkoutScreenViewModel: ViewModel() {
                     // Handle successful response
                     template.let {
                         for (exercise in template.exercises) { //populate exercises
-                            val newExercise = Exercise(
-                                exerciseSet = exercise.exerciseSet,
-                                workoutId = null,
-                                templateId = exercise.templateId,
-                                exerciseRefId = exercise.exerciseRef.id,
-                                customExerciseRefId = exercise.customExerciseRef?.id
-                            )
-                            createExercises(newExercise)
+                            // TODO: pls update
+                            createExercises(exercise, -1)
                         }
                     }
                 }
@@ -247,8 +289,7 @@ class WorkoutScreenViewModel: ViewModel() {
                     workoutResponse?.let {
                         val workoutId = it.workoutId
                         for (exercise in currentWorkout.exercises){ //populate exercises
-                            val newExercise = Exercise(exerciseSet = exercise.exerciseSet, workoutId = workoutId, templateId = exercise.templateId, exerciseRefId = exercise.exerciseRef.id, customExerciseRefId = exercise.customExerciseRef?.id)
-                            createExercises(newExercise)
+                            createExercises(exercise, workoutId)
                         }
                     }
                     println("Workout created successfully" )
@@ -265,17 +306,28 @@ class WorkoutScreenViewModel: ViewModel() {
         )
     }
 
-    private fun createExercises(exercise: Exercise){
+
+
+    private fun createExercises(exercise: ExerciseIteration, workoutId: Int){
         val apiService = RetrofitInstance.exerciseService
         val exerciseDataSet = mutableListOf<ExerciseDataSet>()
+        val exercisePR = mePrs?.get(exercise.exerciseRef.name)
+        var value = 0
         exercise.exerciseSet.forEach{
-            exerciseDataSet.add(ExerciseDataSet(it.weight, it.reps, it.duration, it.distance))
+            exerciseDataSet.add(ExerciseDataSet(translateWeight(it.weight), it.reps, it.duration, translateDistance(it.distance)))
+            if (calculateScore(it) > value)
+                value = calculateScore(it)
         }
 
+        if (exercisePR != null && value > exercisePR)
+            updatePersonalBest(value, exercise.exerciseRef.id)
+        else
+            updatePersonalBest(value, exercise.exerciseRef.id)
+
         val call = apiService.createExercise(ExerciseRequest(
-                workoutId = exercise.workoutId,
-                exerciseRefId = exercise.exerciseRefId,
-                customExerciseRefId = exercise.customExerciseRefId,
+                workoutId = workoutId,
+                exerciseRefId = exercise.exerciseRef.id,
+                customExerciseRefId = exercise.customExerciseRef?.id,
                 exerciseSet = exerciseDataSet
             )
         )
@@ -292,6 +344,22 @@ class WorkoutScreenViewModel: ViewModel() {
 
             override fun onFailure(call: Call<ApiResponse<Boolean>>, t: Throwable) {
                 println("Failure: ${t.message}")
+            }
+
+        })
+    }
+
+    private fun updatePersonalBest(value: Int, exerciseRefIndex: Int){
+        RetrofitInstance.prVisibilityService.updateUserPr(exerciseRefIndex, UpdateUserPrRequest(value)).enqueue(object: Callback<ApiResponse<String>>{
+            override fun onResponse(
+                call: Call<ApiResponse<String>>,
+                response: Response<ApiResponse<String>>
+            ) {
+                println("PR $exerciseRefIndex updated")
+            }
+
+            override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
+                t.printStackTrace()
             }
 
         })
@@ -404,7 +472,7 @@ class WorkoutScreenViewModel: ViewModel() {
         })
     }
 
-    fun getWorkoutsByUserId(){
+    fun getWorkoutsByUserId(onSuccess: () -> Unit = {}){
         val apiService = RetrofitInstance.workoutService
         val call = apiService.getWorkoutByUserId()
 
@@ -414,7 +482,7 @@ class WorkoutScreenViewModel: ViewModel() {
                 response: Response<ApiResponse<List<GetWorkoutResponse>>>
             ) {
                 if (response.isSuccessful) {
-                    response.body()?.data?.let { it ->
+                    response.body()?.data?.let {
                         val newWorkouts = mutableListOf<Workout>()
                         it.forEach { workout->
                             val newExercises = mutableListOf<ExerciseIteration>()
@@ -448,6 +516,7 @@ class WorkoutScreenViewModel: ViewModel() {
                             println(workout.id)
                         }
                         workouts.value = newWorkouts
+                        onSuccess()
                     }
                 }
                 else{
@@ -477,6 +546,39 @@ class WorkoutScreenViewModel: ViewModel() {
             override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
             }
         })
+    }
+
+    private fun getPersonalBests(){
+        RetrofitInstance.userPrsService.getAllUserPr().enqueue(object :
+            Callback<ApiResponse<Map<String, Int>>>{
+            override fun onResponse(
+                call: Call<ApiResponse<Map<String, Int>>>,
+                response: Response<ApiResponse<Map<String, Int>>>
+            ) {
+                if (response.isSuccessful){
+                    mePrs = response.body()?.data
+                    mePrsId = mePrs?.get("id")!!
+                    mePrs = mePrs!!.filter { it.key != "id" && it.value != 0 }
+                    println(mePrs)
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<Map<String, Int>>>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+        }
+        )
+    }
+
+    fun refreshHistory(){
+        isHistoryRefreshing = true
+        getWorkoutsByUserId(
+            onSuccess = {
+                isHistoryRefreshing = false
+                println("Done")
+            }
+        )
     }
 
     fun updateTempWorkoutName(name: String){
@@ -568,7 +670,10 @@ class WorkoutScreenViewModel: ViewModel() {
     )
 
     init {
-        getWorkoutsByUserId()
-        fetchCombinedExercises()
+        if (AppPreferences.accessToken != null) {
+            getWorkoutsByUserId()
+            fetchCombinedExercises()
+            getPersonalBests()
+        }
     }
 }

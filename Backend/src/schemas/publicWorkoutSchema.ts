@@ -1,4 +1,4 @@
-import { boolean, number, object, string } from "zod";
+import { number, object, string } from "zod";
 
 export const allPublicWorkoutSchema = object({
     params: object({
@@ -32,19 +32,22 @@ export const createPublicWorkoutSchema = object({
         date: number({
             required_error: "date is required",
         }),
-        location: string({
-            required_error: "location is required",
+        latitude: string({
+            required_error: "latitude is required",
+        }),
+        longitude: string({
+            required_error: "longitude is required",
         }),
         description: string({
             required_error: "description is required",
         }),
         gender: string({
             required_error: "gender is required",
-        }),
+        }).optional(),
         experience: string({
             required_error: "experience is required",
-        }),
-    })
+        }).optional(),
+    }),
 });
 
 export const removePublicWorkoutSchema = object({
@@ -58,18 +61,15 @@ export const removePublicWorkoutSchema = object({
     }),
 });
 
-export const filterGenderPublicWorkoutSchema = object({
+export const filterPublicWorkoutSchema = object({
     body: object({
-        gender: string({
-            required_error: "gender is required",
+        gender: string().optional(),
+        experience: string().optional(),
+        latitude: string({
+            required_error: "latitude is required",
         }),
-    })
-});
-
-export const filterExperiencePublicWorkoutSchema = object({
-    body: object({
-        gender: string({
-            required_error: "gender is required",
+        longitude: string({
+            required_error: "longitude is required",
         }),
-    })
+    }),
 });

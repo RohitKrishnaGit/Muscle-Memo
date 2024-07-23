@@ -81,6 +81,8 @@ fun DisplayMe(
         DisplayProfile(
             user = if (viewModel.editEnabled) viewModel.getNewUser() else viewModel.user,
             me = true,
+            prs = viewModel.mePrs,
+            exerciseRefs = viewModel.exerciseRefs,
             editProfilePicture = {
                 EditSurface(edit = viewModel.editEnabled, spacerSize = 20.dp, showBackground = false){
                     ChooseProfilePicture(

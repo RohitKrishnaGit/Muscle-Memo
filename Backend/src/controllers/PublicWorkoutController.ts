@@ -1,11 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
+import { PublicWorkout } from "../entities/PublicWorkout";
 import { User } from "../entities/User";
 import { failure, success } from "../utils/responseTypes";
-import { PublicWorkout } from "../entities/PublicWorkout";
+import { geoFire } from "../utils/location";
+import { ArrayContains } from "typeorm";
 
 export class PublicWorkoutController {
-    private publicWorkoutRepository = AppDataSource.getRepository(PublicWorkout);
+    private publicWorkoutRepository =
+        AppDataSource.getRepository(PublicWorkout);
 
     async all(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
@@ -34,57 +37,73 @@ export class PublicWorkoutController {
 
     async create(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
-        const { name, date, location, description, gender, experience } = request.body;
+        const { name, date, latitude, longitude, description, gender, experience } = request.body;
 
         const publicWorkout = Object.assign(new PublicWorkout(), {
             name,
             date,
-            location,
+            latitude,
+            longitude,
             description,
             gender,
             experience,
             creator: { id: userId } as User,
         });
 
-        const newPublicWorkout = await this.publicWorkoutRepository.save(publicWorkout);
+        const newPublicWorkout = await this.publicWorkoutRepository.save(
+            publicWorkout
+        );
+
+        geoFire.set(newPublicWorkout.id.toString(), [+latitude, +longitude]).then(function () {
+            console.log("Provided key has been added to GeoFire");
+        }, function (error) {
+            console.log("Error: " + error);
+        });
 
         return success({ publicWorkoutId: newPublicWorkout.id });
     }
 
-    async filterGender(request: Request, response: Response, next: NextFunction) {
-        const { gender } = request.body;
+    async filter(request: Request, response: Response, next: NextFunction) {
+        const { gender, experience, latitude, longitude } = request.body;
 
-        const publicWorkout = await this.publicWorkoutRepository.findBy({
+        const nearby: string[] = []
+
+        const geoQuery = geoFire.query({
+            center: [+latitude, +longitude],
+            radius: 9.5
+        });
+
+        geoQuery.on("key_entered", function (key: any, location: any, distance: any) {
+            nearby.push(key)
+        });
+        
+        const sleep = (ms:number) => {
+            return new Promise ((resolve) => {
+                setTimeout(resolve, ms)
+            })
+        }
+
+        await sleep(50)
+
+        const publicWorkouts = await this.publicWorkoutRepository.findBy({
             gender,
-        });
-
-        if (!publicWorkout || publicWorkout.length == 0) {
-            return failure("no workouts exist with the filter");
-        }
-        return success(publicWorkout);
-    }
-
-    async filterExperience(request: Request, response: Response, next: NextFunction) {
-        const { experience } = request.body;
-
-        const publicWorkout = await this.publicWorkoutRepository.findBy({
             experience,
-        });
+        })
 
-        if (!publicWorkout || publicWorkout.length == 0) {
-            return failure("no workouts exist with the filter");
-        }
-        return success(publicWorkout);
+        return success(
+            publicWorkouts.filter((publicWorkout) => nearby.includes(publicWorkout.id.toString()))
+        );
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
         const id = parseInt(request.params.id);
 
-        let publicWorkoutToRemove = await this.publicWorkoutRepository.findOneBy({
-            id,
-            creator: { id: userId },
-        });
+        let publicWorkoutToRemove =
+            await this.publicWorkoutRepository.findOneBy({
+                id,
+                creator: { id: userId },
+            });
 
         if (!publicWorkoutToRemove) {
             return failure("this public workout does not exist");

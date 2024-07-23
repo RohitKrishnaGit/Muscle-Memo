@@ -21,15 +21,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +45,7 @@ import com.cs346.musclememo.screens.components.PasswordTextField
 import com.cs346.musclememo.screens.components.SignupSheet
 import com.cs346.musclememo.screens.components.ValidPasswordRequirement
 import com.cs346.musclememo.screens.viewmodels.LoginScreenViewModel
-import com.cs346.musclememo.screens.components.getTransitionDirection
+import com.cs346.musclememo.utils.getTransitionDirection
 
 
 @Composable
@@ -299,7 +293,7 @@ fun PasswordSignup(
 
         ValidPasswordRequirement(text = "Minimum 8 characters long", valid = viewModel.minLength())
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         PasswordTextField(
             password = viewModel.passwordCheck,
@@ -319,7 +313,6 @@ fun PasswordSignup(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BasicInformationSignup(
     viewModel: LoginScreenViewModel

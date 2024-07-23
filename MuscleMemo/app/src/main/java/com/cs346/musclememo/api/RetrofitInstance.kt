@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 
 import com.cs346.musclememo.api.services.ExerciseService
+import com.cs346.musclememo.api.services.PasswordResetService
 import com.cs346.musclememo.api.services.PrVisibilityService
 import com.cs346.musclememo.api.services.UserPrsService
 import com.cs346.musclememo.api.services.TemplateService
@@ -67,6 +68,9 @@ object RetrofitInstance: RetrofitInterface {
 
     val templateService: TemplateService by lazy {
         retrofit.create(TemplateService::class.java)
+    }
 
+    val passwordResetService: PasswordResetService by lazy {
+        retrofit.create(PasswordResetService::class.java)
     }
 }

@@ -12,22 +12,22 @@ import com.cs346.musclememo.api.services.ImageUploadService
 import com.cs346.musclememo.utils.AppPreferences
 import com.cs346.musclememo.api.services.LoginRequest
 import com.cs346.musclememo.api.services.LoginResponse
+import com.cs346.musclememo.api.services.PasswordResetAttemptRequest
+import com.cs346.musclememo.api.services.PasswordResetRequest
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.api.types.parseErrorBody
 import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.screens.services.SignupRequest
 import com.cs346.musclememo.utils.Conversions.sliderToExperience
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.storage.FirebaseStorage
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.UUID
-
 
 class LoginScreenViewModel : ViewModel() {
     var signupVisible by mutableStateOf(false)
         private set
+
     var loginVisible by mutableStateOf(false)
         private set
     var username by mutableStateOf("")
@@ -41,16 +41,31 @@ class LoginScreenViewModel : ViewModel() {
     var email by mutableStateOf("")
         private set
 
+    // Signup Screen States
+    private val signupOrder: List<SignupState> = listOf(
+        SignupState.USERNAME_EMAIL,
+        SignupState.PASSWORD,
+        SignupState.BASIC_INFO,
+        SignupState.PFP
+    )
+
+    private var signupIndex = 0
+    var signupScreenData by mutableStateOf(createSignupScreenData())
+
     // Login Screen States
     private val loginOrder: List<LoginState> = listOf(
-        LoginState.USERNAME_EMAIL,
-        LoginState.PASSWORD,
-        LoginState.BASIC_INFO,
-        LoginState.PFP
+        LoginState.LOGIN,
+        LoginState.EMAIL_VERIFICATION,
+        LoginState.CODE_VERIFICATION,
+        LoginState.RESET_PASSWORD
     )
 
     private var loginIndex = 0
     var loginScreenData by mutableStateOf(createLoginScreenData())
+    var verificationCode by mutableStateOf("")
+        private set
+
+
 
     private val specialPattern = "[^A-Za-z0-9]"
     private val digitPattern = "\\d"
@@ -69,19 +84,21 @@ class LoginScreenViewModel : ViewModel() {
     var profilePicture by mutableStateOf<String?>(null)
         private set
 
+    fun updateVerificationCode(code: String){
+        verificationCode = code
+    }
+
     fun updateCustomGender(gender: String) {
         customGender = gender
     }
 
     fun updateProfilePicture(uri: Uri?) {
         if (uri != null){
-            var imageUploader = ImageUploadService()
+            val imageUploader = ImageUploadService()
             imageUploader.uploadImage({ res ->
                 profilePicture = res
             }, uri)
         }
-
-
     }
 
     fun updateSliderPosition(pos: Float) {
@@ -107,17 +124,34 @@ class LoginScreenViewModel : ViewModel() {
     fun onBackPressed() {
         errorMessage = ""
         if (loginVisible) {
-            loginVisible = false
-            email = ""
-            password = ""
+            if (loginIndex == 0){
+                loginVisible = false
+                email = ""
+                password = ""
+            } else {
+                updateLoginState(false)
+                when (loginIndex){
+                    1 -> {
+                        email = ""
+                    }
+                    2 -> {
+                        verificationCode = ""
+                    }
+                    3 -> {
+                        password = ""
+                        passwordCheck = ""
+                        verificationCode = ""
+                    }
+                }
+            }
         } else if (signupVisible) {
-            if (loginIndex == 0) {
+            if (signupIndex == 0) {
                 signupVisible = false
                 username = ""
                 email = ""
             } else {
-                updateLoginState(false)
-                when (loginIndex) {
+                updateSignupState(false)
+                when (signupIndex) {
                     1 -> {
                         password = ""
                         passwordCheck = ""
@@ -137,6 +171,49 @@ class LoginScreenViewModel : ViewModel() {
         }
     }
 
+    fun updateLoginState(next: Boolean){
+        if (next) {
+            when (loginIndex) {
+                0 -> loginIndex++
+                1 -> checkEmail(email, onSuccess = {
+                    loginIndex++
+                    loginScreenData = createLoginScreenData()
+                    sendVerificationCode()
+                },
+                    onFailure = {
+                        errorMessage = "Email does not exist"
+                    }
+                )
+                2 -> {
+                    verifyVerificationCode(
+                        onSuccess = {
+                            email = ""
+                            loginIndex++
+                            loginScreenData = createLoginScreenData()
+                        }
+                    )
+                }
+                3 -> {
+                    resetPassword(
+                        onSuccess = {
+                            loginIndex = 0
+                            verificationCode = ""
+                            loginScreenData = createLoginScreenData()
+                        }
+                    )
+                }
+            }
+        }
+        else {
+            if (loginIndex == 3)
+                loginIndex = 0
+            else if (loginIndex != 0)
+                loginIndex--
+        }
+
+        loginScreenData = createLoginScreenData()
+    }
+
     fun updateUsername(name: String) {
         username = name
     }
@@ -153,22 +230,27 @@ class LoginScreenViewModel : ViewModel() {
         passwordCheck = password
     }
 
-    fun updateLoginState(next: Boolean) {
+    fun updateSignupState(next: Boolean) {
         if (next) {
             errorMessage = ""
-            if (loginScreenData.question == LoginState.USERNAME_EMAIL) {
+            if (signupScreenData.question == SignupState.USERNAME_EMAIL) {
                 if (username == "") {
                     errorMessage = "Please enter a username."
                 } else if (email == "") {
                     errorMessage = "Please enter an email."
                 } else {
-                    //TODO: Check email validity
-                    loginIndex++
+                    checkEmail(email,
+                        onSuccess = {
+                            errorMessage = "Email already exists"
+                        },
+                        onFailure = {signupIndex++
+                            signupScreenData = createSignupScreenData()
+                        })
                 }
-            } else if (loginScreenData.question == LoginState.PASSWORD) {
+            } else if (signupScreenData.question == SignupState.PASSWORD) {
                 if ((password != "") and containsCapLower() and containsSpecialChar() and containsDigit() and minLength()) {
                     if ((password == passwordCheck))
-                        loginIndex++
+                        signupIndex++
                     else {
                         errorMessage = "The passwords don't match. Try again."
                         passwordCheck = ""
@@ -177,19 +259,19 @@ class LoginScreenViewModel : ViewModel() {
                     errorMessage = "Please make a valid password."
                     passwordCheck = ""
                 }
-            } else if (loginScreenData.question == LoginState.BASIC_INFO) {
+            } else if (signupScreenData.question == SignupState.BASIC_INFO) {
                 if (gender != "") {
                     if ((gender == "Custom") and (customGender == ""))
                         errorMessage = "Please input your custom gender."
                     else
-                        loginIndex++
+                        signupIndex++
                 } else
                     errorMessage = "Please select a gender."
             } else
-                loginIndex++
+                signupIndex++
         } else
-            loginIndex--
-        loginScreenData = createLoginScreenData()
+            signupIndex--
+        signupScreenData = createSignupScreenData()
     }
 
     fun containsCapLower(): Boolean {
@@ -208,8 +290,110 @@ class LoginScreenViewModel : ViewModel() {
         return password.length >= 8
     }
 
+    private fun createSignupScreenData(): SignupScreenData {
+        return SignupScreenData(signupIndex, signupOrder[signupIndex])
+    }
+
     private fun createLoginScreenData(): LoginScreenData {
         return LoginScreenData(loginIndex, loginOrder[loginIndex])
+    }
+
+    private fun resetPassword(onSuccess: () -> Unit){
+        RetrofitInstance.passwordResetService.resetPassword(verificationCode, PasswordResetRequest(password)).enqueue(
+            object : Callback<ApiResponse<String>>{
+                override fun onResponse(
+                    call: Call<ApiResponse<String>>,
+                    response: Response<ApiResponse<String>>
+                ) {
+                    if (response.isSuccessful){
+                        onSuccess()
+                    }
+                    else {
+                        errorMessage = "Please try again."
+                    }
+                    password = ""
+                    passwordCheck = ""
+                }
+
+                override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
+                    t.printStackTrace()
+                    errorMessage = "Failed to connect to server"
+                }
+
+            }
+        )
+    }
+
+    private fun verifyVerificationCode(onSuccess: () -> Unit){
+        RetrofitInstance.passwordResetService.verifyCode(verificationCode, PasswordResetAttemptRequest(email)).enqueue(
+            object : Callback<ApiResponse<String>>{
+                override fun onResponse(
+                    call: Call<ApiResponse<String>>,
+                    response: Response<ApiResponse<String>>
+                ) {
+                    if (response.isSuccessful){
+                        onSuccess()
+                    }
+                    else
+                        errorMessage = response.body()?.message ?: "Code is wrong"
+                }
+
+                override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
+                    t.printStackTrace()
+                    errorMessage = "Failed to connect to server"
+                }
+
+            }
+        )
+    }
+
+    private fun sendVerificationCode(){
+        RetrofitInstance.passwordResetService.requestPasswordReset(PasswordResetAttemptRequest(email)).enqueue(
+            object : Callback<ApiResponse<String>>{
+                override fun onResponse(
+                    call: Call<ApiResponse<String>>,
+                    response: Response<ApiResponse<String>>
+                ) {
+                    if (!response.isSuccessful)
+                        errorMessage = response.body()?.message ?: "Try again"
+                }
+
+                override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
+                    errorMessage = "Failed to connect to server"
+                }
+
+            }
+        )
+    }
+
+    private fun checkEmail(email: String, onSuccess: () -> Unit, onFailure: () -> Unit) {
+        // official RFC 5322 standard
+        val emailRegex = "(?:[a-z0-9!#\$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#\$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
+        if (Regex(emailRegex).find(email) != null) {
+            RetrofitInstance.signupService.checkEmail(email)
+                .enqueue(object : Callback<ApiResponse<Boolean>> {
+                    override fun onResponse(
+                        call: Call<ApiResponse<Boolean>>,
+                        response: Response<ApiResponse<Boolean>>
+                    ) {
+                        if (response.isSuccessful) {
+                            if (response.body()?.data == true)
+                                onSuccess()
+                            else
+                                onFailure()
+                        } else {
+                            errorMessage = "Bad request."
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ApiResponse<Boolean>>, t: Throwable) {
+                        t.printStackTrace()
+                        errorMessage = "Failed to connect to server."
+                    }
+                })
+        }
+        else
+            errorMessage = "Please enter a proper email."
     }
 
     fun loginAttempt(onSuccess: () -> Unit, onFailure: () -> Unit = {}) {
@@ -317,11 +501,23 @@ class LoginScreenViewModel : ViewModel() {
 
     }
 
-    enum class LoginState {
+    enum class SignupState {
         USERNAME_EMAIL,
         PASSWORD,
         BASIC_INFO,
         PFP
+    }
+
+    data class SignupScreenData(
+        val signupIndex: Int,
+        val question: SignupState
+    )
+
+    enum class LoginState {
+        LOGIN,
+        EMAIL_VERIFICATION,
+        CODE_VERIFICATION,
+        RESET_PASSWORD
     }
 
     data class LoginScreenData(

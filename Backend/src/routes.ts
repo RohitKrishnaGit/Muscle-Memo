@@ -675,7 +675,14 @@ export const Routes = [
         method: "get",
         route: "/leaderboard/:userId/:exerciseRefId/:count",
         controller: UserPrsController,
-        middleware: [validateSchema(leaderboardFriendsSchema)],
+        middleware: [validateSchema(leaderboardFriendsSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            )
+        ],
         action: "getTopNFriends",
     },
     {

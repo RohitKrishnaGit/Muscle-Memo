@@ -32,14 +32,14 @@ fun ChatTestScreen() {
     ){
         LaunchedEffect(Unit) {
             sm.connect()
-            sm.joinRoom("3")
+            sm.joinRoom("3", AppPreferences.refreshToken.toString())
             sm.onMessageReceived { msg -> println(msg) }
             sm.onHistoryRequest { msg -> println(msg) }
         }
         MMButton(
             onClick = {
                 if (AppPreferences.refreshToken!=null) {
-                    sm.sendMessage("Hello, everyone!", AppPreferences.refreshToken.toString())
+                    sm.sendMessage("Hello, everyone!")
                 }
             },
             text = "Send Message Test",

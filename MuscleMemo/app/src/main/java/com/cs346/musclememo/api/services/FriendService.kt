@@ -3,6 +3,7 @@ package com.cs346.musclememo.api.services
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.classes.Friend
 import com.cs346.musclememo.classes.User
+import com.cs346.musclememo.screens.viewmodels.Message
 import retrofit2.Call
 import retrofit2.http.POST
 import retrofit2.http.Body
@@ -43,5 +44,5 @@ public interface  FriendService {
     fun reportUserById(@Body reportUserAction: ReportUserAction): Call<ApiResponse<String>>
 
     @GET("/chat/{roomId}")
-    fun getChat(@Path("roomId") roomId: String): Call<ApiResponse<Any>>
+    fun getChat(@Path("roomId") roomId: String): Call<ApiResponse<List<Message>>>
 }

@@ -16,8 +16,41 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+data class Message(
+    val id: Double,
+    val roomId: Int,
+    val message: String,
+    val sender: Sender
+)
+
+data class Sender(
+    val id: Double,
+    val username: String,
+    val email: String,
+    val gender: String,
+    val experience: String,
+    val firebaseTokens: Any,
+    val profilePicture: String?
+)
+
 class FriendsScreenViewModel : ViewModel() {
     val sm = SocketManager()
+    private val _friends = mutableStateListOf<Friend>()
+    private val _incomingRequests = mutableStateListOf<Friend>()
+    var currentUser: User? by mutableStateOf(null)
+
+    val friends: List<Friend> = _friends
+    val incomingRequests: List<Friend> = _incomingRequests
+
+    init {
+        getIncomingFriendRequests()
+        getFriendByUserId()
+        getCurrentUser()
+    }
+
+    private val _receivedMessages = mutableStateListOf<Message>()
+
+    val receivedMessages: List<Message> get() = _receivedMessages
 
     var showAddFriendDialog by mutableStateOf(false)
         private set
@@ -48,9 +81,6 @@ class FriendsScreenViewModel : ViewModel() {
         private set
 
     var friendChatVisible by mutableStateOf(false)
-        private set
-
-    var receivedMessage by mutableStateOf("")
         private set
 
     fun updateCurrentMessage(message: String) {
@@ -89,24 +119,29 @@ class FriendsScreenViewModel : ViewModel() {
         friendChatVisible = visible
     }
 
-    fun updateReceivedMessage(message: String) {
-        receivedMessage = message
+    fun updateReceivedMessages(messages: List<Message>) {
+        _receivedMessages.clear()
+        _receivedMessages.addAll(messages)
     }
 
     fun getChatHistory(roomId: String) {
         val apiService = RetrofitInstance.friendService
         val call = apiService.getChat(roomId)
 
-        call.enqueue(object : Callback<ApiResponse<Any>> {
-            override fun onResponse(call: Call<ApiResponse<Any>>, response: Response<ApiResponse<Any>>) {
+        call.enqueue(object : Callback<ApiResponse<List<Message>>> {
+            override fun onResponse(call: Call<ApiResponse<List<Message>>>, response: Response<ApiResponse<List<Message>>>) {
                 if (response.isSuccessful) {
+                    response.body()?.data?.let { messages ->
+                        updateReceivedMessages(messages)
+                    }
+                    println(receivedMessages)
                     println(response.body())
                 } else {
                     println("Failed to get chat history: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<ApiResponse<Any>>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<List<Message>>>, t: Throwable) {
                 println("Failed to get chat history: ${t.message}")
             }
         })
@@ -115,7 +150,9 @@ class FriendsScreenViewModel : ViewModel() {
     fun connectSocket(roomId: String) {
         sm.connect()
         sm.joinRoom(roomId, AppPreferences.refreshToken.toString())
-        sm.onMessageReceived { msg -> updateReceivedMessage(msg) }
+        sm.onMessageReceived { msg ->
+            println(msg)
+        }
         sm.onHistoryRequest { getChatHistory(roomId) }
     }
 
@@ -157,17 +194,6 @@ class FriendsScreenViewModel : ViewModel() {
         }
     }
 
-    private val _friends = mutableStateListOf<Friend>()
-    private val _incomingRequests = mutableStateListOf<Friend>()
-
-    val friends: List<Friend> = _friends
-    val incomingRequests: List<Friend> = _incomingRequests
-
-    init {
-        getIncomingFriendRequests()
-        getFriendByUserId()
-    }
-
     fun getIncomingFriendRequests() {
         val apiService = RetrofitInstance.friendService
         val call = apiService.getIncomingFriendRequestsByUserId()
@@ -187,6 +213,35 @@ class FriendsScreenViewModel : ViewModel() {
 
             override fun onFailure(call: Call<ApiResponse<List<Friend>>>, t: Throwable) {
                 println("Failure: ${t.message}")
+            }
+        })
+    }
+
+    fun generateRoomId(userId: Int, friendId: Int): String {
+        val minId = minOf(userId, friendId)
+        val maxId = maxOf(userId, friendId)
+        return "$minId$maxId"
+    }
+
+    fun getCurrentUser() {
+        val apiService = RetrofitInstance.userService
+        val call = apiService.getMyUser()
+
+        call.enqueue(object : Callback<ApiResponse<User>> {
+            override fun onResponse(
+                call: Call<ApiResponse<User>>,
+                response: Response<ApiResponse<User>>
+            ) {
+                if (response.isSuccessful){
+                    val fetchedUser = response.body()?.data
+                    fetchedUser?.let{
+                        currentUser = it
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
+                t.printStackTrace()
             }
         })
     }

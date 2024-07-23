@@ -26,7 +26,6 @@ fun AppNavHost (
     startDestination: String,
 ) {
     val workoutScreenViewModel = viewModel<WorkoutScreenViewModel>()
-    val friendScreenViewModel = viewModel<FriendsScreenViewModel>()
 
     NavHost (
         navController = navController,
@@ -52,7 +51,7 @@ fun AppNavHost (
             LeaderboardScreen()
         }
         composable(route = Screen.Friends.route) {
-            FriendsScreen(viewModel = friendScreenViewModel)
+            FriendsScreen()
         }
         composable(route = Screen.Workout.route) {
             WorkoutScreen(viewModel = workoutScreenViewModel)

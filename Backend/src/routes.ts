@@ -93,6 +93,7 @@ import {
 import { createPublicKey } from "crypto";
 import { ChatController } from "./controllers/ChatController";
 import { allChatsSchema, removeChatsSchema } from "./schemas/chatSchema";
+import { sendNotificationSchema } from "./schemas/notificationSchema";
 
 export const Routes = [
     /* User routes */
@@ -722,7 +723,10 @@ export const Routes = [
         method: "post",
         route: "/notification",
         controller: NotificationController,
-        middleware: [],
+        middleware: [
+            validateSchema(sendNotificationSchema),
+            authenticateWithToken,
+        ],
         action: "notification",
     },
 

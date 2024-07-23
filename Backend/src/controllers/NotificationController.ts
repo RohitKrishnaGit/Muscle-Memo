@@ -5,18 +5,21 @@ import { verifyRefreshToken } from "../utils/token";
 import { getMessaging } from '../firebaseAdmin';
 
 export class NotificationController {
+  async notificationHelper(registrationToken: string, title: string, message: string) {
+    const messageData = {
+        data: {
+          title: title,
+          message: message
+        },
+        token: registrationToken
+      };
+    await getMessaging().send(messageData);
+    return success(true);
+}
+
     async notification(request: Request, response: Response, next: NextFunction) {
         const {registrationToken, title, message} = request.body
-        const messageData = {
-            data: {
-              title: title,
-              message: message
-            },
-            token: registrationToken
-          };
-        console.log(messageData);
-        const yert = await getMessaging().send(messageData);
-        return await success(true)
+        return this.notificationHelper(registrationToken, title, message);
     }
 
     

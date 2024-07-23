@@ -14,7 +14,6 @@ export const generateTokens = async (user: User) => {
             getEnv().ACCESS_TOKEN_PRIVATE_KEY,
             { expiresIn: getEnv().ACCESS_TOKEN_TIMEOUT }
         );
-        console.log(typeof getEnv().ACCESS_TOKEN_TIMEOUT);
         const refreshToken = jwt.sign(
             payload,
             getEnv().REFRESH_TOKEN_PRIVATE_KEY

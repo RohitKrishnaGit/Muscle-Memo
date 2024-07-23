@@ -43,11 +43,11 @@ class SocketManager {
         }
     }
 
-    fun joinRoom(roomId: String) {
-        socket?.emit("join", roomId);
+    fun joinRoom(roomId: String, refreshToken: String) {
+        socket?.emit("join", roomId, refreshToken);
     }
 
-    fun sendMessage(message: String, refreshToken: String) {
-        socket?.emit("message", message, refreshToken)
+    fun sendMessage(message: String) {
+        socket?.emit("message", message)
     }
 }

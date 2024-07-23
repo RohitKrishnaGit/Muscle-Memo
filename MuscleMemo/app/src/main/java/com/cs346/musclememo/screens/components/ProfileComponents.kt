@@ -1,8 +1,6 @@
 package com.cs346.musclememo.screens.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -14,11 +12,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,8 +32,10 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults.Container
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,15 +47,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.User
-import kotlin.math.exp
+import com.cs346.musclememo.utils.convertPrNameToRefName
+import com.cs346.musclememo.utils.displayScore
 
 
 @Composable
 fun DisplayProfilePicture(
     model: Any?,
     size: Dp = 240.dp
-){
+) {
     Box(
         modifier = Modifier
             .size(size)
@@ -72,29 +74,35 @@ fun DisplayProfilePicture(
                 contentDescription = null
             )
         } else {
-            Icon(Icons.Default.Person, "Default Profile Picture", modifier = Modifier.size(size*0.8f), tint = MaterialTheme.colorScheme.onPrimaryContainer)
+            Icon(
+                Icons.Default.Person,
+                "Default Profile Picture",
+                modifier = Modifier.size(size * 0.8f),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         }
     }
 }
 
 @Composable
-fun DisplayProfile (
+fun DisplayProfile(
     user: User,
     me: Boolean,
-
+    prs: Map<String, Int>? = null,
+    exerciseRefs: List<ExerciseRef>? = null,
     editProfilePicture: @Composable () -> Unit = {},
     editUsername: @Composable () -> Unit = {},
     editExperience: @Composable () -> Unit = {},
-    editGender: @Composable () -> Unit = {}
-){
+    editGender: @Composable () -> Unit = {},
+) {
     val listState = rememberLazyListState()
-    LazyColumn (
+    LazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        item{
-            Column (
+        item {
+            Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -111,23 +119,80 @@ fun DisplayProfile (
                 editGender()
                 DisplayExperience(experience = user.experience, size = 250.dp)
                 editExperience()
-                Column (
+            }
+        }
+        if (prs != null) {
+            item {
+                Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(text = "Personal Bests", fontSize = 30.sp)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = "Sets",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 12.sp
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = "Score",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            }
+            items(items = prs.toList()) { prs ->
+                val prName = convertPrNameToRefName(prs.first)
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(text = prName)
+                    Spacer(modifier = Modifier.weight(1f))
+                    if (exerciseRefs != null) {
+                        Text(
+                            text = displayScore(
+                                exerciseRef = (exerciseRefs.find { it.name == prName }),
+                                score = prs.second
+                            )
+                        )
+                    }
+                }
+            }
+        } else if (me) {
+            item {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(text = "Personal Bests", fontSize = 30.sp)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = "Sets",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 12.sp
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = "Score",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(5.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(text = "Start your first workout!")
                 }
             }
         }
     }
-}
-
-@Composable
-fun ConfirmationDialog(
-
-){
-    //TODO: confirmation for exiting without saving changes, signing out of all devices
 }
 
 @Composable
@@ -136,7 +201,7 @@ fun EditSurface(
     spacerSize: Dp = 10.dp,
     showBackground: Boolean = true,
     content: @Composable () -> Unit
-){
+) {
     AnimatedVisibility(
         visible = edit ?: false,
 //        enter = slideInVertically(initialOffsetY = {it}),
@@ -171,20 +236,22 @@ fun EditSurface(
 fun DisplayExperience(
     experience: String,
     size: Dp
-){
-    val containerColor = if (experience == "Professional") MaterialTheme.colorScheme.tertiaryContainer else if (experience == "Intermediate") MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.primaryContainer
-    val textColor = if (experience == "Professional") MaterialTheme.colorScheme.onTertiaryContainer else if (experience == "Intermediate") MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onPrimaryContainer
+) {
+    val containerColor =
+        if (experience == "Professional") MaterialTheme.colorScheme.tertiaryContainer else if (experience == "Intermediate") MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.primaryContainer
+    val textColor =
+        if (experience == "Professional") MaterialTheme.colorScheme.onTertiaryContainer else if (experience == "Intermediate") MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onPrimaryContainer
     Box(
         modifier = Modifier
             .width(size)
             .height(size / 6)
             .clip(RoundedCornerShape(16.dp))
             .background(containerColor)
-    ){
-        Column (
+    ) {
+        Column(
             modifier = Modifier.fillMaxHeight(),
             verticalArrangement = Arrangement.Center
-        ){
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -199,11 +266,11 @@ fun DisplayExperience(
 fun SignoutButton(
     onClick: () -> Unit,
     content: @Composable () -> Unit
-){
-    Row (
+) {
+    Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
-    ){
+    ) {
         Button(
             onClick = onClick,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer),
@@ -223,9 +290,9 @@ fun DropdownSetting(
     expanded: Boolean,
     options: List<String>,
     onExpandedChange: (Boolean) -> Unit
-){
+) {
     Box(modifier = Modifier.fillMaxWidth()) {
-        Row (
+        Row(
             modifier = Modifier
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -248,7 +315,7 @@ fun DropdownSetting(
                     singleLine = true,
                     textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                     modifier = Modifier
-                        .menuAnchor()
+                        .menuAnchor(MenuAnchorType.PrimaryEditable, true)
                 ) {
                     TextFieldDefaults.DecorationBox(
                         value = text,
@@ -263,7 +330,12 @@ fun DropdownSetting(
                             end = 8.dp,
                         ),
                         container = {
-                            TextFieldDefaults.ContainerBox(true, false, interactionSource, TextFieldDefaults.colors())
+                            Container(
+                                enabled = true,
+                                isError = false,
+                                interactionSource = interactionSource,
+                                colors = TextFieldDefaults.colors(),
+                            )
                         },
                     )
                 }
@@ -272,7 +344,7 @@ fun DropdownSetting(
                     onDismissRequest = { onExpandedChange(false) },
                     modifier = Modifier.exposedDropdownSize()
                 ) {
-                    options.forEach{option ->
+                    options.forEach { option ->
                         DropdownMenuItem(
                             text = { Text(text = option) },
                             onClick = {

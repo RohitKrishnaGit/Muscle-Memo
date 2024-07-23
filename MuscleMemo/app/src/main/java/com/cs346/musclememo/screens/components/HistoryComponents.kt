@@ -1,6 +1,5 @@
 package com.cs346.musclememo.screens.components
 
-import android.graphics.Paint.Align
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -35,11 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -50,8 +44,13 @@ import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.classes.Workout
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 import com.cs346.musclememo.utils.AppPreferences
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
+import com.cs346.musclememo.utils.calculateScore
+import com.cs346.musclememo.utils.displayScore
+import com.cs346.musclememo.utils.displayTime
+import com.cs346.musclememo.utils.epochToDate
+import com.cs346.musclememo.utils.getDistance
+import com.cs346.musclememo.utils.getWeight
+import com.cs346.musclememo.utils.toHourMinuteSeconds
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -105,20 +104,10 @@ fun DisplayHistory(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ){
-                        Text(text = "Finished workouts are displayed here!")
+                        Text(text = "Start your first workout!")
                     }
                 }
             }
-//            items(items = viewModel.workouts.value) { workout ->
-//                WorkoutHistoryCard(
-//                    workout = workout,
-//                    onClick = {
-//                        viewModel.updateCurrentHistoryWorkout(workout)
-//                        viewModel.updateShowCurrentHistoryWorkout(true)
-//                    }
-//                )
-//            }
-
         }
     }
 }
@@ -211,7 +200,6 @@ fun WorkoutHistorySheet(
                             .fillMaxSize()
                             .padding(horizontal = 24.dp)
                     ) {
-                        // TODO: Add date and duration
                         DisplayDateDuration(workout.date, workout.duration, true)
                         Spacer(modifier = Modifier.height(10.dp))
                         workout.exercises.forEach { exercise ->
@@ -222,14 +210,24 @@ fun WorkoutHistorySheet(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 22.sp
                                 )
+                                Spacer(modifier = Modifier.height(5.dp))
+                                Row (modifier = Modifier.fillMaxWidth()) {
+                                    Text(text = "Sets", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(text = "Score", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                                }
                                 Spacer(modifier = Modifier.height(10.dp))
                                 exercise.exerciseSet.forEachIndexed { index, set ->
-                                    Text(
-                                        text = (index + 1).toString() + " - " + getSetDisplay(
-                                            exercise.exerciseRef,
-                                            set
-                                        ), fontSize = 18.sp
-                                    )
+                                    Row (modifier = Modifier.fillMaxWidth()){
+                                        Text(
+                                            text = (index + 1).toString() + " - " + getSetDisplay(
+                                                exercise.exerciseRef,
+                                                set
+                                            ), fontSize = 18.sp
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Text(text = displayScore(exercise.exerciseRef, calculateScore(set)))
+                                    }
                                     Spacer(modifier = Modifier.height(5.dp))
                                 }
                             }
@@ -247,7 +245,7 @@ fun getSetDisplay(
 ): String {
     var setDisplay = ""
     setDisplay += if (exerciseRef.durationVSReps)
-        (set.duration?.toString() ?: "N/A") + " min"
+        (set.duration?.let { displayTime(it) } ?: "N/A")
     else
         (set.reps?.toString() ?: "N/A") + if (!exerciseRef.weight && !exerciseRef.distance) " reps" else ""
     if (exerciseRef.weight)

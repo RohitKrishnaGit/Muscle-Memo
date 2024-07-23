@@ -47,7 +47,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -71,9 +70,9 @@ import com.cs346.musclememo.screens.components.ExerciseTitle
 import com.cs346.musclememo.screens.components.TopAppBar
 import com.cs346.musclememo.screens.components.WorkoutHistoryCard
 import com.cs346.musclememo.screens.components.WorkoutHistorySheet
-import com.cs346.musclememo.screens.components.getTransitionDirection
-import com.cs346.musclememo.screens.components.toHourMinuteSeconds
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
+import com.cs346.musclememo.utils.getTransitionDirection
+import com.cs346.musclememo.utils.toHourMinuteSeconds
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 

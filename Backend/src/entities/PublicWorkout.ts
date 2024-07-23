@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { User } from "./User";
 
 @Entity()
@@ -27,6 +27,12 @@ export class PublicWorkout {
     @Column({ nullable: true })
     experience?: string;
 
-    @ManyToOne(() => User, (user) => user.workouts)
+    @ManyToOne(() => User, (user) => user.publicWorkouts)
     creator: User;
+
+    @ManyToMany(() => User, {
+        cascade: true,
+    })
+    @JoinTable()
+    users?: Relation<User[]>;
 }

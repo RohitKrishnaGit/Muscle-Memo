@@ -59,6 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -231,6 +232,7 @@ fun CurrentWorkout(
     viewModel: WorkoutScreenViewModel
 ) {
     val listState = rememberLazyListState()
+    val localFocusManager = LocalFocusManager.current
     LaunchedEffect(Unit) {
         while(true) {
             delay(1.seconds)
@@ -290,6 +292,7 @@ fun CurrentWorkout(
             ) {
                 Text(text = viewModel.currentWorkout.name, fontSize = 24.sp, color = MaterialTheme.colorScheme.onPrimary)
                 IconButton(onClick = {
+                    localFocusManager.clearFocus()
                     viewModel.updateShowChangeWorkoutNameDialog(true)
                 }) {
                     Icon(
@@ -336,7 +339,7 @@ fun CurrentWorkout(
                     Column {
                         MMButton(
                             onClick = {
-                                //TODO: replace
+                                localFocusManager.clearFocus()
                                 viewModel.setAddExerciseScreenVisible(true)
                             },
                             text = "Add New Exercise",
@@ -352,6 +355,7 @@ fun CurrentWorkout(
                         ) {
                             MMButton(
                                 onClick = {
+                                    localFocusManager.clearFocus()
                                     viewModel.updateShowCancelWorkoutDialog(true)
                                 },
                                 text = "Cancel Workout",
@@ -362,6 +366,7 @@ fun CurrentWorkout(
                             Spacer(modifier = Modifier.width(16.dp))
                             MMButton(
                                 onClick = {
+                                    localFocusManager.clearFocus()
                                     viewModel.finishWorkout()
                                     viewModel.updateScreenState(true)
                                 },
@@ -581,7 +586,7 @@ fun EditCustomExercise(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AddExercise(
     viewModel: WorkoutScreenViewModel
@@ -704,6 +709,7 @@ private fun AddExercise(
                                 }
                             }
                             IconButton(onClick = {
+                                viewModel.exerciseSearchText = ""
                                 viewModel.resetNewExerciseRef()
                                 viewModel.updateShowAddNewCustomExerciseDialog(true)
                             }) {
@@ -740,6 +746,7 @@ private fun AddExercise(
                                     .fillMaxWidth()
                                     .height(50.dp)
                                     .clickable(onClick = {
+                                        viewModel.exerciseSearchText = ""
                                         viewModel.addWorkoutExercise(exerciseRef)
                                         viewModel.setAddExerciseScreenVisible(false)
                                     }),

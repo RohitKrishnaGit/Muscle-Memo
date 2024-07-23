@@ -1,5 +1,6 @@
 package com.cs346.musclememo
 
+import com.cs346.musclememo.api.RetrofitInterface
 import io.socket.client.IO
 import io.socket.client.Socket
 import java.net.URISyntaxException
@@ -9,7 +10,7 @@ class SocketManager {
 
     init {
         try {
-            socket = IO.socket("http://10.0.2.2:3000")
+            socket = IO.socket((object : RetrofitInterface {}).baseUrl)
         } catch (e: URISyntaxException) {
             e.printStackTrace()
         }

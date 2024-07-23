@@ -13,9 +13,6 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,7 +47,7 @@ fun FriendsContent(viewModel: FriendsScreenViewModel) {
             .padding(24.dp)
     ) {
         Text(
-            text = "Friends Screen",
+            text = "Friends",
             fontSize = 40.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -289,7 +286,7 @@ fun AddFriendDialog(viewModel: FriendsScreenViewModel) {
             onConfirm = {
                 viewModel.updateDialogErrorMessage("")
                 viewModel.updateDialogSuccessMessage("")
-                viewModel.sendFriendRequest(viewModel.addFriendEmail)
+                viewModel.sendFriendRequest(viewModel.addFriendCode)
             },
             onDismissRequest = {
                 viewModel.updateShowAddFriendDialog(false)
@@ -298,9 +295,9 @@ fun AddFriendDialog(viewModel: FriendsScreenViewModel) {
             },
             body = {
                 TextField(
-                    value = viewModel.addFriendEmail,
-                    onValueChange = { viewModel.addFriendEmail = it },
-                    label = { Text("Username") }
+                    value = viewModel.addFriendCode,
+                    onValueChange = { viewModel.addFriendCode = it },
+                    label = { Text("Enter Friend Code") }
                 )
             },
             errorText = viewModel.dialogErrorMessage,

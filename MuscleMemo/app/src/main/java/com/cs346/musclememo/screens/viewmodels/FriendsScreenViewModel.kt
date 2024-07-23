@@ -4,11 +4,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.SocketManager
 import com.cs346.musclememo.api.RetrofitInstance
 import com.cs346.musclememo.api.services.ReportUserAction
 import com.cs346.musclememo.api.types.ApiResponse
+import com.cs346.musclememo.api.types.parseErrorBody
 import com.cs346.musclememo.classes.Friend
 import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.utils.AppPreferences
@@ -64,7 +66,7 @@ class FriendsScreenViewModel : ViewModel() {
     var dialogSuccessMessage by mutableStateOf("")
         private set
 
-    var addFriendEmail by mutableStateOf("")
+    var addFriendCode by mutableStateOf("")
 
     var reportUserReason by mutableStateOf("")
 
@@ -103,8 +105,8 @@ class FriendsScreenViewModel : ViewModel() {
         dialogSuccessMessage = message
     }
 
-    fun updateAddFriendEmail(email: String) {
-        addFriendEmail = email
+    fun updateAddFriendCode(code: String) {
+        addFriendCode = code
     }
 
     fun setAddFriendScreenVisible(visible: Boolean) {
@@ -384,47 +386,29 @@ class FriendsScreenViewModel : ViewModel() {
         }
     }
 
-    fun sendFriendRequest(username: String) {
-        if (username.isEmpty()) {
-            dialogErrorMessage = "Please enter a username"
+    fun sendFriendRequest(friendCode: String) {
+        if (friendCode.isEmpty() || !friendCode.isDigitsOnly()) {
+            dialogErrorMessage = "Please enter a valid friend code"
             return
         }
 
         data class FriendRequest(val friendId: Int)
 
         val apiService = RetrofitInstance.friendService
-        val call = apiService.getUserIdByUsername(username)
 
-        call.enqueue(object : Callback<ApiResponse<Int>> {
-            override fun onResponse(call: Call<ApiResponse<Int>>, response: Response<ApiResponse<Int>>) {
+        val friendRequestCall = apiService.sendFriendRequest(FriendRequest(friendId = friendCode.toInt()))
+        friendRequestCall.enqueue(object : Callback<ApiResponse<Any>> {
+            override fun onResponse(call: Call<ApiResponse<Any>>, response: Response<ApiResponse<Any>>) {
                 if (response.isSuccessful) {
-                    response.body()?.data?.let { userId ->
-                        println("User ID obtained: $userId")
-
-                        val friendRequestCall = apiService.sendFriendRequest(FriendRequest(friendId = userId))
-                        friendRequestCall.enqueue(object : Callback<ApiResponse<Any>> {
-                            override fun onResponse(call: Call<ApiResponse<Any>>, response: Response<ApiResponse<Any>>) {
-                                if (response.isSuccessful) {
-                                    println("Friend request sent successfully to User ID: $userId")
-                                    dialogSuccessMessage = "Friend request sent"
-                                } else {
-                                    dialogErrorMessage = "Failed to send friend request: ${response.message()}"
-                                }
-                            }
-
-                            override fun onFailure(call: Call<ApiResponse<Any>>, t: Throwable) {
-                                dialogErrorMessage = "Something went wrong while sending friend request"
-                            }
-                        })
-
-                    }
+                    println("Friend request sent successfully to User ID: $friendCode")
+                    dialogSuccessMessage = "Friend request sent"
                 } else {
-                    dialogErrorMessage = "User not found"
+                    dialogErrorMessage = "Failed to send friend request: ${response.parseErrorBody()?.message}"
                 }
             }
 
-            override fun onFailure(call: Call<ApiResponse<Int>>, t: Throwable) {
-                dialogErrorMessage = "Something went wrong"
+            override fun onFailure(call: Call<ApiResponse<Any>>, t: Throwable) {
+                dialogErrorMessage = "Something went wrong while sending friend request"
             }
         })
     }

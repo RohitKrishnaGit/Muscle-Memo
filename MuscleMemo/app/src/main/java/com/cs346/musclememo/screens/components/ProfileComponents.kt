@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.User
-import com.cs346.musclememo.screens.viewmodels.ProfileScreenViewModel
 import com.cs346.musclememo.utils.convertPrNameToRefName
 import com.cs346.musclememo.utils.displayScore
 

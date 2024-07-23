@@ -10,14 +10,12 @@ import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.api.RetrofitInstance
 import com.cs346.musclememo.api.services.ImageUploadService
 import com.cs346.musclememo.api.services.LogoutRequest
-import com.cs346.musclememo.api.services.UserService
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.utils.AppPreferences
 import com.cs346.musclememo.utils.Conversions.experienceToSlider
 import com.cs346.musclememo.utils.Conversions.sliderToExperience
-import com.google.android.gms.common.api.Api
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

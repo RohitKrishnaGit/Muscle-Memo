@@ -19,12 +19,20 @@ export class UserController {
         return success(this.userRepository.find());
     }
 
-    async one(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id);
+    async oneHelper(userId: string) {
+        const id = parseInt(userId);
 
         const user = await this.userRepository.findOneBy({
             id,
         });
+
+        return user;
+    }
+
+    async one(request: Request, response: Response, next: NextFunction) {
+        const id = request.params.id;
+
+        const user = this.oneHelper(id)
 
         if (!user) {
             return failure("unregistered user");

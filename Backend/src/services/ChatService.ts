@@ -1,5 +1,6 @@
 import { ChatController } from "../controllers/ChatController";
 import { NotificationController } from "../controllers/NotificationController";
+import { UserController } from "../controllers/UserController";
 import { User } from "../entities/User";
 const socketIO = require('socket.io');
 
@@ -7,6 +8,7 @@ export const initChatService = (server: any) => {
     const io = socketIO(server);
     const cc = new ChatController();
     const nc = new NotificationController();
+    const uc = new UserController();
 
     type UserDict = {
         [userId: number]: boolean
@@ -54,9 +56,12 @@ export const initChatService = (server: any) => {
                 let value = userRoomMap[room][userKey];
                 
                 if (!value) {
-                    for (let fcmToken in JSON.parse(user.firebaseTokens)) {
-                        console.log(`sent notification to ${userKey}`)
-                        nc.notificationHelper(fcmToken,`From: ${user.username}`,message)
+                    const userToSend = await uc.oneHelper(userKey);
+                    if (userToSend) {
+                        for (let fcmToken in JSON.parse(userToSend.firebaseTokens)) {
+                            console.log(`sent notification to ${userToSend.username}`)
+                            nc.notificationHelper(fcmToken,`From: ${user.username}`,message)
+                        }
                     }
                 }
             }
@@ -64,8 +69,10 @@ export const initChatService = (server: any) => {
         });
 
         socket.on('disconnect', async () => {
-            console.log(`user ${user.id} disconnected`);
-            userRoomMap[room][user.id] = false;
+            if (user) {
+                console.log(`user ${user.id} disconnected`);
+                userRoomMap[room][user.id] = false;
+            }
         });
     });
 }

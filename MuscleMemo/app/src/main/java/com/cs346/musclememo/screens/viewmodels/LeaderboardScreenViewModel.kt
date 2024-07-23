@@ -30,6 +30,7 @@ class LeaderboardScreenViewModel : ViewModel() {
                 response: Response<ApiResponse<List<Records>>>
             ) {
                 if (response.isSuccessful){
+                    leaderboardEntries.clear()
                     response.body()?.data?.let{
                         for (record in it){
                             val entry = LeaderboardEntry(username = record.username, value = record.pr)
@@ -38,6 +39,32 @@ class LeaderboardScreenViewModel : ViewModel() {
                         println("$leaderboardEntries")
                         }
                     }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<List<Records>>>, t: Throwable) {
+                TODO("Not yet implemented")
+            }
+
+        })
+
+    }
+    fun fetchFriendLeaderboardResults(){
+        RetrofitInstance.userPrsService.getTopNFriends(exerciseRefId, "50").enqueue(object:
+            Callback<ApiResponse<List<Records>>>{
+            override fun onResponse(
+                call: Call<ApiResponse<List<Records>>>,
+                response: Response<ApiResponse<List<Records>>>
+            ) {
+                if (response.isSuccessful){
+                    leaderboardEntries.clear()
+                    response.body()?.data?.let{
+                        for (record in it){
+                            val entry = LeaderboardEntry(username = record.username, value = record.pr)
+                            leaderboardEntries.add(entry)
+                        }
+                        println("$leaderboardEntries")
+                    }
+                }
             }
 
             override fun onFailure(call: Call<ApiResponse<List<Records>>>, t: Throwable) {

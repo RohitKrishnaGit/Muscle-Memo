@@ -9,6 +9,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Path
 
+data class ReportUserAction(val reportedUserId: Int, val reason: String)
 
 public interface  FriendService {
 //    @POST("/workouts")
@@ -37,4 +38,7 @@ public interface  FriendService {
 
     @GET("/users/{id}")
     fun getFriendById (@Path("id") id: Int): Call<ApiResponse<User>>
+
+    @POST("/users/report")
+    fun reportUserById(@Body reportUserAction: ReportUserAction): Call<ApiResponse<String>>
 }

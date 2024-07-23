@@ -15,6 +15,7 @@ import com.cs346.musclememo.screens.LeaderboardScreen
 import com.cs346.musclememo.screens.LoginScreen
 import com.cs346.musclememo.screens.ProfileScreen
 import com.cs346.musclememo.screens.WorkoutScreen
+import com.cs346.musclememo.screens.viewmodels.FriendsScreenViewModel
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 import com.cs346.musclememo.utils.AppPreferences
 
@@ -25,6 +26,7 @@ fun AppNavHost (
     startDestination: String,
 ) {
     val workoutScreenViewModel = viewModel<WorkoutScreenViewModel>()
+    val friendScreenViewModel = viewModel<FriendsScreenViewModel>()
 
     NavHost (
         navController = navController,
@@ -50,7 +52,7 @@ fun AppNavHost (
             LeaderboardScreen()
         }
         composable(route = Screen.Friends.route) {
-            FriendsScreen()
+            FriendsScreen(viewModel = friendScreenViewModel)
         }
         composable(route = Screen.Workout.route) {
             WorkoutScreen(viewModel = workoutScreenViewModel)

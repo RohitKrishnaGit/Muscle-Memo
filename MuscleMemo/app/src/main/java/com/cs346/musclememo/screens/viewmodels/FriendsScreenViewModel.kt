@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.api.RetrofitInstance
+import com.cs346.musclememo.api.services.ReportUserAction
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.classes.Friend
 import com.cs346.musclememo.classes.User
@@ -17,6 +18,9 @@ class FriendsScreenViewModel : ViewModel() {
     var showAddFriendDialog by mutableStateOf(false)
         private set
 
+    var showReportFriendDialog by mutableStateOf(false)
+        private set
+
     var dialogErrorMessage by mutableStateOf("")
         private set
 
@@ -24,6 +28,11 @@ class FriendsScreenViewModel : ViewModel() {
         private set
 
     var addFriendEmail by mutableStateOf("")
+
+    var reportUserReason by mutableStateOf("")
+
+    var currentMessage by mutableStateOf("")
+        private set
 
     var addFriendVisible by mutableStateOf(false)
         private set
@@ -37,8 +46,16 @@ class FriendsScreenViewModel : ViewModel() {
     var friendChatVisible by mutableStateOf(false)
         private set
 
+    fun updateCurrentMessage(message: String) {
+        currentMessage = message
+    }
+
     fun updateShowAddFriendDialog(visible: Boolean) {
         showAddFriendDialog = visible
+    }
+
+    fun updateShowReportFriendDialog(visible: Boolean) {
+        showReportFriendDialog = visible
     }
 
     fun updateDialogErrorMessage(message: String) {
@@ -231,6 +248,30 @@ class FriendsScreenViewModel : ViewModel() {
 
             override fun onFailure(call: Call<ApiResponse<List<Friend>>>, t: Throwable) {
                 println("Failure: ${t.message}")
+            }
+        })
+    }
+
+    fun reportUser(reason: String) {
+        if (reason.isEmpty()) {
+            dialogErrorMessage = "Please enter a reason"
+            return
+        }
+
+        val apiService = RetrofitInstance.friendService
+        val call = apiService.reportUserById(ReportUserAction(selectedFriend?.id ?: 0, reason))
+
+        call.enqueue(object : Callback<ApiResponse<String>> {
+            override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
+                if (response.isSuccessful) {
+                    dialogSuccessMessage = "User reported"
+                } else {
+                    dialogErrorMessage = "Failed to report user: ${response.message()}"
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
+                dialogErrorMessage = "Something went wrong: ${t.message}"
             }
         })
     }

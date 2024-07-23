@@ -5,16 +5,20 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.cs346.musclememo.SocketManager
 import com.cs346.musclememo.api.RetrofitInstance
 import com.cs346.musclememo.api.services.ReportUserAction
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.classes.Friend
 import com.cs346.musclememo.classes.User
+import com.cs346.musclememo.utils.AppPreferences
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class FriendsScreenViewModel : ViewModel() {
+    val sm = SocketManager()
+
     var showAddFriendDialog by mutableStateOf(false)
         private set
 
@@ -44,6 +48,9 @@ class FriendsScreenViewModel : ViewModel() {
         private set
 
     var friendChatVisible by mutableStateOf(false)
+        private set
+
+    var receivedMessage by mutableStateOf("")
         private set
 
     fun updateCurrentMessage(message: String) {
@@ -80,6 +87,36 @@ class FriendsScreenViewModel : ViewModel() {
 
     fun updateFriendChatVisible(visible: Boolean) {
         friendChatVisible = visible
+    }
+
+    fun updateReceivedMessage(message: String) {
+        receivedMessage = message
+    }
+
+    fun getChatHistory(roomId: String) {
+        val apiService = RetrofitInstance.friendService
+        val call = apiService.getChat(roomId)
+
+        call.enqueue(object : Callback<ApiResponse<Any>> {
+            override fun onResponse(call: Call<ApiResponse<Any>>, response: Response<ApiResponse<Any>>) {
+                if (response.isSuccessful) {
+                    println(response.body())
+                } else {
+                    println("Failed to get chat history: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<Any>>, t: Throwable) {
+                println("Failed to get chat history: ${t.message}")
+            }
+        })
+    }
+
+    fun connectSocket(roomId: String) {
+        sm.connect()
+        sm.joinRoom(roomId, AppPreferences.refreshToken.toString())
+        sm.onMessageReceived { msg -> updateReceivedMessage(msg) }
+        sm.onHistoryRequest { getChatHistory(roomId) }
     }
 
     fun selectFriend(friendId: Int, onComplete: (Boolean) -> Unit) {

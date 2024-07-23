@@ -118,7 +118,6 @@ fun FriendsScreen(
             exit = slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) + fadeOut()
         ) {
             viewModel.selectedFriend?.let { friend ->
-                val sm by remember { mutableStateOf(SocketManager()) }
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -126,10 +125,8 @@ fun FriendsScreen(
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         LaunchedEffect(Unit) {
-                            sm.connect()
-                            sm.joinRoom("2", AppPreferences.refreshToken.toString())
-                            sm.onMessageReceived { msg -> println(msg) }
-                            sm.onHistoryRequest { msg -> println(msg) }
+                            // Concatenate user ids to generate room id
+                            viewModel.connectSocket("2")
                         }
                         Row(
                             modifier = Modifier
@@ -138,7 +135,10 @@ fun FriendsScreen(
                                 .heightIn(min = 60.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            IconButton(onClick = { viewModel.updateFriendChatVisible(false) }) {
+                            IconButton(onClick = {
+                                viewModel.updateFriendChatVisible(false)
+                                viewModel.sm.disconnect()
+                            }) {
                                 Icon(
                                     Icons.Filled.Close,
                                     contentDescription = "Close",
@@ -170,7 +170,7 @@ fun FriendsScreen(
                             IconButton(
                                 onClick = {
                                     if (AppPreferences.refreshToken != null && viewModel.currentMessage.isNotBlank()) {
-                                        sm.sendMessage(viewModel.currentMessage)
+                                        viewModel.sm.sendMessage(viewModel.currentMessage)
                                         viewModel.updateCurrentMessage("")
                                     }
                                 }
@@ -211,7 +211,7 @@ fun FriendsScreen(
                                 )
                             }
                             Text(
-                                "Friend Profile",
+                                "User Profile",
                                 modifier = Modifier.padding(end = 8.dp),
                                 color = Color.White,
                                 fontSize = 20.sp

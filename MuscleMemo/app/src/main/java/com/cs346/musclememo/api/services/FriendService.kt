@@ -41,4 +41,7 @@ public interface  FriendService {
 
     @POST("/users/report")
     fun reportUserById(@Body reportUserAction: ReportUserAction): Call<ApiResponse<String>>
+
+    @GET("/chat/{roomId}")
+    fun getChat(@Path("roomId") roomId: String): Call<ApiResponse<Any>>
 }

@@ -16,6 +16,8 @@ export const initChatService = (server: any) => {
     io.on('connection', async (socket: any) => {
         let room = "default";
         let user: User;
+
+        console.log("user connected")
         
 
         socket.on('join', async function(roomId: string, refreshToken: string) {
@@ -44,6 +46,9 @@ export const initChatService = (server: any) => {
             console.log(`Received message '${message}'
                 from user ${user.id}
                 in room ${room}`);
+            if((await cc.createHelper(user, room, message)).error) {
+                return
+            }
             socket.to(room).emit('message', `${message}`);
             for (let userKey in userRoomMap[room]) {
                 let value = userRoomMap[room][userKey];

@@ -47,8 +47,8 @@ export class ChatController {
     //     return success(chat);
     // }
 
-    async createHelper(refreshToken: string, roomId: string, message: string) {
-        const sender = this.tokenToUserHelper(refreshToken)
+    async createHelper(user: User, roomId: string, message: string) {
+        const sender = user;
 
         if (!sender) return failure("unregistered sender");
 

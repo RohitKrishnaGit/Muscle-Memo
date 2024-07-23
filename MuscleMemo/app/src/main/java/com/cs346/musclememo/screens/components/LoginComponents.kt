@@ -241,6 +241,7 @@ fun ChooseExperience(
                     .fillMaxWidth()
             )
         }
+        Spacer(modifier = Modifier.height(5.dp))
         Row {
             Text(
                 text = "Novice",

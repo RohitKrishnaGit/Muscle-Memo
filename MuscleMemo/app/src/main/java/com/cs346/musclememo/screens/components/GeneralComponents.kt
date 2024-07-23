@@ -18,6 +18,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -27,11 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.cs346.musclememo.classes.ExerciseRef
+import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.utils.AppPreferences
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.round
 
 
 @Composable
@@ -116,61 +120,4 @@ fun MMButton(
     ) {
         Text(text, color = textColor)
     }
-}
-
-// Source: compose-examples/jetsurvey
-fun getTransitionDirection(
-    initialIndex: Int,
-    targetIndex: Int
-): AnimatedContentTransitionScope.SlideDirection {
-    return if (targetIndex > initialIndex) {
-        // Going forwards in the survey: Set the initial offset to start
-        // at the size of the content so it slides in from right to left, and
-        // slides out from the left of the screen to -fullWidth
-        AnimatedContentTransitionScope.SlideDirection.Left
-    } else {
-        // Going back to the previous question in the set, we do the same
-        // transition as above, but with different offsets - the inverse of
-        // above, negative fullWidth to enter, and fullWidth to exit.
-        AnimatedContentTransitionScope.SlideDirection.Right
-    }
-}
-
-fun getWeight(weight: Int?): Int?{
-    return if (AppPreferences.systemOfMeasurementWeight == "lbs" && weight != null)
-        (weight.times(2.205)).toInt()
-    else
-        weight
-}
-
-fun getDistance(distance: Int?): Int? {
-    return if (AppPreferences.systemOfMeasurementWeight == "miles" && distance != null)
-        (distance.div(1.609)).toInt()
-    else
-        distance
-}
-
-fun toHourMinuteSeconds(time: Int): String{
-    return String.format(Locale.getDefault(),"%02d:%02d:%02d", time / 3600, (time % 3600) / 60, time % 60)
-}
-
-fun epochToDate(
-    date: Long,
-    time: Boolean = false
-): String {
-    val instant = Instant.ofEpochMilli(date)
-    val zoneId = ZoneId.systemDefault() // Use the system default time zone
-    val localDateTime = instant.atZone(zoneId).toLocalDateTime()
-    val formatter = if (time) DateTimeFormatter.ofPattern("dd/MM/yyyy 'at' hh:mm a") else DateTimeFormatter.ofPattern("dd/MM/yyyy")
-    return localDateTime.format(formatter)
-}
-
-fun epochToMonthYear(
-    date: Long
-): String {
-    val instant = Instant.ofEpochMilli(date)
-    val zoneId = ZoneId.systemDefault() // Use the system default time zone
-    val localDateTime = instant.atZone(zoneId).toLocalDateTime()
-    val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
-    return localDateTime.format(formatter)
 }

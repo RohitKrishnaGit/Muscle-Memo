@@ -3,6 +3,7 @@ package com.cs346.musclememo.screens.viewmodels
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,7 @@ import com.cs346.musclememo.api.services.ImageUploadService
 import com.cs346.musclememo.api.services.LogoutRequest
 import com.cs346.musclememo.api.services.UserService
 import com.cs346.musclememo.api.types.ApiResponse
+import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.utils.AppPreferences
 import com.cs346.musclememo.utils.Conversions.experienceToSlider
@@ -21,7 +23,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class ProfileScreenViewModel : ViewModel() {
-    var user by mutableStateOf(User(0, "Blazefire878", "blazefire878@gmail.com", null, null, "Male", "Intermediate"))
+    var user by mutableStateOf(User(0, "User", "", null, null, "Male", "Intermediate"))
         private set
     var showSettings by mutableStateOf(false)
         private set
@@ -47,27 +49,12 @@ class ProfileScreenViewModel : ViewModel() {
         private set
     var editEnabled by mutableStateOf(false)
         private set
+    var exerciseRefs by mutableStateOf<List<ExerciseRef>>(listOf())
 
     init {
-        RetrofitInstance.userService.getMyUser().enqueue(object: Callback<ApiResponse<User>>{
-            override fun onResponse(
-                call: Call<ApiResponse<User>>,
-                response: Response<ApiResponse<User>>
-            ) {
-                if (response.isSuccessful){
-                    val fetchedUser = response.body()?.data
-                    fetchedUser?.let{
-                        user = it
-
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
-                t.printStackTrace()
-            }
-
-        })
+        getMe()
+        getPersonalBests()
+        getExerciseRefs()
     }
 
     private fun customGender(): String{
@@ -220,7 +207,67 @@ class ProfileScreenViewModel : ViewModel() {
         })
     }
 
-    init {
-        //TODO: get user's name and details
+    var mePrs by mutableStateOf<Map<String, Int>?>(null)
+    var mePrsId by mutableIntStateOf(0)
+
+    private fun getPersonalBests(){
+        RetrofitInstance.userPrsService.getAllUserPr().enqueue(object :
+        Callback<ApiResponse<Map<String, Int>>>{
+            override fun onResponse(
+                call: Call<ApiResponse<Map<String, Int>>>,
+                response: Response<ApiResponse<Map<String, Int>>>
+            ) {
+                if (response.isSuccessful){
+                    mePrs = response.body()?.data
+                    mePrsId = mePrs?.get("id")!!
+                    mePrs = mePrs!!.filter { it.key != "id" && it.value != 0 }
+                    //println(mePrs)
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<Map<String, Int>>>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+        }
+        )
+    }
+
+    fun getExerciseRefs(){
+        RetrofitInstance.exerciseService.getExerciseRef().enqueue(object: Callback<ApiResponse<List<ExerciseRef>>>{
+            override fun onResponse(
+                call: Call<ApiResponse<List<ExerciseRef>>>,
+                response: Response<ApiResponse<List<ExerciseRef>>>
+            ) {
+                exerciseRefs = response.body()?.data!!
+            }
+
+            override fun onFailure(call: Call<ApiResponse<List<ExerciseRef>>>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+        })
+    }
+
+    private fun getMe(){
+        RetrofitInstance.userService.getMyUser().enqueue(object: Callback<ApiResponse<User>>{
+            override fun onResponse(
+                call: Call<ApiResponse<User>>,
+                response: Response<ApiResponse<User>>
+            ) {
+                if (response.isSuccessful){
+                    val fetchedUser = response.body()?.data
+                    fetchedUser?.let{
+                        user = it
+
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
+                t.printStackTrace()
+            }
+
+        })
     }
 }

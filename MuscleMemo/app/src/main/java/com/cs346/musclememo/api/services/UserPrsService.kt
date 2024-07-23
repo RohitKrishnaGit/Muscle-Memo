@@ -2,7 +2,6 @@ package com.cs346.musclememo.api.services
 
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.classes.User
-import com.cs346.musclememo.classes.UserPrs
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -14,8 +13,8 @@ import retrofit2.http.Path
 data class Records(val userId: String, val pr: String)
 
 interface UserPrsService {
-    @GET("/Pr/me/")
-    fun getAllUserPr(@Path("exerciseRefId") exerciseRefId: String): Call<ApiResponse<UserPrs>>
+    @GET("/Pr/me")
+    fun getAllUserPr(): Call<ApiResponse<Map<String, Int>>>
 
     @GET("/Pr/me/{exerciseRefId}")
     fun getUserPr(@Path("exerciseRefId") exerciseRefId: String): Call<ApiResponse<Number>>

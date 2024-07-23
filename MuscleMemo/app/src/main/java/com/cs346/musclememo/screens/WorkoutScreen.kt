@@ -71,9 +71,9 @@ import com.cs346.musclememo.screens.components.ExerciseTitle
 import com.cs346.musclememo.screens.components.TopAppBar
 import com.cs346.musclememo.screens.components.WorkoutHistoryCard
 import com.cs346.musclememo.screens.components.WorkoutHistorySheet
-import com.cs346.musclememo.screens.components.getTransitionDirection
-import com.cs346.musclememo.screens.components.toHourMinuteSeconds
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
+import com.cs346.musclememo.utils.getTransitionDirection
+import com.cs346.musclememo.utils.toHourMinuteSeconds
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 

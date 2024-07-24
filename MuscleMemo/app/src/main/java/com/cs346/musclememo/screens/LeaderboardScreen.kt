@@ -17,9 +17,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,43 +100,56 @@ fun FirstTimeDialog(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Leaderboard (
     viewModel: LeaderboardScreenViewModel
 ){
     val leaderboard = viewModel.leaderboardEntries
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        item {
-            LeaderboardHeading()
+    val state = rememberPullToRefreshState()
+
+    PullToRefreshBox(
+        modifier = Modifier.fillMaxSize(),
+        isRefreshing = viewModel.isLeaderboardRefreshing,
+        state = state,
+        onRefresh = {
+            viewModel.fetchAllLeaderboards()
         }
-        itemsIndexed(items = leaderboard) { index, item ->
-            if (item != null){
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = "${index + 1}",
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 8.dp)
-                    )
-                    Text(
-                        text = item.username,
-                        fontSize = 16.sp,
-                        color = if (item.username == viewModel.user.username) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier
-                            .weight(2f)
-                            .padding(horizontal = 8.dp)
-                    )
-                    Text(
-                        text = item.value,
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 8.dp)
-                    )
+    )
+    {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            item {
+                LeaderboardHeading()
+            }
+            itemsIndexed(items = leaderboard) { index, item ->
+                if (item != null) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = "${index + 1}",
+                            fontSize = 16.sp,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 8.dp)
+                        )
+                        Text(
+                            text = item.username,
+                            fontSize = 16.sp,
+                            color = if (item.username == viewModel.user.username) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier
+                                .weight(2f)
+                                .padding(horizontal = 8.dp)
+                        )
+                        Text(
+                            text = item.value,
+                            fontSize = 16.sp,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 8.dp)
+                        )
+                    }
                 }
             }
         }

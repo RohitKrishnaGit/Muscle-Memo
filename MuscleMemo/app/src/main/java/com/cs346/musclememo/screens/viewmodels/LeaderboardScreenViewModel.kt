@@ -76,6 +76,13 @@ class LeaderboardScreenViewModel : ViewModel() {
 
     var showFirstTimeDialog by mutableStateOf(AppPreferences.isFirstTime)
 
+    var isGlobalLeaderboardRefreshing by mutableStateOf(false)
+    var isFriendLeaderboardRefreshing by mutableStateOf(false)
+
+    var isLeaderboardRefreshing: Boolean = false
+        get() = isFriendLeaderboardRefreshing && isGlobalLeaderboardRefreshing
+
+
     fun updateShowFirstTimeDialog(state: Boolean){
         showFirstTimeDialog = state
         if (showFirstTimeDialog == false)
@@ -155,6 +162,7 @@ class LeaderboardScreenViewModel : ViewModel() {
     }
 
     private fun fetchLeaderboardResults(){
+        isGlobalLeaderboardRefreshing = true
         RetrofitInstance.userPrsService.getTopN(currentExerciseRef.id.toString(), "50").enqueue(object:
             Callback<ApiResponse<List<Records>>>{
             override fun onResponse(
@@ -173,17 +181,20 @@ class LeaderboardScreenViewModel : ViewModel() {
                         globalLeaderboardEntries.sortBy {it.value}
                         }
                     }
+                isGlobalLeaderboardRefreshing = false
             }
 
             override fun onFailure(call: Call<ApiResponse<List<Records>>>, t: Throwable) {
                 t.printStackTrace()
                 println("Fetch leaderboard failed")
+                isGlobalLeaderboardRefreshing = false
             }
 
         })
     }
 
     fun fetchFriendLeaderboardResults(){
+        isFriendLeaderboardRefreshing = true
         RetrofitInstance.userPrsService.getTopNFriends(currentExerciseRef.id.toString(), "50").enqueue(object:
             Callback<ApiResponse<List<Records>>>{
             override fun onResponse(
@@ -200,11 +211,13 @@ class LeaderboardScreenViewModel : ViewModel() {
                         friendsLeaderboardEntries.sortBy {it.value}
                     }
                 }
+                isFriendLeaderboardRefreshing = false
             }
 
             override fun onFailure(call: Call<ApiResponse<List<Records>>>, t: Throwable) {
                 t.printStackTrace()
                 println("Fetch friend leaderboard failed")
+                isFriendLeaderboardRefreshing = false
             }
 
         })

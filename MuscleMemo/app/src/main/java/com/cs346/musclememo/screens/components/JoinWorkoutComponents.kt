@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import com.cs346.musclememo.classes.User
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -146,7 +147,7 @@ fun PublicWorkoutTabs(
     viewModel: JoinWorkoutViewModel
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().height(56.dp)
     ) {
         TabButton(
             text = "Search",
@@ -159,7 +160,7 @@ fun PublicWorkoutTabs(
             }
         )
         TabButton(
-            text = "Workouts",
+            text = "Active",
             modifier = Modifier.weight(1f),
             highlighted = viewModel.publicWorkoutTab == "Current",
             onClick = {
@@ -170,7 +171,7 @@ fun PublicWorkoutTabs(
             }
         )
         TabButton(
-            text = "My Workouts",
+            text = "Owned",
             modifier = Modifier.weight(1f),
             highlighted = viewModel.publicWorkoutTab == "Owned",
             onClick = {
@@ -192,17 +193,17 @@ fun TabButton(
 ) {
     Box(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .clickable(onClick = onClick)
             .background(if (highlighted) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerLowest)
             .padding(15.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Text(text = text)
+            Text(text = text, textAlign = TextAlign.Center)
         }
     }
 }
@@ -213,14 +214,14 @@ fun SelectExperienceLevel(
     experience: String,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
-    updateExperience: (String) -> Unit
+    updateExperience: (String) -> Unit,
 ) {
     val experienceLevels: List<String> = listOf(
+        "",
         "Novice",
         "Intermediate",
         "Professional"
     )
-
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -247,6 +248,56 @@ fun SelectExperienceLevel(
                         text = { Text(text = experience) },
                         onClick = {
                             updateExperience(experience)
+                            onExpandedChange(false)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SelectGenderTag(
+    gender: String,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    updateGender: (String) -> Unit
+) {
+    val genderTags: List<String> = listOf(
+        "",
+        "Male",
+        "Female"
+    )
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = onExpandedChange
+        ) {
+            TextField(
+                value = gender,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor()
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { onExpandedChange(false) },
+                modifier = Modifier.exposedDropdownSize()
+            ) {
+                genderTags.forEach { gender ->
+                    DropdownMenuItem(
+                        text = { Text(text = gender) },
+                        onClick = {
+                            updateGender(gender)
                             onExpandedChange(false)
                         },
                         modifier = Modifier.fillMaxWidth()

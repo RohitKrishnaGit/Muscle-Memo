@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,26 +33,24 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.api.services.PublicWorkout
-import com.cs346.musclememo.screens.components.DisplayProfile
 import com.cs346.musclememo.screens.components.IncomingWorkoutRequestCard
 import com.cs346.musclememo.screens.components.MMButton
 import com.cs346.musclememo.screens.components.PublicWorkoutTabs
 import com.cs346.musclememo.screens.components.SelectExperienceLevel
+import com.cs346.musclememo.screens.components.SelectGenderTag
 import com.cs346.musclememo.screens.components.TopAppBar
 import com.cs346.musclememo.screens.components.WorkoutList
-import com.cs346.musclememo.screens.viewmodels.FriendsScreenViewModel
 import com.cs346.musclememo.screens.viewmodels.JoinWorkoutViewModel
 import com.cs346.musclememo.utils.AppPreferences
 
 @Composable
 fun JoinWorkoutScreen(
     viewModel: JoinWorkoutViewModel = viewModel<JoinWorkoutViewModel>()
-){
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -74,9 +71,7 @@ fun JoinWorkoutScreen(
                 onClick = {
 //                    viewModel.resetWorkout()
                     viewModel.updateCreateWorkoutVisible(true)
-                },
-                text = "Start A Public Workout",
-                maxWidth = true
+                }, text = "Start A Public Workout", maxWidth = true
             )
             Spacer(modifier = Modifier.height(8.dp))
             PublicWorkoutTabs(viewModel)
@@ -87,6 +82,7 @@ fun JoinWorkoutScreen(
         WorkoutChat(viewModel)
     }
     CreatePublicWorkoutSheet(viewModel = viewModel)
+    ResultsSheet(viewModel)
 }
 
 @Composable
@@ -105,7 +101,6 @@ fun PublicWorkoutContent(
                     .padding(8.dp)
             ) {
                 SearchFilters(viewModel)
-                SearchResults(viewModel, viewModel.workouts)
             }
         }
     } else if (viewModel.publicWorkoutTab == "Current") {
@@ -148,8 +143,7 @@ fun MyResults(
 
 @Composable
 fun SearchResults(
-    viewModel: JoinWorkoutViewModel,
-    publicWorkouts: MutableList<PublicWorkout>
+    viewModel: JoinWorkoutViewModel, publicWorkouts: MutableList<PublicWorkout>
 ) {
     WorkoutList(viewModel, publicWorkouts)
 }
@@ -159,8 +153,7 @@ fun SearchFilters(
     viewModel: JoinWorkoutViewModel
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -170,37 +163,37 @@ fun SearchFilters(
         ) {
             Text(text = "Friends Only")
             Spacer(modifier = Modifier.weight(1f))
-            Switch(
-                checked = viewModel.friendsOnlyFilter,
-                onCheckedChange = { viewModel.updateFriendsOnlyFilter(it) }
-            )
+            Switch(checked = viewModel.friendsOnlyFilter,
+                onCheckedChange = { viewModel.updateFriendsOnlyFilter(it) })
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = viewModel.genderFilter.orEmpty(),
-            onValueChange = { viewModel.updateGenderFilter(it.takeIf { it.isNotEmpty() }) },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Gender") },
-            placeholder = { Text("Enter gender") }
+        Text("Gender Tag")
+        Spacer(modifier = Modifier.height(8.dp))
+        SelectGenderTag(
+            gender = viewModel.genderFilter,
+            expanded = viewModel.genderFilterExpanded,
+            onExpandedChange = viewModel::updateGenderFilterExpanded,
+            updateGender = viewModel::updateGenderFilter
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = viewModel.experienceFilter.orEmpty(),
-            onValueChange = { viewModel.updateExperienceFilter(it.takeIf { it.isNotEmpty() }) },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Experience") },
-            placeholder = { Text("Novice") }
+        Text("Experience Level")
+        Spacer(modifier = Modifier.height(8.dp))
+        SelectExperienceLevel(
+            experience = viewModel.experienceFilter,
+            expanded = viewModel.experienceFilterExpanded,
+            onExpandedChange = viewModel::updateExperienceFilterExpanded,
+            updateExperience = viewModel::updateExperienceFilter,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         MMButton(
             onClick = {
-                viewModel.getWorkouts()
+                viewModel.getWorkouts {
+                    viewModel.updateResultsScreenVisible(true)
+                }
             },
             maxWidth = true,
             text = "Search",
@@ -243,13 +236,20 @@ fun NewPublicWorkout(viewModel: JoinWorkoutViewModel) {
             ) {
                 Text("Workout Name")
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = viewModel.createWorkoutName,
+                TextField(value = viewModel.createWorkoutName,
                     onValueChange = { viewModel.updateCreateWorkoutName(it) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 8.dp),
-                    placeholder = { Text("Power Gym Meetup 6/28") }
+                    placeholder = { Text("Power Gym Meetup 6/28") })
+                Spacer(modifier = Modifier.height(15.dp))
+                Text("Gender Tag")
+                Spacer(modifier = Modifier.height(8.dp))
+                SelectGenderTag(
+                    gender = viewModel.createWorkoutGender,
+                    expanded = viewModel.genderExpanded,
+                    onExpandedChange = viewModel::updateGenderExpanded,
+                    updateGender = viewModel::updateCreateWorkoutGender
                 )
                 // Date
                 Spacer(modifier = Modifier.height(15.dp))
@@ -264,14 +264,12 @@ fun NewPublicWorkout(viewModel: JoinWorkoutViewModel) {
                 Spacer(modifier = Modifier.height(15.dp))
                 Text("Description")
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = viewModel.createWorkoutDescription,
+                TextField(value = viewModel.createWorkoutDescription,
                     onValueChange = { viewModel.updateCreateWorkoutDescription(it) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 8.dp),
-                    placeholder = { Text("Going for PRs today") }
-                )
+                    placeholder = { Text("Going for PRs today") })
                 Spacer(modifier = Modifier.height(15.dp))
                 if (viewModel.showCreateError) {
                     Text(
@@ -292,7 +290,7 @@ fun NewPublicWorkout(viewModel: JoinWorkoutViewModel) {
                         }
                     },
                     maxWidth = true,
-                    text = "Finish Workout",
+                    text = "Create Public Workout",
                     backgroundColor = MaterialTheme.colorScheme.primaryContainer,
                     modifier = Modifier.padding(end = 8.dp)
                 )
@@ -300,6 +298,31 @@ fun NewPublicWorkout(viewModel: JoinWorkoutViewModel) {
         }
     }
 }
+
+@Composable
+fun ResultsSheet(
+    viewModel: JoinWorkoutViewModel
+) {
+    AnimatedVisibility(
+        visible = viewModel.resultsScreenVisible,
+        enter = slideInHorizontally(initialOffsetX = { it }),
+        exit = slideOutHorizontally(targetOffsetX = { it })
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Column (modifier = Modifier.fillMaxSize()){
+                TopAppBar(text = "Results") {
+                    viewModel.updateResultsScreenVisible(false)
+                }
+                SearchResults(viewModel, viewModel.workouts)
+            }
+        }
+    }
+}
+
 
 @Composable
 fun RequestsHeader(onClose: () -> Unit) {
@@ -312,9 +335,7 @@ fun RequestsHeader(onClose: () -> Unit) {
     ) {
         IconButton(onClick = onClose) {
             Icon(
-                Icons.Filled.Close,
-                contentDescription = "Close",
-                tint = Color.White
+                Icons.Filled.Close, contentDescription = "Close", tint = Color.White
             )
         }
         Text(
@@ -338,9 +359,7 @@ fun WorkoutRequests(viewModel: JoinWorkoutViewModel) {
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
         ) {
-            RequestsHeader(
-                onClose = { viewModel.updateRequestsVisible(false) }
-            )
+            RequestsHeader(onClose = { viewModel.updateRequestsVisible(false) })
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -349,9 +368,7 @@ fun WorkoutRequests(viewModel: JoinWorkoutViewModel) {
             ) {
                 itemsIndexed(viewModel.workoutRequests) { index, request ->
                     IncomingWorkoutRequestCard(
-                        request = request,
-                        viewModel = viewModel,
-                        requestIndex = index
+                        request = request, viewModel = viewModel, requestIndex = index
                     )
                 }
             }
@@ -398,12 +415,10 @@ fun WorkoutChatMessages(viewModel: JoinWorkoutViewModel) {
     val messageListState = rememberLazyListState()
     LazyColumn(
         state = messageListState,
-        modifier = Modifier
-            .padding(8.dp),
+        modifier = Modifier.padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        itemsIndexed(
-            items = viewModel.receivedMessages,
+        itemsIndexed(items = viewModel.receivedMessages,
             key = { index, message -> "${message.id}_$index" } // Ensure unique keys
         ) { _, message ->
             MessageBubble(message = message, currentUserId = viewModel.currentUser?.id)
@@ -416,8 +431,7 @@ fun WorkoutChatInput(viewModel: JoinWorkoutViewModel) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp),
-        contentAlignment = Alignment.BottomCenter
+            .padding(8.dp), contentAlignment = Alignment.BottomCenter
     ) {
         Row(
             modifier = Modifier
@@ -433,15 +447,17 @@ fun WorkoutChatInput(viewModel: JoinWorkoutViewModel) {
                     .padding(end = 8.dp),
                 placeholder = { Text("Type your message here...") },
             )
-            IconButton(
-                onClick = {
-                    if (AppPreferences.refreshToken != null && viewModel.currentMessage.isNotBlank()) {
-                        viewModel.sm.sendMessage(viewModel.currentMessage)
-                        viewModel.updateCurrentMessage("")
-                    }
+            IconButton(onClick = {
+                if (AppPreferences.refreshToken != null && viewModel.currentMessage.isNotBlank()) {
+                    viewModel.sm.sendMessage(viewModel.currentMessage)
+                    viewModel.updateCurrentMessage("")
                 }
-            ) {
-                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = MaterialTheme.colorScheme.primary)
+            }) {
+                Icon(
+                    Icons.AutoMirrored.Filled.Send,
+                    contentDescription = "Send",
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }

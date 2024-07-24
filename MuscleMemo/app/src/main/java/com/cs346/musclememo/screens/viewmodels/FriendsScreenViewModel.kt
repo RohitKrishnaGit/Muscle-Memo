@@ -152,6 +152,9 @@ class FriendsScreenViewModel : ViewModel() {
         }
         sm.onHistoryRequest { getChatHistory(roomId) }
     }
+    fun disconnectSocket() {
+        sm.disconnect()
+    }
 
     fun selectFriend(friendId: Int, onComplete: (Boolean) -> Unit) {
         val apiService = RetrofitInstance.friendService
@@ -217,7 +220,7 @@ class FriendsScreenViewModel : ViewModel() {
     fun generateRoomId(userId: Int, friendId: Int): String {
         val minId = minOf(userId, friendId)
         val maxId = maxOf(userId, friendId)
-        return "$minId$maxId"
+        return "$minId-$maxId"
     }
 
     fun getCurrentUser() {

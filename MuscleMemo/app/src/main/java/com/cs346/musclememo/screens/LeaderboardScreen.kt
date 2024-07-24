@@ -1,6 +1,7 @@
 package com.cs346.musclememo.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,22 +10,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.screens.components.ChooseLeaderboardExercise
 import com.cs346.musclememo.screens.components.ChooseLeaderboardType
 import com.cs346.musclememo.screens.components.DisplayLeaderboardExercise
 import com.cs346.musclememo.screens.components.LeaderboardHeading
+import com.cs346.musclememo.screens.components.MMDialog
 import com.cs346.musclememo.screens.viewmodels.LeaderboardScreenViewModel
+import com.cs346.musclememo.utils.AppPreferences
 
 @Composable
 fun LeaderboardScreen(
@@ -55,8 +65,37 @@ fun LeaderboardScreen(
     }
 
     ChooseLeaderboardExercise(viewModel = viewModel)
+    FirstTimeDialog(viewModel)
 }
 
+@Composable
+fun FirstTimeDialog(
+    viewModel: LeaderboardScreenViewModel
+){
+    MMDialog(
+        showDialog = viewModel.showFirstTimeDialog ?: false,
+        title = "Welcome!",
+        onConfirm = {
+            viewModel.updateShowFirstTimeDialog(false) },
+        onDismissRequest = {  viewModel.updateShowFirstTimeDialog(false) },
+        body = {
+            Text(text = "This is a leaderboard to show off your Personal Records! Please note the scores are unmoderated and are just to be used for fun. By default, your scores are hidden from others.\n\nIf you see this icon:")
+            Spacer(modifier = Modifier.height(5.dp))
+            Row (modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center) {
+                Icon(Icons.Filled.Visibility, null)
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = "or")
+                Spacer(modifier = Modifier.width(5.dp))
+                Icon(Icons.Filled.VisibilityOff, null)
+            }
+            Spacer(modifier = Modifier.height(5.dp))
+            Text(text = "it toggles the visibility of your PR.\n\nPlease workout responsibly and have fun!")
+        },
+        dismiss = false
+    )
+}
 
 @Composable
 fun Leaderboard (

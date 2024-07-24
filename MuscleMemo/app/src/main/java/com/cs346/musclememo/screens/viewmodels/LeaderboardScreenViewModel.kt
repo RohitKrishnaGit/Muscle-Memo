@@ -14,6 +14,7 @@ import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.LeaderboardEntry
 import com.cs346.musclememo.classes.User
+import com.cs346.musclememo.utils.AppPreferences
 import com.cs346.musclememo.utils.convertPrNameToRefName
 import retrofit2.Call
 import retrofit2.Callback
@@ -72,6 +73,14 @@ class LeaderboardScreenViewModel : ViewModel() {
 
     var mePrs by mutableStateOf<Map<String, Int>?>(null)
     var mePrsVisible = mutableStateMapOf<String, Boolean>()
+
+    var showFirstTimeDialog by mutableStateOf(AppPreferences.isFirstTime)
+
+    fun updateShowFirstTimeDialog(state: Boolean){
+        showFirstTimeDialog = state
+        if (showFirstTimeDialog == false)
+            AppPreferences.isFirstTime = false
+    }
 
     fun updateCurrentExerciseRef(ref: ExerciseRef){
         currentExerciseRef = ref

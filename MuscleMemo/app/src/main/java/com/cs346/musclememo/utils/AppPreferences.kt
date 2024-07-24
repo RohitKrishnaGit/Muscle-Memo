@@ -64,7 +64,7 @@ object AppPreferences {
         set(value) = Key.LATITUDE.setFloat(value)
 
     private enum class Key {
-        ACCESS_TOKEN, REFRESH_TOKEN, SYSTEMMEASUREMENTDISTANCE, SYSTEMMEASUREMENTWEIGHT, DARKMODE, FIREBASE_TOKEN, LONGITUDE, LATITUDE;
+        ACCESS_TOKEN, REFRESH_TOKEN, SYSTEMMEASUREMENTDISTANCE, SYSTEMMEASUREMENTWEIGHT, DARKMODE, FIREBASE_TOKEN, LONGITUDE, LATITUDE, FIRST_TIME;
 
         fun getBoolean(): Boolean? = if (sharedPreferences!!.contains(name)) sharedPreferences!!.getBoolean(name, false) else null
         fun getFloat(): Float? = if (sharedPreferences!!.contains(name)) sharedPreferences!!.getFloat(name, 0f) else null

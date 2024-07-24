@@ -1,10 +1,13 @@
 package com.cs346.musclememo.screens.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -58,9 +61,11 @@ fun MMDialog(
     body: @Composable () -> Unit,
     confirmButtonText: String = "Confirm",
     cancelButtonText: String = "Cancel",
-    errorText: String? = null
+    errorText: String? = null,
+    dismiss: Boolean = true,
 ) {
     if (showDialog) {
+        Box (modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)))
         AlertDialog(
             onDismissRequest = onDismissRequest,
             title = { Text(title) },
@@ -77,15 +82,17 @@ fun MMDialog(
                 }
             },
             confirmButton = {
-                TextButton(onClick = {
-                    onConfirm()
-                }) {
-                    Text(confirmButtonText)
-                }
+                    TextButton(onClick = {
+                        onConfirm()
+                    }) {
+                        Text(confirmButtonText)
+                    }
             },
             dismissButton = {
-                TextButton(onClick = onDismissRequest) {
-                    Text(cancelButtonText)
+                if (dismiss) {
+                    TextButton(onClick = onDismissRequest) {
+                        Text(cancelButtonText)
+                    }
                 }
             }
         )

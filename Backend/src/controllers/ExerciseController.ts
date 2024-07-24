@@ -2,9 +2,17 @@ import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Exercise } from "../entities/Exercise";
 import { failure, success } from "../utils/responseTypes";
+import { Workout } from "../entities/Workout";
+import { CustomExerciseRef } from "../entities/CustomExerciseRef";
+import { Template } from "../entities/Template";
+import { ExerciseRef } from "../entities/ExerciseRef";
 
 export class ExerciseController {
     private exerciseRepository = AppDataSource.getRepository(Exercise);
+    private exerciseRefRepository = AppDataSource.getRepository(ExerciseRef);
+    private workoutRepository = AppDataSource.getRepository(Workout);
+    private customExerciseRefRepository = AppDataSource.getRepository(CustomExerciseRef);
+    private templateRepository = AppDataSource.getRepository(Template);
 
     async all(request: Request, response: Response, next: NextFunction) {
         const workoutId = parseInt(request.params.workoutId);
@@ -46,7 +54,7 @@ export class ExerciseController {
         //Check for the references
 
         const exercise = Object.assign(new Exercise(), {
-            workout: { id: workoutId ?? null},
+            workout: { id: workoutId ?? null } as Workout,
             exerciseRef: { id: exerciseRefId ?? null },
             customExerciseRef: { id: customExerciseRefId ?? null },
             exerciseSet: strExerciseSet,

@@ -59,7 +59,7 @@ export const initChatService = (server: any) => {
             console.log(`Received message '${message}'
                 from user ${user.id}
                 in room ${room}`);
-            const msg = await cc.createHelper(user, room, message);
+            const msg = await cc.createHelper(user, room, message, Date.now());
             if (msg.error || !msg.data) {
                 return;
             }
@@ -67,7 +67,8 @@ export const initChatService = (server: any) => {
                 "message",
                 msg.data.id,
                 message,
-                JSON.stringify(msg.data.sender)
+                JSON.stringify(msg.data.sender),
+                Date.now()
             );
             for (let userKey in userRoomMap[room]) {
                 let value = userRoomMap[room][userKey];

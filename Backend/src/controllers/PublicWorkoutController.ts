@@ -21,6 +21,15 @@ export class PublicWorkoutController {
         );
     }
 
+    async allJoined(request: Request, response: Response, next: NextFunction) {
+        const userId = parseInt(request.params.userId);
+
+        return success(
+            (await this.publicWorkoutRepository.find({relations: {users: true}}))
+            .filter((publicWorkout)=> publicWorkout.users?.find((user) => user.id === userId))
+        );
+    }
+
     async one(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
         const id = parseInt(request.params.id);

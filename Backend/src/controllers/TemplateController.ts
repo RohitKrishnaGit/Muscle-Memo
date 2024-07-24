@@ -3,6 +3,8 @@ import { AppDataSource } from "../data-source";
 import { Template } from "../entities/Template";
 import { User } from "../entities/User";
 import { failure, success } from "../utils/responseTypes";
+import { template } from "lodash";
+import { fail } from "assert";
 
 export class TemplateController {
     private templateRepository = AppDataSource.getRepository(Template);
@@ -72,6 +74,26 @@ export class TemplateController {
         const newTemplate = await this.templateRepository.save(template);
 
         return success({ templateId: newTemplate.id });
+    }
+
+    async update (request: Request, response: Response, next: NextFunction) {
+        const userId = parseInt(request.params.userId);
+        const id = parseInt(request.params.id);
+
+        const {name} = request.body
+        
+
+        let templateToUpdate = await this.templateRepository.findOneBy({
+            id,
+            user: {id: userId},
+        })
+        if (templateToUpdate){
+            templateToUpdate.name = name
+            return success(await this.templateRepository.save(templateToUpdate))
+        }
+        return failure("Update failed")
+
+
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {

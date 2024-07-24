@@ -18,6 +18,9 @@ export class Chat {
     @Column()
     message: string;
 
+    @Column()
+    timestamp: number;
+
     @ManyToOne(() => User, (user) => user)
     sender: Relation<User>;
 }

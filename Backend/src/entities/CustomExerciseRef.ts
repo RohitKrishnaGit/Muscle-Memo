@@ -32,4 +32,7 @@ export class CustomExerciseRef {
 
     @ManyToOne(() => User, (user) => user)
     user: Relation<User>;
+
+    @Column({ default: true })
+    isCustom: boolean;
 }

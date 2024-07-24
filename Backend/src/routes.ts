@@ -299,6 +299,14 @@ export const Routes = [
     },
 
     {
+        method: "get",
+        route: "/users/username/:username",
+        controller: UserController,
+        middleware: [validateSchema(allUserSchema)],
+        action: "findUsername",
+    },
+
+    {
         method: "put",
         route: "/users/update/firebase/:userId",
         controller: UserController,
@@ -673,7 +681,14 @@ export const Routes = [
         method: "get",
         route: "/leaderboard/:userId/:exerciseRefId/:count",
         controller: UserPrsController,
-        middleware: [validateSchema(leaderboardFriendsSchema)],
+        middleware: [validateSchema(leaderboardFriendsSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            )
+        ],
         action: "getTopNFriends",
     },
     {

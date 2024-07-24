@@ -8,13 +8,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.cs346.musclememo.screens.ChatTestScreen
 import com.cs346.musclememo.screens.FindBuddyScreen
 import com.cs346.musclememo.screens.FriendsScreen
 import com.cs346.musclememo.screens.LeaderboardScreen
 import com.cs346.musclememo.screens.LoginScreen
 import com.cs346.musclememo.screens.ProfileScreen
 import com.cs346.musclememo.screens.WorkoutScreen
+import com.cs346.musclememo.screens.viewmodels.FriendsScreenViewModel
 import com.cs346.musclememo.screens.viewmodels.WorkoutScreenViewModel
 import com.cs346.musclememo.utils.AppPreferences
 

@@ -22,6 +22,7 @@ export class Exercise {
 
     @ManyToOne(() => Template, (template) => template.exercises, {
         nullable: true,
+        onDelete: 'CASCADE',
     })
     template: Relation<Workout>;
 

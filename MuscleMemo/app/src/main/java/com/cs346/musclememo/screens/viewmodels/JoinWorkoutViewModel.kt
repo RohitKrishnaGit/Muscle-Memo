@@ -51,6 +51,12 @@ class JoinWorkoutViewModel: ViewModel() {
     var experienceExpanded by mutableStateOf(false)
         private set
 
+    var createWorkoutGender by mutableStateOf("")
+        private set
+
+    var genderExpanded by mutableStateOf(false)
+        private set
+
     var createWorkoutDescription by mutableStateOf("")
         private set
 
@@ -63,10 +69,16 @@ class JoinWorkoutViewModel: ViewModel() {
     var friendsOnlyFilter by mutableStateOf(false)
         private set
 
-    var genderFilter by mutableStateOf<String?>(null)
+    var genderFilter by mutableStateOf<String>("")
         private set
 
-    var experienceFilter by mutableStateOf<String?>(null)
+    var genderFilterExpanded by mutableStateOf(false)
+        private set
+
+    var experienceFilter by mutableStateOf("")
+        private set
+
+    var experienceFilterExpanded by mutableStateOf(false)
         private set
 
     var requestsVisible by mutableStateOf(false)
@@ -77,6 +89,13 @@ class JoinWorkoutViewModel: ViewModel() {
 
     var workoutChatVisible by mutableStateOf(false)
         private set
+
+    var resultsScreenVisible by mutableStateOf(false)
+        private set
+
+    fun updateResultsScreenVisible(visible: Boolean) {
+        resultsScreenVisible = visible
+    }
 
     fun updateCurrentMessage(message: String) {
         currentMessage = message
@@ -151,12 +170,8 @@ class JoinWorkoutViewModel: ViewModel() {
         requestsVisible = visible
     }
 
-    fun updateExperienceFilter(experience: String?) {
+    fun updateExperienceFilter(experience: String) {
         experienceFilter = experience
-    }
-
-    fun updateGenderFilter(gender: String?) {
-        genderFilter = gender
     }
 
     fun updateFriendsOnlyFilter(state: Boolean) {
@@ -181,6 +196,26 @@ class JoinWorkoutViewModel: ViewModel() {
 
     fun updateExperienceExpanded(expanded: Boolean) {
         experienceExpanded = expanded
+    }
+
+    fun updateExperienceFilterExpanded(expanded: Boolean) {
+        experienceFilterExpanded = expanded
+    }
+
+    fun updateCreateWorkoutGender(gender: String) {
+        createWorkoutGender = gender
+    }
+
+    fun updateGenderFilter(gender: String) {
+        genderFilter = gender
+    }
+
+    fun updateGenderExpanded(expanded: Boolean) {
+        genderExpanded = expanded
+    }
+
+    fun updateGenderFilterExpanded(expanded: Boolean) {
+        genderFilterExpanded = expanded
     }
 
     fun updateCreateWorkoutDescription(description: String) {
@@ -323,7 +358,8 @@ class JoinWorkoutViewModel: ViewModel() {
         val apiService = RetrofitInstance.publicWorkoutService
         val apiBody = CreatePublicWorkout(
             name = createWorkoutName,
-            experience = createWorkoutExperience,
+            experience = if(createWorkoutExperience == "") null else createWorkoutExperience,
+            gender = if(createWorkoutGender == "") null else createWorkoutGender,
             description = createWorkoutDescription
         )
         val call = apiService.createPublicWorkout(apiBody)
@@ -421,10 +457,9 @@ class JoinWorkoutViewModel: ViewModel() {
         })
     }
 
-    fun getWorkouts() {
-        println(genderFilter)
-        println(experienceFilter)
-        println(friendsOnlyFilter)
+
+
+    fun getWorkouts(onSuccess: () -> Unit) {
 
         val genderValue: String? = genderFilter?.takeIf { it.isNotEmpty() }
         val experienceValue: String? = experienceFilter?.takeIf { it.isNotEmpty() }
@@ -459,6 +494,7 @@ class JoinWorkoutViewModel: ViewModel() {
                     response.body()?.data?.let {
                         workouts.clear()
                         workouts.addAll(it)
+                        onSuccess()
                     }
                 } else {
                     println("Failed to get workouts: ${response.message()}")

@@ -11,16 +11,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,13 +49,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cs346.musclememo.api.services.PublicWorkout
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.screens.viewmodels.JoinWorkoutViewModel
 import com.cs346.musclememo.screens.viewmodels.LeaderboardScreenViewModel
 
 @Composable
-fun CreatePublicWorkout() {
+fun WorkoutItem(index: Int, workout: PublicWorkout, onClick: (PublicWorkout) -> Unit) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .clickable { onClick(workout) }
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "${index + 1}. ${workout.name}", fontSize = 20.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = workout.description)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
 
+@Composable
+fun WorkoutList(viewModel: JoinWorkoutViewModel) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        itemsIndexed(viewModel.workouts) { index, workout ->
+            WorkoutItem(index = index, workout = workout, onClick = { println(workout) })
+        }
+    }
 }
 
 @Composable

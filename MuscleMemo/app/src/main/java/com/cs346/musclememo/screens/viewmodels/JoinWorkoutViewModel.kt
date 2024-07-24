@@ -14,12 +14,15 @@ import com.cs346.musclememo.api.services.CreateWorkoutRequest
 import com.cs346.musclememo.api.services.CreateWorkoutResponse
 import com.cs346.musclememo.api.services.GetWorkoutResponse
 import com.cs346.musclememo.api.services.CreateTemplateClass
+import com.cs346.musclememo.api.services.FilterPublicWorkout
+import com.cs346.musclememo.api.services.PublicWorkout
 import com.cs346.musclememo.api.services.UpdateUserPrRequest
 import com.cs346.musclememo.api.types.ApiResponse
 import com.cs346.musclememo.api.types.parseErrorBody
 import com.cs346.musclememo.classes.ExerciseIteration
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet
+import com.cs346.musclememo.classes.Friend
 import com.cs346.musclememo.classes.Template
 import com.cs346.musclememo.classes.Workout
 import com.cs346.musclememo.utils.AppPreferences
@@ -30,9 +33,17 @@ import com.cs346.musclememo.utils.translateWeight
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import kotlin.math.exp
 
 
 class JoinWorkoutViewModel: ViewModel() {
+    val workouts = mutableStateListOf<PublicWorkout>()
+
+//    init {
+//        getWorkouts()
+//    }
+
     var createWorkoutVisible by mutableStateOf(false)
         private set
 
@@ -52,6 +63,27 @@ class JoinWorkoutViewModel: ViewModel() {
 
     var showCreateError by mutableStateOf(false)
         private set
+
+    var friendsOnlyFilter by mutableStateOf(false)
+        private set
+
+    var genderFilter by mutableStateOf<String?>(null)
+        private set
+
+    var experienceFilter by mutableStateOf<String?>(null)
+        private set
+
+    fun updateExperienceFilter(experience: String?) {
+        experienceFilter = experience
+    }
+
+    fun updateGenderFilter(gender: String?) {
+        genderFilter = gender
+    }
+
+    fun updateFriendsOnlyFilter(state: Boolean) {
+        friendsOnlyFilter = state
+    }
 
     fun updateCreateWorkoutVisible(visible: Boolean) {
         createWorkoutVisible = visible
@@ -73,8 +105,8 @@ class JoinWorkoutViewModel: ViewModel() {
         experienceExpanded = expanded
     }
 
-    fun updateCreateWorkoutDescription(experience: String) {
-        createWorkoutDescription = experience
+    fun updateCreateWorkoutDescription(description: String) {
+        createWorkoutDescription = description
     }
 
     fun validateForm(): Boolean {
@@ -111,5 +143,55 @@ class JoinWorkoutViewModel: ViewModel() {
         createWorkoutName = ""
         createWorkoutExperience = ""
         createWorkoutDescription = ""
+    }
+
+    fun getWorkouts() {
+        println(genderFilter)
+        println(experienceFilter)
+        println(friendsOnlyFilter)
+
+        val genderValue: String? = genderFilter?.takeIf { it.isNotEmpty() }
+        val experienceValue: String? = experienceFilter?.takeIf { it.isNotEmpty() }
+
+        println("Gender: $genderValue, Experience: $experienceValue, Friends Only: $friendsOnlyFilter")
+
+
+
+        val apiService = RetrofitInstance.publicWorkoutService
+        val apiBody = FilterPublicWorkout(
+            gender = genderValue,
+            experience = experienceValue,
+            friendsOnly = friendsOnlyFilter,
+            latitude = "10",
+            longitude = "10"
+        )
+        val call = apiService.filterPublicWorkout(apiBody)
+//        val call = apiService.filterPublicWorkout(
+//            gender = genderValue,
+//            experience = experienceValue,
+//            friendsOnly = friendsOnlyFilter,
+//            latitude = "10",
+//            longitude = "10"
+//        )
+
+        call.enqueue(object : Callback<ApiResponse<List<PublicWorkout>>> {
+            override fun onResponse(
+                call: Call<ApiResponse<List<PublicWorkout>>>,
+                response: Response<ApiResponse<List<PublicWorkout>>>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.data?.let {
+                        workouts.clear()
+                        workouts.addAll(it)
+                    }
+                } else {
+                    println("Failed to get workouts: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<List<PublicWorkout>>>, t: Throwable) {
+                println("Failure: ${t.message}")
+            }
+        })
     }
 }

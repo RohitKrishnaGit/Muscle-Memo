@@ -18,6 +18,8 @@ export const authenticateWithToken = (
             message: "Access Denied: No token provided",
         });
 
+    console.log({ token });
+
     try {
         const tokenDetails = jwt.verify(
             token,

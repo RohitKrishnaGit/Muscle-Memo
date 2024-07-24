@@ -9,6 +9,18 @@ import retrofit2.http.POST
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Path
+import java.util.logging.Filter
+
+data class PublicWorkout(
+    val id: Int,
+    val name: String,
+    val date: Int,
+    val description: String,
+    val latitude: String,
+    val longitude: String,
+    val gender: String?,
+    val experience: String
+)
 
 data class CreatePublicWorkout(
     val name: String,
@@ -19,7 +31,18 @@ data class CreatePublicWorkout(
     val description: String,
 )
 
+data class FilterPublicWorkout(
+    val gender: String? = null,
+    val experience: String? = null,
+    val friendsOnly: Boolean,
+    val latitude: String,
+    val longitude: String
+)
+
 public interface  PublicWorkoutService {
     @POST("/publicWorkouts/me")
     fun createPublicWorkout(@Body body: CreatePublicWorkout): Call<ApiResponse<Int>>
+
+    @POST("/publicWorkouts/filter/me")
+    fun filterPublicWorkout(@Body body: FilterPublicWorkout): Call<ApiResponse<List<PublicWorkout>>>
 }

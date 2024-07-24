@@ -7,12 +7,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -27,6 +29,7 @@ import com.cs346.musclememo.screens.components.MMButton
 import com.cs346.musclememo.screens.components.PublicWorkoutTabs
 import com.cs346.musclememo.screens.components.SelectExperienceLevel
 import com.cs346.musclememo.screens.components.TopAppBar
+import com.cs346.musclememo.screens.components.WorkoutList
 import com.cs346.musclememo.screens.viewmodels.JoinWorkoutViewModel
 
 @Composable
@@ -59,9 +62,96 @@ fun JoinWorkoutScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
             PublicWorkoutTabs(viewModel)
+            Spacer(modifier = Modifier.height(8.dp))
+            PublicWorkoutContent(viewModel)
         }
     }
     CreatePublicWorkoutSheet(viewModel = viewModel)
+}
+
+@Composable
+fun PublicWorkoutContent(
+    viewModel: JoinWorkoutViewModel
+) {
+    if (viewModel.publicWorkoutTab == "Search") {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                SearchFilters(viewModel)
+                SearchResults(viewModel)
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchResults(
+    viewModel: JoinWorkoutViewModel
+) {
+    WorkoutList(viewModel)
+}
+
+@Composable
+fun SearchFilters(
+    viewModel: JoinWorkoutViewModel
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Text(text = "Friends Only")
+            Spacer(modifier = Modifier.weight(1f))
+            Switch(
+                checked = viewModel.friendsOnlyFilter,
+                onCheckedChange = { viewModel.updateFriendsOnlyFilter(it) }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextField(
+            value = viewModel.genderFilter.orEmpty(),
+            onValueChange = { viewModel.updateGenderFilter(it.takeIf { it.isNotEmpty() }) },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Gender") },
+            placeholder = { Text("Enter gender") }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextField(
+            value = viewModel.experienceFilter.orEmpty(),
+            onValueChange = { viewModel.updateExperienceFilter(it.takeIf { it.isNotEmpty() }) },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Experience") },
+            placeholder = { Text("Novice") }
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        MMButton(
+            onClick = {
+                viewModel.getWorkouts()
+            },
+            maxWidth = true,
+            text = "Search",
+            backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+            modifier = Modifier.padding(end = 8.dp)
+        )
+    }
 }
 
 @Composable

@@ -14,10 +14,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.cs346.musclememo.navigation.AppNavHost
 import com.cs346.musclememo.navigation.BottomNavigationBar
@@ -55,7 +62,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         // Get the FCM token
-
+        WindowCompat.setDecorFitsSystemWindows(window, true)
         enableEdgeToEdge()
         setContent {
             MuscleMemoTheme  {
@@ -156,7 +163,8 @@ fun MainScreen() {
         darkTheme = isDarkTheme.value ?: isSystemInDarkTheme()
     ) {
         Scaffold(
-            bottomBar = { BottomNavigationBar(bottomBarState = bottomBarState, navHostController = navController) }
+            modifier = Modifier.imePadding(),
+            bottomBar = { BottomNavigationBar(bottomBarState = bottomBarState.value, navHostController = navController) },
         ) { innerPadding ->
             // Apply the padding globally to the whole BottomNavScreensController
             Box(modifier = Modifier.padding(innerPadding)) {

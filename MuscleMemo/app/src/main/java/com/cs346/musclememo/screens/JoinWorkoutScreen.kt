@@ -45,6 +45,7 @@ import com.cs346.musclememo.screens.components.SelectGenderTag
 import com.cs346.musclememo.screens.components.TopAppBar
 import com.cs346.musclememo.screens.components.WorkoutList
 import com.cs346.musclememo.screens.viewmodels.JoinWorkoutViewModel
+import com.cs346.musclememo.screens.viewmodels.Message
 import com.cs346.musclememo.utils.AppPreferences
 
 @Composable
@@ -422,6 +423,65 @@ fun WorkoutChatMessages(viewModel: JoinWorkoutViewModel) {
             key = { index, message -> "${message.id}_$index" } // Ensure unique keys
         ) { _, message ->
             MessageBubble(message = message, currentUserId = viewModel.currentUser?.id)
+        }
+    }
+}
+
+@Composable
+fun FriendChatHeader(onClose: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.secondary)
+            .heightIn(min = 60.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(onClick = onClose) {
+            Icon(
+                Icons.Filled.Close,
+                contentDescription = "Close",
+                tint = Color.White
+            )
+        }
+        Text(
+            "Friend Chat",
+            modifier = Modifier.padding(end = 8.dp),
+            color = Color.White,
+            fontSize = 20.sp
+        )
+    }
+}
+
+@Composable
+fun MessageBubble(message: Message, currentUserId: Int?) {
+    val isCurrentUser = message.sender.id.toInt() == currentUserId
+    val bubbleColor = if (isCurrentUser) Color.Blue else Color.White
+    val textColor = if (isCurrentUser) Color.White else Color.Black
+    val horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
+
+    if (!isCurrentUser) {
+        Text(
+            text = message.sender.username,
+            color = Color.Gray,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalArrangement = horizontalArrangement
+    ) {
+        Box(
+            modifier = Modifier
+                .background(bubbleColor, shape = MaterialTheme.shapes.medium)
+                .padding(8.dp)
+        ) {
+            Text(
+                text = message.message,
+                color = textColor
+            )
         }
     }
 }

@@ -127,8 +127,8 @@ class JoinWorkoutViewModel: ViewModel() {
     fun connectSocket(roomId: String) {
         sm.connect()
         sm.joinRoom(roomId, AppPreferences.refreshToken.toString())
-        sm.onMessageReceived { msgId: Int, msg: String, sender: Sender ->
-            receivedMessages.add(Message(msgId, roomId, msg, sender))
+        sm.onMessageReceived { msgId: Int, msg: String, sender: Sender, timestamp: Long ->
+            receivedMessages.add(Message(msgId, roomId, msg, sender, timestamp))
         }
         sm.onHistoryRequest { getChatHistory(roomId) }
     }

@@ -9,10 +9,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,9 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BottomNavigationBar (
-    bottomBarState: MutableState<Boolean>,
+    bottomBarState: Boolean,
     navHostController: NavHostController
 ) {
     val items = listOf(
@@ -45,13 +49,12 @@ fun BottomNavigationBar (
     )
 
     val selected = remember { mutableStateOf(2) }
-    LaunchedEffect (bottomBarState.value) {
-        if (bottomBarState.value)
+    LaunchedEffect (bottomBarState) {
+        if (bottomBarState)
             selected.value = 2
     }
-
     AnimatedVisibility(
-        visible = bottomBarState.value,
+        visible = bottomBarState,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it }),
         content = {
@@ -60,16 +63,20 @@ fun BottomNavigationBar (
             ) {
                 Row {
                     items.forEachIndexed { index, item ->
-                        NavBarItem(value = item, highlighted = (index == selected.value), modifier = Modifier.weight(1f)) {
+                        NavBarItem(
+                            value = item,
+                            highlighted = (index == selected.value),
+                            modifier = Modifier.weight(1f)
+                        ) {
                             if (index != selected.value) {
                                 selected.value = index
                                 navHostController.navigate(item.screen.route)
                             }
                         }
-                        }
                     }
                 }
-    })
+            }
+        })
 }
 
 

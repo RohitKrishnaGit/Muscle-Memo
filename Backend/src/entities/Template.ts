@@ -20,6 +20,8 @@ export class Template {
     @ManyToOne(() => User, (user) => user.templates)
     user: User;
 
-    @OneToMany(() => Exercise, (exercise) => exercise.template)
+    @OneToMany(() => Exercise, (exercise) => exercise.template, {
+        cascade: true
+    })
     exercises: Relation<Exercise[]>;
 }

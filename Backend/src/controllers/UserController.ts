@@ -477,6 +477,10 @@ export class UserController {
 
         if (!reporterId) return failure("Access Token Error");
 
+        if (reportedUserId == reporterId) {
+            return failure("Cannot report yourself")
+        }
+
         const reporter = await this.userRepository.findOneBy({
             id: reporterId,
         });

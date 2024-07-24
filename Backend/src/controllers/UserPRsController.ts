@@ -88,10 +88,6 @@ export class UserPrsController {
             )
             .getRawMany();
 
-        if (userPrs.length === 0) {
-            return failure("No user PRs exist");
-        }
-
         return success(userPrs);
     }
 
@@ -135,10 +131,6 @@ export class UserPrsController {
                 `userPrs.userId = user.id`
             )
             .getRawMany();
-
-        if (userPrs.length === 0) {
-            return failure("No user PRs exist");
-        }
 
         return success(userPrs);
     }

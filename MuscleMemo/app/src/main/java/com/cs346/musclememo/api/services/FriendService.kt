@@ -26,10 +26,10 @@ public interface  FriendService {
     fun removeFriendByUserId (@Body friendId: Any): Call<ApiResponse<Void>>
 
     @POST("/users/me/acceptFriendRequest")
-    fun acceptFriendRequest (@Body friendId: Any): Call<ApiResponse<List<Friend>>>
+    fun acceptFriendRequest (@Body friendId: Any): Call<ApiResponse<String>>
 
     @POST("/users/me/rejectFriendRequest")
-    fun rejectFriendRequest (@Body friendId: Any): Call<ApiResponse<List<Friend>>>
+    fun rejectFriendRequest (@Body friendId: Any): Call<ApiResponse<String>>
 
     @POST("/users/me/sendFriendRequest")
     fun sendFriendRequest (@Body friendId: Any): Call<ApiResponse<Any>>

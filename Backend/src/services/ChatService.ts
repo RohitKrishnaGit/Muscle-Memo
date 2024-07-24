@@ -50,10 +50,16 @@ export const initChatService = (server: any) => {
             console.log(`Received message '${message}'
                 from user ${user.id}
                 in room ${room}`);
-            if ((await cc.createHelper(user, room, message)).error) {
+            const msg = await cc.createHelper(user, room, message);
+            if (msg.error || !msg.data) {
                 return;
             }
-            io.to(room).emit("message", `${message}`);
+            io.to(room).emit(
+                "message",
+                msg.data.id,
+                message,
+                JSON.stringify(msg.data.sender)
+            );
             for (let userKey in userRoomMap[room]) {
                 let value = userRoomMap[room][userKey];
 

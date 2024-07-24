@@ -70,7 +70,7 @@ export const filterPublicWorkoutSchema = object({
     body: object({
         gender: string().optional(),
         experience: string().optional(),
-        friendsOnly: string({
+        friendsOnly: boolean({
             required_error: "friendsOnly is required",
         }),
         latitude: string({

@@ -844,7 +844,7 @@ export const Routes = [
     },
     {
         method: "get",
-        route: "/users/:userId/outgoingFriendRequests",
+        route: "/publicWorkoutRequests/:userId/outgoingPublicWorkoutRequests",
         controller: PublicWorkoutRequestController,
         middleware: [
             validateSchema(outgoingPublicWorkoutRequestsSchema),
@@ -855,11 +855,11 @@ export const Routes = [
                 enforce(or(sameUser, isAdmin))
             ),
         ],
-        action: "getOutgoingFriendRequests",
+        action: "getOutgoingPublicWorkoutRequests",
     },
     {
         method: "post",
-        route: "/users/:userId/sendPublicWorkoutRequest",
+        route: "/publicWorkoutRequests/:userId/sendPublicWorkoutRequest",
         controller: PublicWorkoutRequestController,
         middleware: [
             validateSchema(sendPublicWorkoutRequestSchema),
@@ -874,7 +874,7 @@ export const Routes = [
     },
     {
         method: "post",
-        route: "/users/:userId/:id/acceptPublicWorkoutRequest",
+        route: "/publicWorkoutRequests/:userId/:id/acceptPublicWorkoutRequest",
         controller: PublicWorkoutRequestController,
         middleware: [
             validateSchema(acceptPublicWorkoutRequestSchema),
@@ -889,7 +889,7 @@ export const Routes = [
     },
     {
         method: "post",
-        route: "/users/:userId/:id/rejectPublicWorkoutRequest",
+        route: "/publicWorkoutRequests/:userId/:id/rejectPublicWorkoutRequest",
         controller: PublicWorkoutRequestController,
         middleware: [
             validateSchema(rejectPublicWorkoutRequestSchema),

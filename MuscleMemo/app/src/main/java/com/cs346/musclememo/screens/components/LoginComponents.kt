@@ -116,8 +116,8 @@ fun InputSheet (
 
                     Spacer(modifier = Modifier.height(20.dp))
                     if (errorMessage != "") {
-                        Spacer(modifier = Modifier.height(20.dp))
                         Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
+                        Spacer(modifier = Modifier.height(20.dp))
                     }
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Spacer(modifier = Modifier.weight(1f))

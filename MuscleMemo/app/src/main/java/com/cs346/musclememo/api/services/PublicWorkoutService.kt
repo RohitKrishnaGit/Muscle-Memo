@@ -53,8 +53,8 @@ public interface  PublicWorkoutService {
     @POST("/publicWorkouts/me")
     fun createPublicWorkout(@Body body: CreatePublicWorkout): Call<ApiResponse<Int>>
 
-//    @GET("/publicWorkouts/me")
-//    fun getInvolvedWorkouts(): Call<ApiResponse<List<PublicWorkout>>>
+    @GET("/publicWorkouts/allJoined/me")
+    fun getJoinedWorkouts(): Call<ApiResponse<List<PublicWorkout>>>
 
     @POST("/publicWorkouts/filter/me")
     fun filterPublicWorkout(@Body body: FilterPublicWorkout): Call<ApiResponse<List<PublicWorkout>>>

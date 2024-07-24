@@ -355,8 +355,29 @@ class JoinWorkoutViewModel: ViewModel() {
         createWorkoutDescription = ""
     }
 
-    fun getInvolvedWorkouts() {
+    fun getJoinedWorkouts() {
         val apiService = RetrofitInstance.publicWorkoutService
+        val call = apiService.getJoinedWorkouts()
+
+        call.enqueue(object : Callback<ApiResponse<List<PublicWorkout>>> {
+            override fun onResponse(
+                call: Call<ApiResponse<List<PublicWorkout>>>,
+                response: Response<ApiResponse<List<PublicWorkout>>>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.data?.let {
+                        workouts.clear()
+                        workouts.addAll(it)
+                    }
+                } else {
+                    println("Failed to get workouts: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<List<PublicWorkout>>>, t: Throwable) {
+                println("Failure: ${t.message}")
+            }
+        })
     }
 
     fun getMyWorkouts() {

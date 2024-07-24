@@ -169,7 +169,7 @@ fun PublicWorkoutTabs(
             onClick = {
                 if (viewModel.publicWorkoutTab != "Current") {
                     viewModel.updateWorkoutTab("Current")
-                    viewModel.getMyWorkouts()
+                    viewModel.getJoinedWorkouts()
                 }
             }
         )

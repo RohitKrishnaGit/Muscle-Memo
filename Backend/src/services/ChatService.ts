@@ -59,7 +59,7 @@ export const initChatService = (server: any) => {
             console.log(`Received message '${message}'
                 from user ${user.id}
                 in room ${room}`);
-            const msg = await cc.createHelper(user, room, message);
+            const msg = await cc.createHelper(user, room, message, Date.now());
             if (msg.error || !msg.data) {
                 return;
             }

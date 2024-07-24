@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,6 +23,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -95,17 +101,32 @@ fun ChooseLeaderboardExercise(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.1f)
+                        .fillMaxHeight(0.11f)
+                        .padding(vertical = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { viewModel.updateChooseExerciseVisible(false) }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
-                    OutlinedTextField(
-                        value = viewModel.exerciseSearchText,
-                        onValueChange = viewModel::updateExerciseSearchText,
-                        modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
-                    )
+                    Row (modifier = Modifier
+                        .weight(1f)){
+                        OutlinedTextField(
+                            value = viewModel.exerciseSearchText,
+                            onValueChange = viewModel::updateExerciseSearchText,
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            trailingIcon = {
+                                Icon(Icons.Default.Clear,
+                                    contentDescription = "clear text",
+                                    modifier = Modifier
+                                        .clickable {
+                                            viewModel.updateExerciseSearchText("")
+                                        }
+                                )
+                            }
+                        )
+                    }
                     IconButton(onClick = { viewModel.toggleSort() }) {
                         if (viewModel.isSortedAlphabetically) {
                             Icon(
@@ -121,43 +142,62 @@ fun ChooseLeaderboardExercise(
                         }
                     }
                 }
-                if (viewModel.exerciseSearchText == ""){
-                    Row (
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = "Your Completed Exercises")
-                    }
-                }
-                LazyColumn {
-                    val groupedRefs = if (viewModel.exerciseSearchText != ""){
-                        viewModel.userCompletedExerciseRefs
-                    } else {
-                        viewModel.sortedExerciseRefs
-                    }.groupBy { it.name.first().uppercase() }
-
-                    groupedRefs.forEach{ (initial, refs) ->
-                        stickyHeader {
+                Column (
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 24.dp)
+                ){
+                    if (viewModel.exerciseSearchText == "") {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center
+                        ) {
                             Text(
-                                text = initial,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.primary)
-                                    .padding(8.dp),
-                                color = MaterialTheme.colorScheme.onPrimary
+                                text = "Your Completed Exercises",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
                             )
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
-                        items(items = refs){ref ->
-                            Row (
-                                modifier = Modifier.fillMaxWidth().clickable {
-                                    localFocusManager.clearFocus()
-                                    viewModel.updateCurrentExerciseRef(ref)
-                                    viewModel.updateChooseExerciseVisible(false)
-                                    viewModel.updateExerciseSearchText("")
+                    }
+                    LazyColumn {
+                        viewModel.groupedRefs.forEach { (initial, refs) ->
+                            stickyHeader {
+                                Text(
+                                    text = initial,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(MaterialTheme.colorScheme.primary)
+                                        .padding(8.dp),
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                            items(items = refs) { ref ->
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(50.dp)
+                                        .clickable {
+                                            localFocusManager.clearFocus()
+                                            viewModel.updateCurrentExerciseRef(ref)
+                                            viewModel.fetchAllLeaderboards()
+                                            viewModel.updateChooseExerciseVisible(false)
+                                            viewModel.updateExerciseSearchText("")
+                                        }
+                                ) {
+                                    Text(text = ref.name, fontSize = 18.sp)
+                                    if (viewModel.exerciseSearchText == "" && viewModel.mePrsVisible[ref.name] != null){
+                                        IconButton(onClick = { viewModel.toggleVisibility(ref) }) {
+                                                Icon(imageVector = if (viewModel.mePrsVisible[ref.name] == true)
+                                                    Icons.Filled.Visibility
+                                                else
+                                                    Icons.Filled.VisibilityOff, null)
+                                        }
+                                    }
                                 }
-                            ) {
-                                Text(text = ref.name)
                             }
                         }
                     }

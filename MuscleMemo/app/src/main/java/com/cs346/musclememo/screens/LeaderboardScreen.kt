@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,9 +43,7 @@ fun LeaderboardScreen(
         ){
             Text(
                 text = "Leaderboard",
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 8.dp)
+                fontSize = 40.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
             DisplayLeaderboardExercise(viewModel = viewModel)
@@ -72,30 +70,32 @@ fun Leaderboard (
         item {
             LeaderboardHeading()
         }
-        items(leaderboard.size) { index ->
-            val item = leaderboard[index]
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = "${index + 1}",
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 8.dp)
-                )
-                Text(
-                    text = item.username,
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .weight(2f)
-                        .padding(horizontal = 8.dp)
-                )
-                Text(
-                    text = item.value,
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 8.dp)
-                )
+        itemsIndexed(items = leaderboard) { index, item ->
+            if (item != null){
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "${index + 1}",
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp)
+                    )
+                    Text(
+                        text = item.username,
+                        fontSize = 16.sp,
+                        color = if (item.username == viewModel.user.username) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier
+                            .weight(2f)
+                            .padding(horizontal = 8.dp)
+                    )
+                    Text(
+                        text = item.value,
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp)
+                    )
+                }
             }
         }
     }

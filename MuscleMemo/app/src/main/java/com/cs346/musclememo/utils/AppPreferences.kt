@@ -15,6 +15,8 @@ object AppPreferences {
             systemOfMeasurementDistance = "km"
         if (systemOfMeasurementWeight == null)
             systemOfMeasurementWeight = "kg"
+        if (isFirstTime == null)
+            isFirstTime = true
     }
 
     fun listen(listener: SharedPreferences. OnSharedPreferenceChangeListener){
@@ -48,6 +50,10 @@ object AppPreferences {
     var firebaseToken: String?
         get() = Key.FIREBASE_TOKEN.getString()
         set(value) = Key.FIREBASE_TOKEN.setString(value)
+        
+    var isFirstTime: Boolean?
+        get() = Key.FIRST_TIME.getBoolean()
+        set(value) = Key.FIRST_TIME.setBoolean(value)
 
     var longitude: Float?
         get() = Key.LONGITUDE.getFloat()

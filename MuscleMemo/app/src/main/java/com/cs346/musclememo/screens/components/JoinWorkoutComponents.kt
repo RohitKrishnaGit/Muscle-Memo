@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,6 +74,10 @@ fun WorkoutItem(index: Int, workout: PublicWorkout, onClick: (PublicWorkout) -> 
 
 @Composable
 fun WorkoutList(viewModel: JoinWorkoutViewModel) {
+    LaunchedEffect(Unit) {
+        viewModel.clearWorkouts()
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -117,6 +122,7 @@ fun PublicWorkoutTabs(
             onClick = {
                 if (viewModel.publicWorkoutTab != "Owned") {
                     viewModel.updateWorkoutTab("Owned")
+                    viewModel.getMyWorkouts()
                 }
             }
         )

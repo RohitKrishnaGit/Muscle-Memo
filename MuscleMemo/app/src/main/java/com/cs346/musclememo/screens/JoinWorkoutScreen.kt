@@ -88,7 +88,30 @@ fun PublicWorkoutContent(
                 SearchResults(viewModel)
             }
         }
+    } else if (viewModel.publicWorkoutTab == "Current") {
+
+    } else if (viewModel.publicWorkoutTab == "Owned") {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                SearchResults(viewModel)
+            }
+        }
     }
+}
+
+@Composable
+fun MyResults(
+    viewModel: JoinWorkoutViewModel
+) {
+
 }
 
 @Composable

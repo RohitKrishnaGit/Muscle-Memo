@@ -45,4 +45,7 @@ public interface  PublicWorkoutService {
 
     @POST("/publicWorkouts/filter/me")
     fun filterPublicWorkout(@Body body: FilterPublicWorkout): Call<ApiResponse<List<PublicWorkout>>>
+
+    @GET("/publicWorkouts/me")
+    fun fetchMyPublicWorkouts(): Call<ApiResponse<List<PublicWorkout>>>
 }

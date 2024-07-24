@@ -62,7 +62,7 @@ fun DisplayProfilePicture(
         modifier = Modifier
             .size(size)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primaryContainer),
+            .background(MaterialTheme.colorScheme.tertiaryContainer),
         contentAlignment = Alignment.Center
     ) {
         if (model != null) {
@@ -78,7 +78,7 @@ fun DisplayProfilePicture(
                 Icons.Default.Person,
                 "Default Profile Picture",
                 modifier = Modifier.size(size * 0.8f),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = MaterialTheme.colorScheme.onTertiaryContainer
             )
         }
     }

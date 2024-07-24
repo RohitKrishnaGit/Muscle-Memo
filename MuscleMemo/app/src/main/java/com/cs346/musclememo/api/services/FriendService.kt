@@ -13,8 +13,6 @@ import retrofit2.http.Path
 data class ReportUserAction(val reportedUserId: Int, val reason: String)
 
 public interface  FriendService {
-//    @POST("/workouts")
-//    fun createWorkout(@Body workout: Workout): Call<ApiResponse<Workout>>
 
     @GET("/users/me/incomingFriendRequests")
     fun getIncomingFriendRequestsByUserId (): Call<ApiResponse<List<Friend>>>

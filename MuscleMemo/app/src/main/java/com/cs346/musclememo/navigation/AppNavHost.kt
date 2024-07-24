@@ -50,7 +50,7 @@ fun AppNavHost (
             LeaderboardScreen()
         }
         composable(route = Screen.Friends.route) {
-            FriendsScreen()
+            FriendsScreen(bottomBarState = bottomBarState)
         }
         composable(route = Screen.Workout.route) {
             WorkoutScreen(viewModel = workoutScreenViewModel)

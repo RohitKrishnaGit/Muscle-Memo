@@ -31,7 +31,7 @@ export class UserController {
         const id = request.params.id;
 
         const user = this.oneHelper(id);
-      
+
         if (!user) {
             return failure("unregistered user");
         }

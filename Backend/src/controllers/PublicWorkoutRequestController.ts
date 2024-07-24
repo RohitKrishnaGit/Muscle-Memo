@@ -18,11 +18,12 @@ export class PublicWorkoutRequestController {
         const userId = parseInt(request.params.userId);
 
         return success(this.publicWorkoutRequestRepository.find({
-            where:{
-                publicWorkout: {creator: {id: userId}}
+            where: {
+                publicWorkout: { creator: { id: userId } }
             },
             relations: {
                 publicWorkout: true,
+                sender: true,
             }
         }));
 
@@ -36,11 +37,12 @@ export class PublicWorkoutRequestController {
         const userId = parseInt(request.params.userId);
 
         return success(this.publicWorkoutRequestRepository.find({
-            where:{
-                sender: {id: userId}
+            where: {
+                sender: { id: userId }
             },
             relations: {
-                sender: true
+                publicWorkout: true,
+                sender: true,
             }
         }));
     }
@@ -61,15 +63,35 @@ export class PublicWorkoutRequestController {
             return failure("unregistered user");
         }
 
-        const publicWorkout = await this.publicWorkoutRepository.findOneBy({
-            id: publicWorkoutId,
+        const publicWorkout = await this.publicWorkoutRepository.findOne({
+            where: {
+                id: publicWorkoutId,
+            },
+            relations: {
+                creator: true,
+                users: true,
+            }
         });
+
+        const existingPublicWorkoutRequest = await this.publicWorkoutRequestRepository.findOne({
+            where: {
+                publicWorkout: { id: publicWorkoutId },
+                sender: { id: userId }
+            },
+            relations: {
+                publicWorkout: true
+            }
+        })
 
         if (!publicWorkout) {
             return failure("public workout does not exist");
         }
 
-        if (publicWorkout.users && publicWorkout.users.includes(user)) {
+        if (user.id == publicWorkout.creator.id) {
+            return failure("can't join own public workout")
+        }
+
+        if (!!existingPublicWorkoutRequest) {
             return failure("already requested to join this workout")
         }
 
@@ -93,7 +115,7 @@ export class PublicWorkoutRequestController {
         const publicWorkoutRequest = await this.publicWorkoutRequestRepository.findOneBy({
             id
         });
-      
+
         if (!publicWorkoutRequest) {
             return failure("invalid public workout request");
         }
@@ -105,7 +127,7 @@ export class PublicWorkoutRequestController {
         if (!publicWorkout) {
             return failure("invalid public workout")
         }
-        
+
         publicWorkout.users = [...(publicWorkout.users ?? []), publicWorkoutRequest.sender];
 
         await this.publicWorkoutRequestRepository.remove(publicWorkoutRequest)
@@ -124,11 +146,11 @@ export class PublicWorkoutRequestController {
         const publicWorkoutRequest = await this.publicWorkoutRequestRepository.findOneBy({
             id
         });
-      
+
         if (!publicWorkoutRequest) {
             return failure("invalid public workout request");
         }
-        
+
         await this.publicWorkoutRequestRepository.remove(publicWorkoutRequest)
 
         return success("public workout request removed");

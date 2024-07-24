@@ -87,6 +87,7 @@ dependencies {
     implementation(libs.firebase.bom)
     implementation(libs.firebase.messaging)
     implementation (libs.google.firebase.storage)
+    implementation (libs.play.services.location)
 
 
     // TODO: Add the dependencies for Firebase products you want to use

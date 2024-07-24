@@ -56,6 +56,7 @@ fun TopAppBar(
 fun MMDialog(
     showDialog: Boolean,
     title: String,
+    buttonsEnabled: Boolean = true,
     onConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
     body: @Composable () -> Unit,
@@ -82,15 +83,21 @@ fun MMDialog(
                 }
             },
             confirmButton = {
-                    TextButton(onClick = {
-                        onConfirm()
-                    }) {
+                    TextButton(
+                        onClick = {
+                            onConfirm()
+                        },
+                        enabled = buttonsEnabled
+                    ) {
                         Text(confirmButtonText)
                     }
             },
             dismissButton = {
                 if (dismiss) {
-                    TextButton(onClick = onDismissRequest) {
+                    TextButton(
+                        onClick = onDismissRequest,
+                        enabled = buttonsEnabled
+                    ) {
                         Text(cancelButtonText)
                     }
                 }

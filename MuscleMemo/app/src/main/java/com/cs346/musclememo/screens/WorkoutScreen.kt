@@ -188,6 +188,18 @@ fun WorkoutSheet(
 
 @Composable
 fun NewWorkout(viewModel: WorkoutScreenViewModel) {
+    MMDialog(
+        showDialog = viewModel.showErrorDialog(),
+        buttonsEnabled = viewModel.dialogButtonsEnabled,
+        title = viewModel.getDialogText(),
+        onConfirm = viewModel::onDialogConfirm,
+        onDismissRequest = viewModel::onDialogDismiss,
+        body = {
+            Text(viewModel.getDialogBodyText())
+        },
+        errorText = viewModel.dialogErrorMessage
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -836,19 +848,6 @@ private fun AddExercise(
 fun DisplayTemplates(
     viewModel: WorkoutScreenViewModel
 ){
-    // for all templates in viewModel.templates, create a TemplateCard
-    MMDialog(
-        showDialog = viewModel.showErrorDialog(),
-        buttonsEnabled = viewModel.dialogButtonsEnabled,
-        title = viewModel.getDialogText(),
-        onConfirm = viewModel::onDialogConfirm,
-        onDismissRequest = viewModel::onDialogDismiss,
-        body = {
-            Text(viewModel.getDialogBodyText())
-        },
-        errorText = viewModel.dialogErrorMessage
-    )
-
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(5.dp)

@@ -86,15 +86,15 @@ export class FriendsController {
         }
 
         if (!friend) {
-            return failure("target user does not exist");
+            return failure("Target user does not exist");
         }
 
         if (friend.id === user.id) {
-            return failure("cannot send friend request to self");
+            return failure("Cannot send friend request to self");
         }
 
         if (user.outgoingFriendRequests.includes(friend)) {
-            return failure("friend request already sent to this user");
+            return failure("Friend request already sent to this user");
         }
 
         user.outgoingFriendRequests = [
@@ -132,7 +132,7 @@ export class FriendsController {
             return failure("unregistered user");
         }
         if (!friend) {
-            return failure("target user does not exist");
+            return failure("Target user does not exist");
         }
 
         const len = friend.outgoingFriendRequests.length;
@@ -143,7 +143,7 @@ export class FriendsController {
         );
 
         if (friend.outgoingFriendRequests.length === len) {
-            return failure("this friend request does not exist");
+            return failure("This friend request does not exist");
         }
 
         user.friends = [...(user.friends ?? []), friend];
@@ -152,7 +152,7 @@ export class FriendsController {
         await this.userRepository.save(user);
         await this.userRepository.save(friend);
 
-        return success("friend request accept successs");
+        return success("Friend request accept successs");
     }
 
     async rejectFriendRequest(
@@ -182,7 +182,7 @@ export class FriendsController {
             return failure("unregistered user");
         }
         if (!friend) {
-            return failure("target user does not exist");
+            return failure("Target user does not exist");
         }
 
         const len = friend.outgoingFriendRequests.length;
@@ -193,13 +193,13 @@ export class FriendsController {
         );
 
         if (friend.outgoingFriendRequests.length === len) {
-            return failure("this friend request does not exist");
+            return failure("This friend request does not exist");
         }
 
         await this.userRepository.save(user);
         await this.userRepository.save(friend);
 
-        return success("friend request accept successs");
+        return success("Friend request accept successs");
     }
 
     async removeFriend(
@@ -228,7 +228,7 @@ export class FriendsController {
             return failure("unregistered user");
         }
         if (!friend) {
-            return failure("target user does not exist");
+            return failure("Target user does not exist");
         }
 
         const len1 = user.friends.length;
@@ -242,12 +242,12 @@ export class FriendsController {
         });
 
         if (user.friends.length === len1 || friend.friends.length === len2) {
-            return failure("this friend does not exist");
+            return failure("This friend does not exist");
         }
 
         await this.userRepository.save(user);
         await this.userRepository.save(friend);
 
-        return success("friend removed");
+        return success("Friend removed");
     }
 }

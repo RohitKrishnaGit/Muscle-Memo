@@ -59,7 +59,7 @@ export const initChatService = (server: any) => {
                 const msg = await chatController.createHelper(
                     user,
                     room,
-                    "Welcome",
+                    `${user.username} has joined the chat`,
                     Date.now()
                 );
                 if (msg.error || !msg.data) {
@@ -68,7 +68,7 @@ export const initChatService = (server: any) => {
                 io.to(room).emit(
                     "message",
                     msg.data.id,
-                    "Welcome",
+                    `${user.username} has joined the chat`,
                     JSON.stringify(msg.data.sender),
                     Date.now()
                 );

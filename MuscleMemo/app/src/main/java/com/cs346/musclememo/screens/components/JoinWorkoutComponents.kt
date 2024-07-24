@@ -61,7 +61,7 @@ import com.cs346.musclememo.screens.viewmodels.JoinWorkoutViewModel
 import com.cs346.musclememo.screens.viewmodels.LeaderboardScreenViewModel
 
 @Composable
-fun WorkoutItem(index: Int, workout: PublicWorkout, isOwner: Boolean, onClick: (PublicWorkout) -> Unit) {
+fun WorkoutItem(index: Int, workout: PublicWorkout, tabState: String, viewModel: JoinWorkoutViewModel) {
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -76,23 +76,47 @@ fun WorkoutItem(index: Int, workout: PublicWorkout, isOwner: Boolean, onClick: (
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
             ) {
-                if (!isOwner) {
+                if (tabState == "Search") {
                     Button(
                         onClick = {
-                            onClick(workout)
+                            viewModel.sendRequest(workout.id)
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text("Request to Join", color = MaterialTheme.colorScheme.onPrimary)
                     }
-                } else {
+                } else if (tabState == "Owned") {
                     Button(
                         onClick = {
-                            onClick(workout)
+                            viewModel.selectRequests(workout.id)
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text("View Requests", color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                } else if (tabState == "Current") {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+                    ) {
+                        Button(
+                            onClick = {
+                                println("chat")
+                                viewModel.selectWorkoutChat(workout)
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                        ) {
+                            Text("Chat", color = MaterialTheme.colorScheme.onPrimary)
+                        }
+
+                        Button(
+                            onClick = {
+                                println("delete")
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        ) {
+                            Text("Leave", color = MaterialTheme.colorScheme.onError)
+                        }
                     }
                 }
             }
@@ -114,14 +138,8 @@ fun WorkoutList(viewModel: JoinWorkoutViewModel) {
             WorkoutItem(
                 index = index,
                 workout = workout,
-                isOwner = viewModel.publicWorkoutTab == "Owned",
-                onClick = {
-                    if (viewModel.publicWorkoutTab == "Owned") {
-                        viewModel.selectRequests(workout.id)
-                    } else {
-                        viewModel.sendRequest(workout.id)
-                    }
-                }
+                tabState = viewModel.publicWorkoutTab,
+                viewModel = viewModel
             )
         }
     }
@@ -151,6 +169,7 @@ fun PublicWorkoutTabs(
             onClick = {
                 if (viewModel.publicWorkoutTab != "Current") {
                     viewModel.updateWorkoutTab("Current")
+                    viewModel.getMyWorkouts()
                 }
             }
         )
@@ -269,9 +288,8 @@ fun IncomingWorkoutRequestCard(request: WorkoutRequest, viewModel: JoinWorkoutVi
                 }
                 Button(
                     onClick = {
-                        println("reject workout request")
-//                        viewModel.rejectWorkoutRequest(request.id)
-//                        viewModel.removeIncomingWorkoutRequest(requestIndex)
+                        viewModel.rejectRequest(request.id)
+                        viewModel.removeIncomingWorkoutRequest(requestIndex)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {

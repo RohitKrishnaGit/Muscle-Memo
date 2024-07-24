@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
@@ -28,6 +30,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +45,9 @@ import com.cs346.musclememo.screens.components.PublicWorkoutTabs
 import com.cs346.musclememo.screens.components.SelectExperienceLevel
 import com.cs346.musclememo.screens.components.TopAppBar
 import com.cs346.musclememo.screens.components.WorkoutList
+import com.cs346.musclememo.screens.viewmodels.FriendsScreenViewModel
 import com.cs346.musclememo.screens.viewmodels.JoinWorkoutViewModel
+import com.cs346.musclememo.utils.AppPreferences
 
 @Composable
 fun JoinWorkoutScreen(
@@ -78,6 +83,7 @@ fun JoinWorkoutScreen(
             PublicWorkoutContent(viewModel)
         }
         WorkoutRequests(viewModel)
+        WorkoutChat(viewModel)
     }
     CreatePublicWorkoutSheet(viewModel = viewModel)
 }
@@ -102,7 +108,19 @@ fun PublicWorkoutContent(
             }
         }
     } else if (viewModel.publicWorkoutTab == "Current") {
-
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                SearchResults(viewModel)
+            }
+        }
     } else if (viewModel.publicWorkoutTab == "Owned") {
         Box(
             modifier = Modifier
@@ -331,6 +349,94 @@ fun WorkoutRequests(viewModel: JoinWorkoutViewModel) {
                         requestIndex = index
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun WorkoutChat(viewModel: JoinWorkoutViewModel) {
+    AnimatedVisibility(
+        visible = viewModel.workoutChatVisible,
+        enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn(),
+        exit = slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) + fadeOut()
+    ) {
+        viewModel.selectedWorkout?.let { workout ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    DisposableEffect(Unit) {
+                        // Concatenate user ids to generate room id
+                        val roomId = "workout-${workout.id}"
+                        viewModel.connectSocket(roomId)
+                        onDispose {
+                            viewModel.disconnectSocket()
+                        }
+                    }
+                    FriendChatHeader(onClose = {
+                        viewModel.updateWorkoutChatVisible(false)
+                        viewModel.sm.disconnect()
+                    })
+                    WorkoutChatMessages(viewModel = viewModel)
+                    WorkoutChatInput(viewModel = viewModel)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WorkoutChatMessages(viewModel: JoinWorkoutViewModel) {
+    val messageListState = rememberLazyListState()
+    LazyColumn(
+        state = messageListState,
+        modifier = Modifier
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        itemsIndexed(
+            items = viewModel.receivedMessages,
+            key = { index, message -> "${message.id}_$index" } // Ensure unique keys
+        ) { _, message ->
+            MessageBubble(message = message, currentUserId = viewModel.currentUser?.id)
+        }
+    }
+}
+
+@Composable
+fun WorkoutChatInput(viewModel: JoinWorkoutViewModel) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = viewModel.currentMessage,
+                onValueChange = { viewModel.updateCurrentMessage(it) },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                placeholder = { Text("Type your message here...") },
+            )
+            IconButton(
+                onClick = {
+                    if (AppPreferences.refreshToken != null && viewModel.currentMessage.isNotBlank()) {
+                        viewModel.sm.sendMessage(viewModel.currentMessage)
+                        viewModel.updateCurrentMessage("")
+                    }
+                }
+            ) {
+                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = MaterialTheme.colorScheme.primary)
             }
         }
     }

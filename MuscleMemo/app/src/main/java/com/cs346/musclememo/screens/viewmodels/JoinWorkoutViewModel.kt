@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.cs346.musclememo.SocketManager
 import com.cs346.musclememo.api.services.CreatePublicWorkout
 import com.cs346.musclememo.api.services.ExerciseDataSet
 import com.cs346.musclememo.api.services.ExerciseRequest
@@ -26,6 +27,7 @@ import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet
 import com.cs346.musclememo.classes.Friend
 import com.cs346.musclememo.classes.Template
+import com.cs346.musclememo.classes.User
 import com.cs346.musclememo.classes.Workout
 import com.cs346.musclememo.utils.AppPreferences
 import com.cs346.musclememo.utils.calculateScore
@@ -40,12 +42,15 @@ import kotlin.math.exp
 
 
 class JoinWorkoutViewModel: ViewModel() {
+    val sm = SocketManager()
     val workouts = mutableStateListOf<PublicWorkout>()
     val workoutRequests = mutableStateListOf<WorkoutRequest>()
+    var currentUser: User? by mutableStateOf(null)
+    val receivedMessages = mutableStateListOf<Message>()
 
-//    init {
-//        getWorkouts()
-//    }
+    init {
+        getCurrentUser()
+    }
 
     var createWorkoutVisible by mutableStateOf(false)
         private set
@@ -64,6 +69,9 @@ class JoinWorkoutViewModel: ViewModel() {
     var createWorkoutDescription by mutableStateOf("")
         private set
 
+    var currentMessage by mutableStateOf("")
+        private set
+
     var showCreateError by mutableStateOf(false)
         private set
 
@@ -78,6 +86,80 @@ class JoinWorkoutViewModel: ViewModel() {
 
     var requestsVisible by mutableStateOf(false)
         private set
+
+    var selectedWorkout by mutableStateOf<PublicWorkout?>(null)
+        private set
+
+    var workoutChatVisible by mutableStateOf(false)
+        private set
+
+    fun updateCurrentMessage(message: String) {
+        currentMessage = message
+    }
+
+    fun getCurrentUser() {
+        val apiService = RetrofitInstance.userService
+        val call = apiService.getMyUser()
+
+        call.enqueue(object : Callback<ApiResponse<User>> {
+            override fun onResponse(
+                call: Call<ApiResponse<User>>,
+                response: Response<ApiResponse<User>>
+            ) {
+                if (response.isSuccessful){
+                    val fetchedUser = response.body()?.data
+                    fetchedUser?.let{
+                        currentUser = it
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
+                t.printStackTrace()
+            }
+        })
+    }
+
+    fun connectSocket(roomId: String) {
+        sm.connect()
+        sm.joinRoom(roomId, AppPreferences.refreshToken.toString())
+        sm.onMessageReceived { msgId: Int, msg: String, sender: Sender ->
+            receivedMessages.add(Message(msgId, roomId.toInt(), msg, sender))
+        }
+        sm.onHistoryRequest { getChatHistory(roomId) }
+    }
+
+    fun getChatHistory(roomId: String) {
+        val apiService = RetrofitInstance.friendService
+        val call = apiService.getChat(roomId)
+
+        call.enqueue(object : Callback<ApiResponse<List<Message>>> {
+            override fun onResponse(call: Call<ApiResponse<List<Message>>>, response: Response<ApiResponse<List<Message>>>) {
+                if (response.isSuccessful) {
+                    response.body()?.data?.let { messages ->
+                        updateReceivedMessages(messages)
+                    }
+                    println(receivedMessages)
+                    println(response.body())
+                } else {
+                    println("Failed to get chat history: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<List<Message>>>, t: Throwable) {
+                println("Failed to get chat history: ${t.message}")
+            }
+        })
+    }
+
+    fun updateReceivedMessages(messages: List<Message>) {
+        receivedMessages.clear()
+        receivedMessages.addAll(messages)
+    }
+
+    fun disconnectSocket() {
+        sm.disconnect()
+    }
 
     fun updateRequestsVisible(visible: Boolean) {
         requestsVisible = visible
@@ -133,12 +215,48 @@ class JoinWorkoutViewModel: ViewModel() {
         workoutRequests.clear()
     }
 
+    fun updateWorkoutChatVisible(visible: Boolean) {
+        workoutChatVisible = visible
+    }
+
     fun removeIncomingWorkoutRequest(requestIndex: Int) {
         if (requestIndex in workoutRequests.indices) {
             workoutRequests.removeAt(requestIndex)
         } else {
             println("Invalid index: $requestIndex")
         }
+    }
+
+    fun selectWorkout(workout: PublicWorkout, onComplete: (Boolean) -> Unit) {
+        selectedWorkout = workout
+        onComplete(true)
+    }
+
+    fun selectWorkoutChat(workout: PublicWorkout) {
+        selectWorkout(workout) { success ->
+            updateWorkoutChatVisible(success)
+        }
+    }
+
+    fun rejectRequest(requestId: Int) {
+        val apiService = RetrofitInstance.publicWorkoutService
+        val call = apiService.rejectWorkoutRequest(requestId.toString())
+
+        call.enqueue(object : Callback<ApiResponse<String>> {
+            override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
+                if (response.isSuccessful) {
+                    println("success")
+                } else {
+                    println("Failed to get requests: ${response.message()}")
+                    updateRequestsVisible(false)
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
+                println("Failed to get requests: ${t.message}")
+                updateRequestsVisible(false)
+            }
+        })
     }
 
     fun acceptRequest(requestId: Int) {
@@ -235,6 +353,10 @@ class JoinWorkoutViewModel: ViewModel() {
         createWorkoutName = ""
         createWorkoutExperience = ""
         createWorkoutDescription = ""
+    }
+
+    fun getInvolvedWorkouts() {
+        val apiService = RetrofitInstance.publicWorkoutService
     }
 
     fun getMyWorkouts() {

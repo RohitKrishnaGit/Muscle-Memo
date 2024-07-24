@@ -8,6 +8,14 @@ export const allPublicWorkoutSchema = object({
     }),
 });
 
+export const allJoinedPublicWorkoutSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
+});
+
 export const onePublicWorkoutSchema = object({
     params: object({
         userId: string({

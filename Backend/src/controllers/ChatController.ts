@@ -25,28 +25,8 @@ export class ChatController {
 
         return this.allHelper(roomId);
     }
-
-    /* Shouldn't need to get single chat messages, keeping until remove confirmed */
-
-    // async one(request: Request, response: Response, next: NextFunction) {
-    //     const userId = parseInt(request.params.userId);
-    //     const roomId = request.params.roomId;
-    //     const id = parseInt(request.params.id);
-
-    //     const chat =
-    //         await this.chatRepository.findOneBy({
-    //             id,
-    //             roomId,
-    //             sender: { id: userId },
-    //         });
-
-    //     if (!chat) {
-    //         return failure("this chat does not exist");
-    //     }
-    //     return success(chat);
-    // }
-
-    async createHelper(user: User, roomId: string, message: string) {
+    
+    async createHelper(user: User, roomId: string, message: string, timestamp: number) {
         const sender = user;
 
         if (!sender) return failure("unregistered sender");
@@ -55,6 +35,7 @@ export class ChatController {
             roomId,
             message,
             sender,
+            timestamp
         });
 
         return success(this.chatRepository.save(chat));

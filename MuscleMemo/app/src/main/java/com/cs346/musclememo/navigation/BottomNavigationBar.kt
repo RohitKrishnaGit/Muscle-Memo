@@ -38,7 +38,7 @@ fun BottomNavigationBar (
 ) {
     val items = listOf(
         NavItem.Friend,
-        NavItem.FindBuddy,
+        NavItem.JoinWorkout,
         NavItem.Workout,
         NavItem.Leaderboard,
         NavItem.Profile

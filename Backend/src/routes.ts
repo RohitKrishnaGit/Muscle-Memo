@@ -47,6 +47,7 @@ import {
     postPrVisibilitySchema,
 } from "./schemas/leaderboardPRSchema";
 import {
+    allJoinedPublicWorkoutSchema,
     allPublicWorkoutSchema,
     createPublicWorkoutSchema,
     filterPublicWorkoutSchema,
@@ -783,6 +784,21 @@ export const Routes = [
     },
     {
         method: "get",
+        route: "/publicWorkouts/allJoined/:userId",
+        controller: PublicWorkoutController,
+        middleware: [
+            validateSchema(allJoinedPublicWorkoutSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "allJoined",
+    },
+    {
+        method: "get",
         route: "/publicWorkouts/:userId/:id",
         controller: PublicWorkoutController,
         middleware: [
@@ -826,6 +842,7 @@ export const Routes = [
         ],
         action: "remove",
     },
+
     {
         method: "get",
         route: "/publicWorkouts/:userId",

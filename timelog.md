@@ -59,7 +59,7 @@
 | 7/21/24 |         |            | 2        |            |           |        | Add retrofit for leaderboards and PRs                       |
 | 7/21/24 |         |            | 8        |            |           |        | Implement chat for friends and groups (missing chat history)|
 | 7/21/24 |         |            |          | 11         |           |        | Merged workout and history screen + bugfixes and backhandler|
-| 7/22/24 |         |            | 10       |            |           |        | Chat: Persisted in DB, fixed bugs (worked all night)        |
+| 7/22/24 |         |            | 10       |            |           |        | Persisted chat in DB, research GeoFire (worked all night)   |
 | 7/22/24 |         |            | 3        |            |           |        | Added Push notifications for chat                           |
 | 7/22/24 |         |            | 6        |            |           |        | Added location data filtering for public workout search     |
 | 7/22/24 |         |            |          |            | 1         |        | Implement user report feature in backend                    |

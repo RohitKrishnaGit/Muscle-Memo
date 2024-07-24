@@ -12,12 +12,19 @@ export class TemplateController {
         const data = (
             await this.templateRepository.find({
                 where: { user: { id: userId } },
-                relations: { exercises: { exerciseRef: true } },
+
+                relations: {
+                    exercises: { exerciseRef: true, customExerciseRef: true },
+                },
             })
         ).map((workout) => ({
             ...workout,
             exercises: workout.exercises.map((exercise) => ({
                 ...exercise,
+                exerciseRef: {
+                    ...(exercise.exerciseRef ?? exercise.customExerciseRef),
+                    isCustom: !!exercise.customExerciseRef,
+                },
                 exerciseSet: JSON.parse(exercise.exerciseSet),
             })),
         }));
@@ -28,15 +35,30 @@ export class TemplateController {
         const userId = parseInt(request.params.userId);
         const id = parseInt(request.params.id);
 
-        const template = await this.templateRepository.findOneBy({
-            user: { id: userId },
-            id,
+        const template = await this.templateRepository.findOne({
+            where: {
+                user: { id: userId },
+                id,
+            },
+            relations: {
+                exercises: { exerciseRef: true, customExerciseRef: true },
+            },
         });
 
         if (!template) {
             return failure("this template does not exist");
         }
-        return success(template);
+        return success({
+            ...template,
+            exercises: template.exercises.map((exercise) => ({
+                ...exercise,
+                exerciseRef: {
+                    ...(exercise.exerciseRef ?? exercise.customExerciseRef),
+                    isCustom: !!exercise.customExerciseRef,
+                },
+                exerciseSet: JSON.parse(exercise.exerciseSet),
+            })),
+        });
     }
 
     async create(request: Request, response: Response, next: NextFunction) {

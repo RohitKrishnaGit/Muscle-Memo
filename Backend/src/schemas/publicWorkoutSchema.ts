@@ -1,4 +1,4 @@
-import { number, object, string } from "zod";
+import { boolean, number, object, string } from "zod";
 
 export const allPublicWorkoutSchema = object({
     params: object({
@@ -62,9 +62,17 @@ export const removePublicWorkoutSchema = object({
 });
 
 export const filterPublicWorkoutSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+    }),
     body: object({
         gender: string().optional(),
         experience: string().optional(),
+        friendsOnly: boolean({
+            required_error: "friendsOnly is required",
+        }),
         latitude: string({
             required_error: "latitude is required",
         }),

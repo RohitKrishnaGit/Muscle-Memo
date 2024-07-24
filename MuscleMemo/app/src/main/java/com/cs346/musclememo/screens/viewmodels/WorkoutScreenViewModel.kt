@@ -377,7 +377,7 @@ class WorkoutScreenViewModel: ViewModel() {
                     val workoutResponse = response.body()?.data
                     workoutResponse?.let {
                         val workoutId = it.workoutId
-                        for (exercise in currentWorkout.exercises){ //populate exercises
+                        for (exercise in currentWorkout.exercises){
                             createWorkoutExercises(exercise, workoutId)
                         }
                     }

@@ -3,6 +3,7 @@ package com.cs346.musclememo.screens.viewmodels
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -70,7 +71,7 @@ class LeaderboardScreenViewModel : ViewModel() {
     var isSortedAlphabetically by mutableStateOf(true)
 
     var mePrs by mutableStateOf<Map<String, Int>?>(null)
-    var mePrsVisible = mutableMapOf<String, Boolean>()
+    var mePrsVisible = mutableStateMapOf<String, Boolean>()
 
     fun updateCurrentExerciseRef(ref: ExerciseRef){
         currentExerciseRef = ref

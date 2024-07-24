@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -115,12 +116,15 @@ fun FriendChat(viewModel: FriendsScreenViewModel) {
                     .background(MaterialTheme.colorScheme.surface)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    LaunchedEffect(Unit) {
+                    DisposableEffect(Unit) {
                         // Concatenate user ids to generate room id
                         val roomId =
                             viewModel.currentUser?.let { viewModel.generateRoomId(it.id, friend.id) }
                         if (roomId != null) {
                             viewModel.connectSocket(roomId)
+                        }
+                        onDispose {
+                            viewModel.disconnectSocket()
                         }
                     }
                     FriendChatHeader(onClose = {

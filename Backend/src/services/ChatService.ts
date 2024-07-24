@@ -56,6 +56,22 @@ export const initChatService = (server: any) => {
                         [user.id]: true,
                     },
                 };
+                const msg = await chatController.createHelper(
+                    user,
+                    room,
+                    "Welcome",
+                    Date.now()
+                );
+                if (msg.error || !msg.data) {
+                    return;
+                }
+                io.to(room).emit(
+                    "message",
+                    msg.data.id,
+                    "Welcome",
+                    JSON.stringify(msg.data.sender),
+                    Date.now()
+                );
                 io.to(socket.id).emit("history", "fetch history");
             }
         );

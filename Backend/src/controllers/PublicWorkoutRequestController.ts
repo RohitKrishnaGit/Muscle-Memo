@@ -15,11 +15,11 @@ export class PublicWorkoutRequestController {
         response: Response,
         next: NextFunction
     ) {
-        const userId = parseInt(request.params.userId);
+        const workoutId = parseInt(request.params.workoutId);
 
         return success(this.publicWorkoutRequestRepository.find({
             where: {
-                publicWorkout: { creator: { id: userId } }
+                publicWorkout: {id: workoutId}
             },
             relations: {
                 publicWorkout: true,

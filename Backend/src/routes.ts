@@ -829,7 +829,7 @@ export const Routes = [
      /* Public workout requests routes */
     {
         method: "get",
-        route: "/publicWorkoutRequests/:userId/incomingPublicWorkoutRequests",
+        route: "/publicWorkoutRequests/:userId/incomingPublicWorkoutRequests/:workoutId",
         controller: PublicWorkoutRequestController,
         middleware: [
             validateSchema(incomingPublicWorkoutRequestsSchema),

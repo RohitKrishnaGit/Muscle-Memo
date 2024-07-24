@@ -62,3 +62,7 @@
 | 7/22/24 |         |            |          |            | 1         |        | Implement user report feature in backend                    |
 | 7/22/24 |         |            |          |            | 2         |        | Implement password reset feature in backend                 |
 | 7/22/24 |         |            |          | 6          |           |        | Refresh history on pull down, update state on log out, PRs  |
+| 7/23/24 |         |            |          |            | 5         |        | Fix login screen redirect and friends screen functionality  |
+| 7/23/24 |         |            |          |            | 4         |        | Perform many hotfixes with socket.io and database entities  |
+| 7/24/24 |         |            |          |            | 1         |        | Do more socket fixes, edit templates and workout endpoint   |
+| 7/24/24 |         |            |          |            | 9         |        | Fix public workouts screen functionality and styling        |

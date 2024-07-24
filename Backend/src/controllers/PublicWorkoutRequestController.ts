@@ -88,11 +88,15 @@ export class PublicWorkoutRequestController {
         }
 
         if (user.id == publicWorkout.creator.id) {
-            return failure("can't join own public workout")
+            return failure("can't join own public workout");
+        }
+
+        if (publicWorkout.users?.includes(user)) {
+            return failure("already in this public workout");
         }
 
         if (!!existingPublicWorkoutRequest) {
-            return failure("already requested to join this workout")
+            return failure("already requested to join this workout");
         }
 
         const publicWorkoutRequest = Object.assign(new PublicWorkoutRequest(), {
@@ -112,8 +116,15 @@ export class PublicWorkoutRequestController {
     ) {
         const id = parseInt(request.params.id);
 
-        const publicWorkoutRequest = await this.publicWorkoutRequestRepository.findOneBy({
-            id
+        const publicWorkoutRequest = await this.publicWorkoutRequestRepository.findOne({
+            where: {
+                id
+            },
+            relations: {
+                publicWorkout: true,
+                sender: true,
+            }
+            
         });
 
         if (!publicWorkoutRequest) {
@@ -143,8 +154,15 @@ export class PublicWorkoutRequestController {
     ) {
         const id = parseInt(request.params.id);
 
-        const publicWorkoutRequest = await this.publicWorkoutRequestRepository.findOneBy({
-            id
+        const publicWorkoutRequest = await this.publicWorkoutRequestRepository.findOne({
+            where: {
+                id
+            },
+            relations: {
+                publicWorkout: true,
+                sender: true,
+            }
+            
         });
 
         if (!publicWorkoutRequest) {
@@ -153,6 +171,6 @@ export class PublicWorkoutRequestController {
 
         await this.publicWorkoutRequestRepository.remove(publicWorkoutRequest)
 
-        return success("public workout request removed");
+        return success("public workout request reject successs");
     }
 }

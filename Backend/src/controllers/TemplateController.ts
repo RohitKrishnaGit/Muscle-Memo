@@ -48,6 +48,10 @@ export class TemplateController {
             ...template,
             exercises: template.exercises.map((exercise) => ({
                 ...exercise,
+                exerciseRef: {
+                    ...(exercise.exerciseRef ?? exercise.customExerciseRef),
+                    isCustom: !!exercise.customExerciseRef,
+                },
                 exerciseSet: JSON.parse(exercise.exerciseSet),
             })),
         });

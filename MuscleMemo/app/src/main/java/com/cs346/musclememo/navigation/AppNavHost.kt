@@ -36,7 +36,6 @@ fun AppNavHost (
                 navController.navigate(NavItem.Workout.screen.route) { popUpTo(navController.graph.id) {inclusive = true} }
                 bottomBarState.value = true
             })
-//            ChatTestScreen()
         }
         composable(route = Screen.Profile.route) {
             ProfileScreen( signOut = {

@@ -34,17 +34,19 @@ class SocketManager {
         return socket?.connected() ?: false
     }
 
-    fun onMessageReceived(listener: (msgId: Int, msg: String, sender: Sender) -> Unit) {
+    fun onMessageReceived(listener: (msgId: Int, msg: String, sender: Sender, timestamp: Long) -> Unit) {
         socket?.on("message") { args ->
             val messageId = args[0] as Int
             val message = args[1] as String
             val senderJSON = args[2] as String
+            val timestamp = args[3] as Long
+
             var mJson: JsonElement
             try {
                 mJson = JsonParser.parseString(senderJSON)
                 val gson = Gson()
                 val senderObj: Sender = gson.fromJson(mJson, Sender::class.java);
-                listener.invoke(messageId, message, senderObj)
+                listener.invoke(messageId, message, senderObj, timestamp)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

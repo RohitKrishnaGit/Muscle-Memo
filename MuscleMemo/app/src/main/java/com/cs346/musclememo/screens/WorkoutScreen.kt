@@ -11,6 +11,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -37,6 +40,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -58,11 +62,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cs346.musclememo.classes.Template
 import com.cs346.musclememo.screens.components.DisplayHistory
 import com.cs346.musclememo.screens.components.MMButton
 import com.cs346.musclememo.screens.components.MMDialog
@@ -104,6 +115,8 @@ fun WorkoutScreen(
             MMButton(
                 onClick = {
                     viewModel.resetWorkout()
+                    viewModel.fetchCombinedExercises()
+                    viewModel.fetchTemplates()
                     viewModel.setWorkoutScreenVisible(true)
                 },
                 text = "Start A New Workout",
@@ -175,6 +188,18 @@ fun WorkoutSheet(
 
 @Composable
 fun NewWorkout(viewModel: WorkoutScreenViewModel) {
+    MMDialog(
+        showDialog = viewModel.showErrorDialog(),
+        buttonsEnabled = viewModel.dialogButtonsEnabled,
+        title = viewModel.getDialogText(),
+        onConfirm = viewModel::onDialogConfirm,
+        onDismissRequest = viewModel::onDialogDismiss,
+        body = {
+            Text(viewModel.getDialogBodyText())
+        },
+        errorText = viewModel.dialogErrorMessage
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -208,10 +233,12 @@ fun NewWorkout(viewModel: WorkoutScreenViewModel) {
                     Text(
                         text = "Templates",
                         fontSize = 20.sp,
+                        style = TextStyle(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     IconButton(onClick = {
-                        // todo: show template sheet
+                        viewModel.resetTemplate()
+                        viewModel.setTemplateScreenVisible(true)
                     }) {
                         Icon(
                             Icons.Filled.Add,
@@ -219,8 +246,9 @@ fun NewWorkout(viewModel: WorkoutScreenViewModel) {
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
-                    DisplayTemplates(viewModel = viewModel)
                 }
+                Spacer(modifier = Modifier.height(10.dp))
+                DisplayTemplates(viewModel = viewModel)
             }
         }
     }
@@ -246,7 +274,10 @@ fun CurrentWorkout(
         onConfirm = {
             viewModel.setWorkoutName()
         },
-        onDismissRequest = { viewModel.updateShowChangeWorkoutNameDialog(false) },
+        onDismissRequest = {
+            viewModel.updateShowChangeWorkoutNameDialog(false)
+            viewModel.updateDialogErrorMessage("")
+        },
         body = {
             TextField(
                 value = viewModel.tempWorkoutName,
@@ -264,6 +295,7 @@ fun CurrentWorkout(
     MMDialog(
         showDialog = viewModel.showErrorDialog(),
         title = viewModel.getDialogText(),
+        buttonsEnabled = viewModel.dialogButtonsEnabled,
         onConfirm = viewModel::onDialogConfirm,
         onDismissRequest = viewModel::onDialogDismiss,
         body = {
@@ -290,7 +322,7 @@ fun CurrentWorkout(
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(horizontal = 24.dp)
             ) {
-                Text(text = viewModel.currentWorkout.name, fontSize = 24.sp, color = MaterialTheme.colorScheme.onPrimary)
+                Text(text = viewModel.currentWorkout.name, fontSize = 20.sp, color = MaterialTheme.colorScheme.onPrimary)
                 IconButton(onClick = {
                     localFocusManager.clearFocus()
                     viewModel.updateShowChangeWorkoutNameDialog(true)
@@ -318,7 +350,7 @@ fun CurrentWorkout(
                         ExerciseTitle(
                             exerciseRef = exerciseIt.exerciseRef,
                             onClick = {
-                                viewModel.updateShowRemoveExerciseDialog(true)
+                                viewModel.updateShowRemoveWorkoutExerciseDialog(true)
                                 viewModel.selectedExerciseIndex = index
                             }
                         )
@@ -366,9 +398,14 @@ fun CurrentWorkout(
                             Spacer(modifier = Modifier.width(16.dp))
                             MMButton(
                                 onClick = {
-                                    localFocusManager.clearFocus()
-                                    viewModel.finishWorkout()
-                                    viewModel.updateScreenState(true)
+                                    if (viewModel.currentWorkout.exercises.isEmpty()) {
+                                        localFocusManager.clearFocus()
+                                        viewModel.updateShowCancelWorkoutDialog(true)
+                                    } else {
+                                        localFocusManager.clearFocus()
+                                        viewModel.finishWorkout()
+                                        viewModel.updateScreenState(true)
+                                    }
                                 },
                                 text = "Finish Workout",
                                 backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -439,6 +476,7 @@ fun AddNewCustomExercise(
     MMDialog(
         showDialog = viewModel.showAddNewCustomExerciseDialog,
         title = "Add New Exercise",
+        buttonsEnabled = viewModel.dialogButtonsEnabled,
         onConfirm = {
             viewModel.updateDialogButtonsEnabled(false)
             viewModel.createCustomExercise(viewModel.newExerciseRef)
@@ -518,6 +556,7 @@ fun EditCustomExercise(
     MMDialog(
         showDialog = viewModel.showEditCustomExerciseDialog,
         title = "Edit Exercise",
+        buttonsEnabled = viewModel.dialogButtonsEnabled,
         onConfirm = {
             viewModel.selectedExercise?.let { exercise ->
                 viewModel.updateDialogButtonsEnabled(false)
@@ -746,8 +785,13 @@ private fun AddExercise(
                                     .fillMaxWidth()
                                     .height(50.dp)
                                     .clickable(onClick = {
+                                        if (viewModel.templateVisible) {
+                                            viewModel.addTemplateExercise(exerciseRef)
+                                        }
+                                        if (viewModel.workoutVisible) {
+                                            viewModel.addWorkoutExercise(exerciseRef)
+                                        }
                                         viewModel.exerciseSearchText = ""
-                                        viewModel.addWorkoutExercise(exerciseRef)
                                         viewModel.setAddExerciseScreenVisible(false)
                                     }),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -762,30 +806,32 @@ private fun AddExercise(
                                 )
 
                                 if (exerciseRef.isCustom) {
-                                    IconButton(onClick = { showMenu = true }) {
-                                        Icon(Icons.Filled.MoreVert, contentDescription = "More")
-                                    }
+                                    Box {
+                                        IconButton(onClick = { showMenu = true }) {
+                                            Icon(Icons.Filled.MoreVert, contentDescription = "More")
+                                        }
 
-                                    DropdownMenu(
-                                        expanded = showMenu,
-                                        onDismissRequest = { showMenu = false },
-                                    ) {
-                                        DropdownMenuItem(
-                                            text = { Text("Edit") },
-                                            onClick = {
-                                                showMenu = false
-                                                viewModel.selectedExercise = exerciseRef
-                                                viewModel.updateShowEditCustomExerciseDialog(true)
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text("Delete") },
-                                            onClick = {
-                                                showMenu = false
-                                                viewModel.selectedExercise = exerciseRef
-                                                viewModel.updateShowDeleteCustomExerciseDialog(true)
-                                            }
-                                        )
+                                        DropdownMenu(
+                                            expanded = showMenu,
+                                            onDismissRequest = { showMenu = false },
+                                        ) {
+                                            DropdownMenuItem(
+                                                text = { Text("Edit") },
+                                                onClick = {
+                                                    showMenu = false
+                                                    viewModel.selectedExercise = exerciseRef
+                                                    viewModel.updateShowEditCustomExerciseDialog(true)
+                                                }
+                                            )
+                                            DropdownMenuItem(
+                                                text = { Text("Delete") },
+                                                onClick = {
+                                                    showMenu = false
+                                                    viewModel.selectedExercise = exerciseRef
+                                                    viewModel.updateShowDeleteCustomExerciseDialog(true)
+                                                }
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -802,12 +848,255 @@ private fun AddExercise(
 fun DisplayTemplates(
     viewModel: WorkoutScreenViewModel
 ){
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
+        items(viewModel.templates) { template ->
+            TemplateCard(
+                template = template,
+                onClick = {
+                    viewModel.resetWorkout()
+                    viewModel.loadTemplateToWorkout(template)
+                    viewModel.updateScreenState(true)
+                },
+                viewModel = viewModel
+            )
+        }
+    }
+}
 
+@Composable
+fun TemplateCard (
+    template: Template,
+    onClick: () -> Unit,
+    viewModel: WorkoutScreenViewModel
+){
+    var showMenu by remember { mutableStateOf(false) }
+
+    Row {
+        Spacer(modifier = Modifier.weight(1f))
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+        ) {
+            Column (
+                modifier = Modifier
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = template.name,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Box { // This Box will provide a correct positioning context for the DropdownMenu
+                        IconButton(
+                            onClick = { showMenu = true },
+                            modifier = Modifier.align(Alignment.CenterEnd) // Align IconButton to the end within the Box
+                        ) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                        }
+
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                            modifier = Modifier.align(Alignment.TopEnd) // Align DropdownMenu to the end within the Box
+                        ) {
+                            // Your DropdownMenuItem(s) here
+                            DropdownMenuItem(
+                                text = { Text(text = "Delete") },
+                                onClick = {
+                                    showMenu = false
+                                    viewModel.selectedTemplate = template
+                                    viewModel.updateShowDeleteTemplateDialog(true)
+                                },
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+                template.exercises.forEach { exercise ->
+                    Column {
+                        Text(text = exercise.exerciseSet.size.toString() + " x " + exercise.exerciseRef.name)
+                        Spacer(modifier = Modifier.height(5.dp))
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+    }
 }
 
 @Composable
 fun CreateTemplateSheet(
     viewModel: WorkoutScreenViewModel
 ){
+    AnimatedVisibility(
+        visible = viewModel.templateVisible,
+        enter = slideInHorizontally(initialOffsetX = { it }),
+        exit = slideOutHorizontally(targetOffsetX = { it })
+    ) {
+        val localFocusManager = LocalFocusManager.current
+        val listState = rememberLazyListState()
 
+        MMDialog(
+            showDialog = viewModel.showChangeTemplateNameDialog,
+            title = "Change Template Name",
+            onConfirm = {
+                viewModel.setTemplateName()
+            },
+            onDismissRequest = {
+                viewModel.updateShowChangeTemplateNameDialog(false)
+                viewModel.updateDialogErrorMessage("")
+            },
+            body = {
+                TextField(
+                    value = viewModel.tempTemplateName,
+                    onValueChange = viewModel::updateTempTemplateName,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    label = { Text("Template Name") }
+                )
+                Text(viewModel.getDialogBodyText())
+            },
+            confirmButtonText = "Save",
+            cancelButtonText = "Cancel",
+            errorText = viewModel.dialogErrorMessage
+        )
+
+        MMDialog(
+            showDialog = viewModel.showErrorDialog(),
+            buttonsEnabled = viewModel.dialogButtonsEnabled,
+            title = viewModel.getDialogText(),
+            onConfirm = viewModel::onDialogConfirm,
+            onDismissRequest = viewModel::onDialogDismiss,
+            body = {
+                Text(viewModel.getDialogBodyText())
+            },
+            errorText = viewModel.dialogErrorMessage
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                // top bar
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.1f)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(horizontal = 24.dp)
+                ) {
+                    Text(text = viewModel.currentTemplate.name, fontSize = 20.sp, color = MaterialTheme.colorScheme.onPrimary)
+                    IconButton(onClick = {
+                        localFocusManager.clearFocus()
+                        viewModel.updateShowChangeTemplateNameDialog(true)
+                    }) {
+                        Icon(
+                            Icons.Filled.Edit,
+                            contentDescription = "Edit",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
+
+                // Display current Exercises
+                LazyColumn(
+                    state = listState,
+                    verticalArrangement = Arrangement.spacedBy(5.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    itemsIndexed(items = viewModel.currentTemplate.exercises) { index, exerciseIt ->
+                        Column {
+                            ExerciseTitle(
+                                exerciseRef = exerciseIt.exerciseRef,
+                                onClick = {
+                                    viewModel.updateShowRemoveTemplateExerciseDialog(true)
+                                    viewModel.selectedExerciseIndex = index
+                                }
+                            )
+                            ExerciseSets(
+                                exerciseRef = exerciseIt.exerciseRef,
+                                disableInputs = true,
+                                sets = exerciseIt.exerciseSet,
+                                deleteSet = { setIndex ->
+                                    viewModel.removeTemplateSet(index, setIndex)
+                                },
+                                addSet = {
+                                    viewModel.addTemplateSet(index)
+                                }
+                            )
+                        }
+
+                    }
+                    item {
+                        Column {
+                            MMButton(
+                                onClick = {
+                                    localFocusManager.clearFocus()
+                                    viewModel.setAddExerciseScreenVisible(true)
+                                },
+                                text = "Add New Exercise",
+                                maxWidth = true,
+                                modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 24.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                            ) {
+                                MMButton(
+                                    onClick = {
+                                        localFocusManager.clearFocus()
+                                        viewModel.updateShowCancelTemplateDialog(true)
+                                    },
+                                    text = "Cancel Template",
+                                    backgroundColor = MaterialTheme.colorScheme.errorContainer,
+                                    textColor = MaterialTheme.colorScheme.onErrorContainer,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                MMButton(
+                                    onClick = {
+                                        if (viewModel.currentTemplate.exercises.isEmpty()) {
+                                            localFocusManager.clearFocus()
+                                            viewModel.updateShowCancelTemplateDialog(true)
+                                        } else {
+                                            localFocusManager.clearFocus()
+                                            viewModel.finishTemplate()
+                                            viewModel.setTemplateScreenVisible(false)
+                                        }
+                                    },
+                                    text = "Finish Template",
+                                    backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                    textColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        AddExercise(viewModel = viewModel)
+    }
 }
+

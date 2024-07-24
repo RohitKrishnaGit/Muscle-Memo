@@ -127,10 +127,7 @@ fun WorkoutHistoryCard (
         ) {
             Column (
                 modifier = Modifier
-                    .padding(
-                        horizontal = 8.dp,
-                        vertical = 8.dp,
-                    )
+                    .padding(16.dp)
             ) {
                 Text(text = workout.name, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 Spacer(modifier = Modifier.height(5.dp))

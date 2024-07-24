@@ -2,9 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { PublicWorkout } from "../entities/PublicWorkout";
 import { User } from "../entities/User";
-import { failure, success } from "../utils/responseTypes";
 import { geoFire } from "../utils/location";
-import { ArrayContains } from "typeorm";
+import { failure, success } from "../utils/responseTypes";
 
 export class PublicWorkoutController {
     private publicWorkoutRepository =
@@ -21,6 +20,22 @@ export class PublicWorkoutController {
         );
     }
 
+    async allJoined(request: Request, response: Response, next: NextFunction) {
+        const userId = parseInt(request.params.userId);
+
+        return success(
+            (
+                await this.publicWorkoutRepository.find({
+                    relations: { users: true, creator: true },
+                })
+            ).filter(
+                (publicWorkout) =>
+                    publicWorkout.creator.id === userId ||
+                    publicWorkout.users?.find((user) => user.id === userId)
+            )
+        );
+    }
+
     async one(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
         const id = parseInt(request.params.id);
@@ -32,7 +47,7 @@ export class PublicWorkoutController {
             },
             relations: {
                 users: true,
-            }
+            },
         });
 
         if (!publicWorkout) {
@@ -43,7 +58,15 @@ export class PublicWorkoutController {
 
     async create(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
-        const { name, date, latitude, longitude, description, gender, experience } = request.body;
+        const {
+            name,
+            date,
+            latitude,
+            longitude,
+            description,
+            gender,
+            experience,
+        } = request.body;
 
         const publicWorkout = Object.assign(new PublicWorkout(), {
             name,
@@ -60,52 +83,88 @@ export class PublicWorkoutController {
             publicWorkout
         );
 
-        geoFire.set(newPublicWorkout.id.toString(), [+latitude, +longitude]).then(function () {
-            console.log("Provided key has been added to GeoFire");
-        }, function (error) {
-            console.log("Error: " + error);
-        });
+        geoFire
+            .set(newPublicWorkout.id.toString(), [+latitude, +longitude])
+            .then(
+                function () {
+                    console.log("Provided key has been added to GeoFire");
+                },
+                function (error) {
+                    console.log("Error: " + error);
+                }
+            );
 
         return success({ publicWorkoutId: newPublicWorkout.id });
     }
 
     async filter(request: Request, response: Response, next: NextFunction) {
-        const { userId, gender, experience, friendsOnly, latitude, longitude } = request.body;
+        const userId = parseInt(request.params.userId);
+        const { gender, experience, friendsOnly, latitude, longitude } =
+            request.body;
 
-        const nearby: string[] = []
-
-        const user = await this.userRepository.findOneBy({
-            id: userId,
-        })
-
-        const geoQuery = geoFire.query({
-            center: [+latitude, +longitude],
-            radius: 9.5
+        const user = await this.userRepository.findOne({
+            where: {
+                id: userId,
+            },
+            relations: {
+                friends: true,
+            },
         });
 
-        geoQuery.on("key_entered", function (key: any, location: any, distance: any) {
-            nearby.push(key)
-        });
-        
-        const sleep = (ms:number) => {
-            return new Promise ((resolve) => {
-                setTimeout(resolve, ms)
-            })
+        function pollGeofireLocation(
+            center: [number, number],
+            radius: number
+        ): Promise<string[]> {
+            return new Promise((resolve) => {
+                const queryResults: any[] = [];
+
+                const geoQuery = geoFire.query({ center, radius });
+
+                geoQuery.on(
+                    "key_entered",
+                    (key: any, location: any, distance: any) => {
+                        queryResults.push(key); // consider storing location
+                    }
+                );
+
+                geoQuery.on("ready", () => {
+                    geoQuery.cancel(); // unsubscribe all event listeners and destroy query
+                    // consider sorting queryResults before resolving the promise (see below)
+                    resolve(queryResults);
+                });
+            });
         }
+        const nearby: string[] = await pollGeofireLocation(
+            [+latitude, +longitude],
+            9.5
+        );
 
-        await sleep(50)
-
-        let publicWorkouts = await this.publicWorkoutRepository.findBy({
-            gender,
-            experience,
-        })
+        let publicWorkouts = await this.publicWorkoutRepository.find({
+            where: {
+                gender,
+                experience,
+            },
+            relations: {
+                creator: true,
+            },
+        });
 
         if (friendsOnly) {
-            publicWorkouts = publicWorkouts.filter((pw) => user?.friends.includes(pw.creator));
+            publicWorkouts = publicWorkouts.filter((pw) =>
+                user?.friends.find((friend) => friend.id === pw.creator.id)
+            );
         }
 
+        console.log(nearby);
+        console.log(publicWorkouts);
+        console.log(userId);
+
         return success(
-            publicWorkouts.filter((publicWorkout) => nearby.includes(publicWorkout.id.toString()))
+            publicWorkouts.filter(
+                (publicWorkout) =>
+                    publicWorkout.creator.id !== userId &&
+                    nearby.includes(publicWorkout.id.toString())
+            )
         );
     }
 

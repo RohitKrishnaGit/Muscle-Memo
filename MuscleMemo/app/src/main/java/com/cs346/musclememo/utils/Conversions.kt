@@ -7,6 +7,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.ceil
 import kotlin.math.round
 
 object Conversions {
@@ -44,28 +45,28 @@ fun getTransitionDirection(
 }
 
 fun getWeight(weight: Int?): Int?{
-    return if (AppPreferences.systemOfMeasurementWeight == "lbs" && weight != null)
+    return if (AppPreferences.systemOfMeasurementWeight == "lb" && weight != null)
         (weight.times(2.205)).toInt()
     else
         weight
 }
 
 fun getDistance(distance: Int?): Int? {
-    return if (AppPreferences.systemOfMeasurementWeight == "miles" && distance != null)
+    return if (AppPreferences.systemOfMeasurementDistance == "mile" && distance != null)
         (distance.div(1.609)).toInt()
     else
         distance
 }
 
 fun translateWeight(weight: Int?): Int?{
-    return if (AppPreferences.systemOfMeasurementWeight == "lbs" && weight != null)
+    return if (AppPreferences.systemOfMeasurementWeight == "lb" && weight != null)
         (weight.div(2.205)).toInt()
     else
         weight
 }
 
 fun translateDistance(distance: Int?): Int?{
-    return if (AppPreferences.systemOfMeasurementWeight == "miles" && distance != null)
+    return if (AppPreferences.systemOfMeasurementDistance == "mile" && distance != null)
         (distance.times(1.609)).toInt()
     else
         distance

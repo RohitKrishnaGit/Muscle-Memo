@@ -27,7 +27,7 @@ class ProfileScreenViewModel : ViewModel() {
         private set
     val listOfMeasurementWeight = listOf("kg", "lb")
     var showWeightOptions by mutableStateOf(false)
-    val listOfMeasurementDistance = listOf("km", "miles")
+    val listOfMeasurementDistance = listOf("km", "mile")
     var showDistanceOptions by mutableStateOf(false)
         private set
     val listOfTheme = listOf("Auto", "Dark", "Light")

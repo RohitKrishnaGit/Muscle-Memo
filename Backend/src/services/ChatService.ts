@@ -6,9 +6,9 @@ const socketIO = require("socket.io");
 
 export const initChatService = (server: any) => {
     const io = socketIO(server);
-    const cc = new ChatController();
-    const nc = new NotificationController();
-    const uc = new UserController();
+    const chatController = new ChatController();
+    const notificationController = new NotificationController();
+    const userController = new UserController();
 
     type UserDict = {
         [userId: number]: boolean;
@@ -17,6 +17,9 @@ export const initChatService = (server: any) => {
     let userRoomMap: { [room: string]: UserDict } = {};
 
     const getDefaultRoom = (roomId: string): UserDict => {
+        if (/^workout-\d+$/.test(roomId)) {
+            return {};
+        }
         const users = roomId.split("-");
         return users.reduce(
             (prev, cur) => ({ ...prev, [parseInt(cur)]: false }),
@@ -33,7 +36,9 @@ export const initChatService = (server: any) => {
         socket.on(
             "join",
             async function (roomId: string, refreshToken: string) {
-                const tempUser = await cc.tokenToUserHelper(refreshToken);
+                const tempUser = await chatController.tokenToUserHelper(
+                    refreshToken
+                );
                 if (!tempUser) {
                     console.log(`invalid refreshToken`);
                     return;
@@ -51,6 +56,22 @@ export const initChatService = (server: any) => {
                         [user.id]: true,
                     },
                 };
+                const msg = await chatController.createHelper(
+                    user,
+                    room,
+                    "",
+                    Date.now()
+                );
+                if (msg.error || !msg.data) {
+                    return;
+                }
+                io.to(room).emit(
+                    "message",
+                    msg.data.id,
+                    "",
+                    JSON.stringify(msg.data.sender),
+                    Date.now()
+                );
                 io.to(socket.id).emit("history", "fetch history");
             }
         );
@@ -59,7 +80,12 @@ export const initChatService = (server: any) => {
             console.log(`Received message '${message}'
                 from user ${user.id}
                 in room ${room}`);
-            const msg = await cc.createHelper(user, room, message, Date.now());
+            const msg = await chatController.createHelper(
+                user,
+                room,
+                message,
+                Date.now()
+            );
             if (msg.error || !msg.data) {
                 return;
             }
@@ -70,11 +96,12 @@ export const initChatService = (server: any) => {
                 JSON.stringify(msg.data.sender),
                 Date.now()
             );
+
             for (let userKey in userRoomMap[room]) {
                 let value = userRoomMap[room][userKey];
 
                 if (!value) {
-                    const userToSend = await uc.oneHelper(userKey);
+                    const userToSend = await userController.oneHelper(userKey);
                     if (userToSend) {
                         const fcmTokens: string[] = JSON.parse(
                             userToSend.firebaseTokens
@@ -83,7 +110,7 @@ export const initChatService = (server: any) => {
                             console.log(
                                 `sent notification to ${userToSend.username} with fcmToken=${fcmToken}`
                             );
-                            nc.notificationHelper(
+                            notificationController.notificationHelper(
                                 fcmToken,
                                 `From: ${user.username}`,
                                 message

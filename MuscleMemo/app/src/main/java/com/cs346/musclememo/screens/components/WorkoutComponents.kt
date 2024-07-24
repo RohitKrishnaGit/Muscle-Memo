@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet
+import com.cs346.musclememo.utils.AppPreferences
+
 @Composable
 fun ExerciseTitle(
     exerciseRef: ExerciseRef,
@@ -61,6 +63,7 @@ fun ExerciseTitle(
 @Composable
 fun ExerciseSets(
     exerciseRef: ExerciseRef,
+    disableInputs: Boolean = false,
     sets: MutableList<ExerciseSet>,
     deleteSet: (Int) -> Unit,
     addSet: () -> Unit
@@ -78,10 +81,12 @@ fun ExerciseSets(
             put("set", FieldAttributes(1f, "Set"))
 
             if (exerciseRef.weight)
-                put("weight", FieldAttributes(dividedSpacing, "Weight (kg)"))
+                put("weight", FieldAttributes(dividedSpacing, "Weight ("
+                        + AppPreferences.systemOfMeasurementWeight + ")"))
 
             if (exerciseRef.distance)
-                put("distance", FieldAttributes(dividedSpacing, "Distance (m)"))
+                put("distance", FieldAttributes(dividedSpacing, "Distance ("
+                        + AppPreferences.systemOfMeasurementDistance + ")"))
 
             if (exerciseRef.durationVSReps)
                 put("duration", FieldAttributes(dividedSpacing, "Duration (s)"))
@@ -106,6 +111,7 @@ fun ExerciseSets(
                             text = entry.value.text,
                             color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
                         )
                     }
                 }
@@ -141,6 +147,7 @@ fun ExerciseSets(
                         modifier = Modifier
                             .weight(setFields["weight"]?.spacing ?: 1f)
                             .padding(start = 8.dp),
+                        enabled = !disableInputs
                     )
                 }
 
@@ -154,6 +161,7 @@ fun ExerciseSets(
                         modifier = Modifier
                             .weight(setFields["distance"]?.spacing ?: 1f)
                             .padding(start = 8.dp),
+                        enabled = !disableInputs
                     )
                 }
 
@@ -167,6 +175,7 @@ fun ExerciseSets(
                         modifier = Modifier
                             .weight(setFields["duration"]?.spacing ?: 1f)
                             .padding(start = 8.dp),
+                        enabled = !disableInputs
                     )
                 } else {
                     OutlinedTextField(
@@ -181,6 +190,7 @@ fun ExerciseSets(
                         modifier = Modifier
                             .weight(setFields["reps"]?.spacing ?: 1f)
                             .padding(start = 8.dp),
+                        enabled = !disableInputs
                     )
                 }
 

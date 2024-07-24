@@ -59,6 +59,7 @@ import {
     createTemplateSchema,
     oneTemplateSchema,
     removeTemplateSchema,
+    updateTemplateSchema,
 } from "./schemas/templateSchema";
 import { newTokenSchema } from "./schemas/tokenSchema";
 import {
@@ -577,6 +578,21 @@ export const Routes = [
             ),
         ],
         action: "create",
+    },
+    {
+        method: "put",
+        route: "/templates/update/:userId/:id",
+        controller: TemplateController,
+        middleware: [
+            validateSchema(updateTemplateSchema),
+            authenticateWithToken,
+            ...applyUser(
+                ["params", "userId"],
+                convertMe,
+                enforce(or(sameUser, isAdmin))
+            ),
+        ],
+        action: "update"
     },
     {
         method: "delete",

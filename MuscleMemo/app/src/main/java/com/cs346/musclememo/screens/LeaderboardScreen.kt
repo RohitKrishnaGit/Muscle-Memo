@@ -43,9 +43,7 @@ fun LeaderboardScreen(
         ){
             Text(
                 text = "Leaderboard",
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 8.dp)
+                fontSize = 40.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
             DisplayLeaderboardExercise(viewModel = viewModel)

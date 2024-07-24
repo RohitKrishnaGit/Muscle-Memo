@@ -25,9 +25,14 @@ export class PublicWorkoutController {
         const userId = parseInt(request.params.userId);
         const id = parseInt(request.params.id);
 
-        const publicWorkout = await this.publicWorkoutRepository.findOneBy({
-            creator: { id: userId },
-            id,
+        const publicWorkout = await this.publicWorkoutRepository.findOne({
+            where: {
+                creator: { id: userId },
+                id,
+            },
+            relations: {
+                users: true,
+            }
         });
 
         if (!publicWorkout) {

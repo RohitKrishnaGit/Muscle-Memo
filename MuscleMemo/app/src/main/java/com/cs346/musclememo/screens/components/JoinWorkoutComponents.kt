@@ -24,6 +24,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -48,26 +50,52 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import com.cs346.musclememo.classes.User
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.api.services.PublicWorkout
+import com.cs346.musclememo.api.services.WorkoutRequest
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.screens.viewmodels.JoinWorkoutViewModel
 import com.cs346.musclememo.screens.viewmodels.LeaderboardScreenViewModel
 
 @Composable
-fun WorkoutItem(index: Int, workout: PublicWorkout, onClick: (PublicWorkout) -> Unit) {
+fun WorkoutItem(index: Int, workout: PublicWorkout, isOwner: Boolean, onClick: (PublicWorkout) -> Unit) {
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .clickable { onClick(workout) }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "${index + 1}. ${workout.name}", fontSize = 20.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = workout.description)
             Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+            ) {
+                if (!isOwner) {
+                    Button(
+                        onClick = {
+                            onClick(workout)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Text("Request to Join", color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                } else {
+                    Button(
+                        onClick = {
+                            onClick(workout)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Text("View Requests", color = MaterialTheme.colorScheme.onPrimary)
+                    }
+                }
+            }
         }
     }
 }
@@ -83,7 +111,18 @@ fun WorkoutList(viewModel: JoinWorkoutViewModel) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         itemsIndexed(viewModel.workouts) { index, workout ->
-            WorkoutItem(index = index, workout = workout, onClick = { println(workout) })
+            WorkoutItem(
+                index = index,
+                workout = workout,
+                isOwner = viewModel.publicWorkoutTab == "Owned",
+                onClick = {
+                    if (viewModel.publicWorkoutTab == "Owned") {
+                        viewModel.selectRequests(workout.id)
+                    } else {
+                        viewModel.sendRequest(workout.id)
+                    }
+                }
+            )
         }
     }
 }
@@ -197,6 +236,46 @@ fun SelectExperienceLevel(
                         },
                         modifier = Modifier.fillMaxWidth()
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun IncomingWorkoutRequestCard(request: WorkoutRequest, viewModel: JoinWorkoutViewModel, requestIndex: Int) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = request.sender.username, fontSize = 20.sp)
+            Text(text = request.sender.experience)
+            Text(text = request.sender.gender)
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick = {
+                        viewModel.acceptRequest(request.id)
+                        viewModel.removeIncomingWorkoutRequest(requestIndex)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Accept", color = MaterialTheme.colorScheme.onPrimary)
+                }
+                Button(
+                    onClick = {
+                        println("reject workout request")
+//                        viewModel.rejectWorkoutRequest(request.id)
+//                        viewModel.removeIncomingWorkoutRequest(requestIndex)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Reject", color = MaterialTheme.colorScheme.onError)
                 }
             }
         }

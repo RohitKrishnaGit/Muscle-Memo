@@ -1,6 +1,8 @@
 package com.cs346.musclememo.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
@@ -12,7 +14,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -25,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cs346.musclememo.screens.components.DisplayProfile
+import com.cs346.musclememo.screens.components.IncomingWorkoutRequestCard
 import com.cs346.musclememo.screens.components.MMButton
 import com.cs346.musclememo.screens.components.PublicWorkoutTabs
 import com.cs346.musclememo.screens.components.SelectExperienceLevel
@@ -65,6 +77,7 @@ fun JoinWorkoutScreen(
             Spacer(modifier = Modifier.height(8.dp))
             PublicWorkoutContent(viewModel)
         }
+        WorkoutRequests(viewModel)
     }
     CreatePublicWorkoutSheet(viewModel = viewModel)
 }
@@ -264,3 +277,63 @@ fun NewPublicWorkout(viewModel: JoinWorkoutViewModel) {
         }
     }
 }
+
+@Composable
+fun RequestsHeader(onClose: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.secondary)
+            .heightIn(min = 60.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(onClick = onClose) {
+            Icon(
+                Icons.Filled.Close,
+                contentDescription = "Close",
+                tint = Color.White
+            )
+        }
+        Text(
+            "Requests to Join Workout",
+            modifier = Modifier.padding(end = 8.dp),
+            color = Color.White,
+            fontSize = 20.sp
+        )
+    }
+}
+
+@Composable
+fun WorkoutRequests(viewModel: JoinWorkoutViewModel) {
+    AnimatedVisibility(
+        visible = viewModel.requestsVisible,
+        enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn(),
+        exit = slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) + fadeOut()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
+            RequestsHeader(
+                onClose = { viewModel.updateRequestsVisible(false) }
+            )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(viewModel.workoutRequests) { index, request ->
+                    IncomingWorkoutRequestCard(
+                        request = request,
+                        viewModel = viewModel,
+                        requestIndex = index
+                    )
+                }
+            }
+        }
+    }
+}
+
+

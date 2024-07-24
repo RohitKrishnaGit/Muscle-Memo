@@ -39,6 +39,16 @@ data class FilterPublicWorkout(
     val longitude: String
 )
 
+data class WorkoutRequestBody(
+    val publicWorkoutId: Int
+)
+
+data class WorkoutRequest(
+    val id: Int,
+    val publicWorkout: PublicWorkout,
+    val sender: User
+)
+
 public interface  PublicWorkoutService {
     @POST("/publicWorkouts/me")
     fun createPublicWorkout(@Body body: CreatePublicWorkout): Call<ApiResponse<Int>>
@@ -48,4 +58,13 @@ public interface  PublicWorkoutService {
 
     @GET("/publicWorkouts/me")
     fun fetchMyPublicWorkouts(): Call<ApiResponse<List<PublicWorkout>>>
+
+    @POST("publicWorkoutRequests/me/sendPublicWorkoutRequest")
+    fun sendWorkoutRequest(@Body body: WorkoutRequestBody): Call<ApiResponse<String>>
+
+    @GET("/publicWorkoutRequests/me/incomingPublicWorkoutRequests/{workoutId}")
+    fun getWorkoutRequests(@Path("workoutId") workoutId: String): Call<ApiResponse<List<WorkoutRequest>>>
+
+    @POST("/publicWorkoutRequests/me/{requestId}/acceptPublicWorkoutRequest")
+    fun acceptWorkoutRequest(@Path("requestId") requestId: String): Call<ApiResponse<String>>
 }

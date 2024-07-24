@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cs346.musclememo.api.services.PublicWorkout
 import com.cs346.musclememo.screens.components.DisplayProfile
 import com.cs346.musclememo.screens.components.IncomingWorkoutRequestCard
 import com.cs346.musclememo.screens.components.MMButton
@@ -104,7 +105,7 @@ fun PublicWorkoutContent(
                     .padding(8.dp)
             ) {
                 SearchFilters(viewModel)
-                SearchResults(viewModel)
+                SearchResults(viewModel, viewModel.workouts)
             }
         }
     } else if (viewModel.publicWorkoutTab == "Current") {
@@ -118,7 +119,7 @@ fun PublicWorkoutContent(
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                SearchResults(viewModel)
+                SearchResults(viewModel, viewModel.joinedWorkouts)
             }
         }
     } else if (viewModel.publicWorkoutTab == "Owned") {
@@ -132,7 +133,7 @@ fun PublicWorkoutContent(
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                SearchResults(viewModel)
+                SearchResults(viewModel, viewModel.myWorkouts)
             }
         }
     }
@@ -147,9 +148,10 @@ fun MyResults(
 
 @Composable
 fun SearchResults(
-    viewModel: JoinWorkoutViewModel
+    viewModel: JoinWorkoutViewModel,
+    publicWorkouts: MutableList<PublicWorkout>
 ) {
-    WorkoutList(viewModel)
+    WorkoutList(viewModel, publicWorkouts)
 }
 
 @Composable
@@ -281,7 +283,10 @@ fun NewPublicWorkout(viewModel: JoinWorkoutViewModel) {
                 MMButton(
                     onClick = {
                         if (viewModel.validateForm()) {
-                            viewModel.createWorkout()
+                            viewModel.createWorkout {
+                                viewModel.getJoinedWorkouts()
+                                viewModel.getMyWorkouts()
+                            }
                             viewModel.clearCreateForm()
                             viewModel.updateCreateWorkoutVisible(false)
                         }

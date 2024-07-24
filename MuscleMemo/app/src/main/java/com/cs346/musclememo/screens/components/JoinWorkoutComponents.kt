@@ -111,7 +111,7 @@ fun WorkoutItem(index: Int, workout: PublicWorkout, tabState: String, viewModel:
 
                         Button(
                             onClick = {
-                                println("delete")
+                                viewModel.deletePublicWorkout(workout.id)
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
@@ -125,16 +125,12 @@ fun WorkoutItem(index: Int, workout: PublicWorkout, tabState: String, viewModel:
 }
 
 @Composable
-fun WorkoutList(viewModel: JoinWorkoutViewModel) {
-    LaunchedEffect(Unit) {
-        viewModel.clearWorkouts()
-    }
-
+fun WorkoutList(viewModel: JoinWorkoutViewModel, publicWorkouts: MutableList<PublicWorkout>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        itemsIndexed(viewModel.workouts) { index, workout ->
+        itemsIndexed(publicWorkouts) { index, workout ->
             WorkoutItem(
                 index = index,
                 workout = workout,

@@ -92,14 +92,19 @@ import {
 } from "./schemas/workoutSchema";
 
 import { ChatController } from "./controllers/ChatController";
-import { allChatsSchema, removeChatsSchema } from "./schemas/chatSchema";
-import { sendNotificationSchema } from "./schemas/notificationSchema";
 import { FriendsController } from "./controllers/FriendsController";
 import { PublicWorkoutRequestController } from "./controllers/PublicWorkoutRequestController";
-import { incomingPublicWorkoutRequestsSchema, outgoingPublicWorkoutRequestsSchema, sendPublicWorkoutRequestSchema, acceptPublicWorkoutRequestSchema, rejectPublicWorkoutRequestSchema } from "./schemas/publicWorkoutRequestSchema";
+import { allChatsSchema, removeChatsSchema } from "./schemas/chatSchema";
+import { sendNotificationSchema } from "./schemas/notificationSchema";
+import {
+    acceptPublicWorkoutRequestSchema,
+    incomingPublicWorkoutRequestsSchema,
+    outgoingPublicWorkoutRequestsSchema,
+    rejectPublicWorkoutRequestSchema,
+    sendPublicWorkoutRequestSchema,
+} from "./schemas/publicWorkoutRequestSchema";
 
 export const Routes = [
-
     /* Friends routes */
     {
         method: "get",
@@ -592,7 +597,7 @@ export const Routes = [
                 enforce(or(sameUser, isAdmin))
             ),
         ],
-        action: "update"
+        action: "update",
     },
     {
         method: "delete",
@@ -698,13 +703,14 @@ export const Routes = [
         method: "get",
         route: "/leaderboard/:userId/:exerciseRefId/:count",
         controller: UserPrsController,
-        middleware: [validateSchema(leaderboardFriendsSchema),
+        middleware: [
+            validateSchema(leaderboardFriendsSchema),
             authenticateWithToken,
             ...applyUser(
                 ["params", "userId"],
                 convertMe,
                 enforce(or(sameUser, isAdmin))
-            )
+            ),
         ],
         action: "getTopNFriends",
     },
@@ -768,7 +774,7 @@ export const Routes = [
 
     /* Public workouts routes */
     {
-        method: "get",
+        method: "post",
         route: "/publicWorkouts/filter/:userId",
         controller: PublicWorkoutController,
         middleware: [
@@ -859,7 +865,7 @@ export const Routes = [
         action: "all",
     },
 
-     /* Public workout requests routes */
+    /* Public workout requests routes */
     {
         method: "get",
         route: "/publicWorkoutRequests/:userId/incomingPublicWorkoutRequests/:workoutId",
@@ -935,7 +941,7 @@ export const Routes = [
         ],
         action: "rejectPublicWorkoutRequest",
     },
-    
+
     /* Chat routes */
     {
         method: "get",

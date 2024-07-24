@@ -1,15 +1,13 @@
 package com.cs346.musclememo.api.services
 
 import com.cs346.musclememo.api.types.ApiResponse
-import com.cs346.musclememo.classes.Friend
 import com.cs346.musclememo.classes.User
-import com.cs346.musclememo.screens.viewmodels.Message
 import retrofit2.Call
 import retrofit2.http.POST
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Path
-import java.util.logging.Filter
 
 data class PublicWorkout(
     val id: Int,
@@ -51,10 +49,10 @@ data class WorkoutRequest(
 
 public interface  PublicWorkoutService {
     @POST("/publicWorkouts/me")
-    fun createPublicWorkout(@Body body: CreatePublicWorkout): Call<ApiResponse<Int>>
+    fun createPublicWorkout(@Body body: CreatePublicWorkout): Call<ApiResponse<Any>>
 
     @GET("/publicWorkouts/allJoined/me")
-    fun getJoinedWorkouts(): Call<ApiResponse<List<PublicWorkout>>>
+    fun getJoinedPublicWorkouts(): Call<ApiResponse<List<PublicWorkout>>>
 
     @POST("/publicWorkouts/filter/me")
     fun filterPublicWorkout(@Body body: FilterPublicWorkout): Call<ApiResponse<List<PublicWorkout>>>
@@ -63,14 +61,17 @@ public interface  PublicWorkoutService {
     fun fetchMyPublicWorkouts(): Call<ApiResponse<List<PublicWorkout>>>
 
     @POST("publicWorkoutRequests/me/sendPublicWorkoutRequest")
-    fun sendWorkoutRequest(@Body body: WorkoutRequestBody): Call<ApiResponse<String>>
+    fun sendPublicWorkoutRequest(@Body body: WorkoutRequestBody): Call<ApiResponse<String>>
 
     @GET("/publicWorkoutRequests/me/incomingPublicWorkoutRequests/{workoutId}")
-    fun getWorkoutRequests(@Path("workoutId") workoutId: String): Call<ApiResponse<List<WorkoutRequest>>>
+    fun getPublicWorkoutRequests(@Path("workoutId") workoutId: String): Call<ApiResponse<List<WorkoutRequest>>>
 
     @POST("/publicWorkoutRequests/me/{requestId}/acceptPublicWorkoutRequest")
-    fun acceptWorkoutRequest(@Path("requestId") requestId: String): Call<ApiResponse<String>>
+    fun acceptPublicWorkoutRequest(@Path("requestId") requestId: String): Call<ApiResponse<String>>
 
     @POST("/publicWorkoutRequests/me/{requestId}/rejectPublicWorkoutRequest")
-    fun rejectWorkoutRequest(@Path("requestId") requestId: String): Call<ApiResponse<String>>
+    fun rejectPublicWorkoutRequest(@Path("requestId") requestId: String): Call<ApiResponse<String>>
+
+    @DELETE("/publicWorkouts/me/{id}")
+    fun deletePublicWorkout(@Path("id") id: String): Call<ApiResponse<String>>
 }

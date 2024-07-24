@@ -20,7 +20,7 @@ import retrofit2.Response
 
 data class Message(
     val id: Int,
-    val roomId: Int,
+    val roomId: String,
     val message: String,
     val sender: Sender
 )
@@ -148,7 +148,7 @@ class FriendsScreenViewModel : ViewModel() {
         sm.connect()
         sm.joinRoom(roomId, AppPreferences.refreshToken.toString())
         sm.onMessageReceived { msgId: Int, msg: String, sender: Sender ->
-            receivedMessages.add(Message(msgId, roomId.toInt(), msg, sender))
+            receivedMessages.add(Message(msgId, roomId, msg, sender))
         }
         sm.onHistoryRequest { getChatHistory(roomId) }
     }

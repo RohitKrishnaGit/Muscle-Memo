@@ -2,54 +2,39 @@ package com.cs346.musclememo.screens.viewmodels
 
 import com.cs346.musclememo.api.RetrofitInstance
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.SocketManager
 import com.cs346.musclememo.api.services.CreatePublicWorkout
-import com.cs346.musclememo.api.services.ExerciseDataSet
-import com.cs346.musclememo.api.services.ExerciseRequest
-import com.cs346.musclememo.api.services.CreateWorkoutRequest
-import com.cs346.musclememo.api.services.CreateWorkoutResponse
-import com.cs346.musclememo.api.services.GetWorkoutResponse
-import com.cs346.musclememo.api.services.CreateTemplateClass
 import com.cs346.musclememo.api.services.FilterPublicWorkout
 import com.cs346.musclememo.api.services.PublicWorkout
-import com.cs346.musclememo.api.services.UpdateUserPrRequest
 import com.cs346.musclememo.api.services.WorkoutRequest
 import com.cs346.musclememo.api.services.WorkoutRequestBody
 import com.cs346.musclememo.api.types.ApiResponse
-import com.cs346.musclememo.api.types.parseErrorBody
-import com.cs346.musclememo.classes.ExerciseIteration
-import com.cs346.musclememo.classes.ExerciseRef
-import com.cs346.musclememo.classes.ExerciseSet
-import com.cs346.musclememo.classes.Friend
-import com.cs346.musclememo.classes.Template
 import com.cs346.musclememo.classes.User
-import com.cs346.musclememo.classes.Workout
 import com.cs346.musclememo.utils.AppPreferences
-import com.cs346.musclememo.utils.calculateScore
-import com.cs346.musclememo.utils.epochToMonthYear
-import com.cs346.musclememo.utils.translateDistance
-import com.cs346.musclememo.utils.translateWeight
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import kotlin.math.exp
 
 
 class JoinWorkoutViewModel: ViewModel() {
     val sm = SocketManager()
+
     val workouts = mutableStateListOf<PublicWorkout>()
+    val myWorkouts = mutableStateListOf<PublicWorkout>()
+    val joinedWorkouts = mutableStateListOf<PublicWorkout>()
+
     val workoutRequests = mutableStateListOf<WorkoutRequest>()
     var currentUser: User? by mutableStateOf(null)
     val receivedMessages = mutableStateListOf<Message>()
 
     init {
         getCurrentUser()
+        getMyWorkouts()
+        getJoinedWorkouts()
     }
 
     var createWorkoutVisible by mutableStateOf(false)
@@ -124,7 +109,7 @@ class JoinWorkoutViewModel: ViewModel() {
         sm.connect()
         sm.joinRoom(roomId, AppPreferences.refreshToken.toString())
         sm.onMessageReceived { msgId: Int, msg: String, sender: Sender ->
-            receivedMessages.add(Message(msgId, roomId.toInt(), msg, sender))
+            receivedMessages.add(Message(msgId, roomId, msg, sender))
         }
         sm.onHistoryRequest { getChatHistory(roomId) }
     }
@@ -147,6 +132,7 @@ class JoinWorkoutViewModel: ViewModel() {
             }
 
             override fun onFailure(call: Call<ApiResponse<List<Message>>>, t: Throwable) {
+                t.printStackTrace()
                 println("Failed to get chat history: ${t.message}")
             }
         })
@@ -211,6 +197,14 @@ class JoinWorkoutViewModel: ViewModel() {
         workouts.clear()
     }
 
+    fun clearMyWorkouts() {
+        myWorkouts.clear()
+    }
+
+    fun clearJoinedWorkouts() {
+        joinedWorkouts.clear()
+    }
+
     fun clearRequests() {
         workoutRequests.clear()
     }
@@ -240,7 +234,7 @@ class JoinWorkoutViewModel: ViewModel() {
 
     fun rejectRequest(requestId: Int) {
         val apiService = RetrofitInstance.publicWorkoutService
-        val call = apiService.rejectWorkoutRequest(requestId.toString())
+        val call = apiService.rejectPublicWorkoutRequest(requestId.toString())
 
         call.enqueue(object : Callback<ApiResponse<String>> {
             override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
@@ -261,7 +255,7 @@ class JoinWorkoutViewModel: ViewModel() {
 
     fun acceptRequest(requestId: Int) {
         val apiService = RetrofitInstance.publicWorkoutService
-        val call = apiService.acceptWorkoutRequest(requestId.toString())
+        val call = apiService.acceptPublicWorkoutRequest(requestId.toString())
 
         call.enqueue(object : Callback<ApiResponse<String>> {
             override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
@@ -282,7 +276,7 @@ class JoinWorkoutViewModel: ViewModel() {
 
     fun selectRequests(workoutId: Int) {
         val apiService = RetrofitInstance.publicWorkoutService
-        val call = apiService.getWorkoutRequests(workoutId.toString())
+        val call = apiService.getPublicWorkoutRequests(workoutId.toString())
 
         call.enqueue(object : Callback<ApiResponse<List<WorkoutRequest>>> {
             override fun onResponse(call: Call<ApiResponse<List<WorkoutRequest>>>, response: Response<ApiResponse<List<WorkoutRequest>>>) {
@@ -308,7 +302,7 @@ class JoinWorkoutViewModel: ViewModel() {
     fun sendRequest(workoutId: Int) {
         val apiService = RetrofitInstance.publicWorkoutService
         val apiBody = WorkoutRequestBody(workoutId)
-        val call = apiService.sendWorkoutRequest(apiBody)
+        val call = apiService.sendPublicWorkoutRequest(apiBody)
 
         call.enqueue(object : Callback<ApiResponse<String>> {
             override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
@@ -325,7 +319,7 @@ class JoinWorkoutViewModel: ViewModel() {
         })
     }
 
-    fun createWorkout() {
+    fun createWorkout(onSuccess: () -> Unit) {
         val apiService = RetrofitInstance.publicWorkoutService
         val apiBody = CreatePublicWorkout(
             name = createWorkoutName,
@@ -334,16 +328,17 @@ class JoinWorkoutViewModel: ViewModel() {
         )
         val call = apiService.createPublicWorkout(apiBody)
 
-        call.enqueue(object : Callback<ApiResponse<Int>> {
-            override fun onResponse(call: Call<ApiResponse<Int>>, response: Response<ApiResponse<Int>>) {
+        call.enqueue(object : Callback<ApiResponse<Any>> {
+            override fun onResponse(call: Call<ApiResponse<Any>>, response: Response<ApiResponse<Any>>) {
                 if (response.isSuccessful) {
                     println(response.body())
+                    onSuccess()
                 } else {
                     println("Failed to create workout: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<ApiResponse<Int>>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<Any>>, t: Throwable) {
                 println("Failed to create workout: ${t.message}")
             }
         })
@@ -357,7 +352,7 @@ class JoinWorkoutViewModel: ViewModel() {
 
     fun getJoinedWorkouts() {
         val apiService = RetrofitInstance.publicWorkoutService
-        val call = apiService.getJoinedWorkouts()
+        val call = apiService.getJoinedPublicWorkouts()
 
         call.enqueue(object : Callback<ApiResponse<List<PublicWorkout>>> {
             override fun onResponse(
@@ -366,8 +361,8 @@ class JoinWorkoutViewModel: ViewModel() {
             ) {
                 if (response.isSuccessful) {
                     response.body()?.data?.let {
-                        workouts.clear()
-                        workouts.addAll(it)
+                        joinedWorkouts.clear()
+                        joinedWorkouts.addAll(it)
                     }
                 } else {
                     println("Failed to get workouts: ${response.message()}")
@@ -391,8 +386,8 @@ class JoinWorkoutViewModel: ViewModel() {
             ) {
                 if (response.isSuccessful) {
                     response.body()?.data?.let {
-                        workouts.clear()
-                        workouts.addAll(it)
+                        myWorkouts.clear()
+                        myWorkouts.addAll(it)
                     }
                 } else {
                     println("Failed to get workouts: ${response.message()}")
@@ -400,6 +395,27 @@ class JoinWorkoutViewModel: ViewModel() {
             }
 
             override fun onFailure(call: Call<ApiResponse<List<PublicWorkout>>>, t: Throwable) {
+                println("Failure: ${t.message}")
+            }
+        })
+    }
+
+    fun deletePublicWorkout(publicWorkoutId: Int) {
+        val apiService = RetrofitInstance.publicWorkoutService
+        val call = apiService.deletePublicWorkout(publicWorkoutId.toString())
+
+        call.enqueue(object : Callback<ApiResponse<String>> {
+            override fun onResponse(
+                call: Call<ApiResponse<String>>,
+                response: Response<ApiResponse<String>>
+            ) {
+                if (response.isSuccessful) {
+                    getMyWorkouts()
+                    getJoinedWorkouts()
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
                 println("Failure: ${t.message}")
             }
         })

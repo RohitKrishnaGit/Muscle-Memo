@@ -32,6 +32,20 @@ export const createTemplateSchema = object({
     }),
 });
 
+export const updateTemplateSchema = object({
+    params: object({
+        userId: string({
+            required_error: "userId is required",
+        }).or(
+            string().regex(/^me$/, "userId should be either numerical or me")
+        ),
+        id: string({
+            required_error: "id is required",
+        }),
+    }),
+});
+
+
 export const removeTemplateSchema = object({
     params: object({
         userId: string({

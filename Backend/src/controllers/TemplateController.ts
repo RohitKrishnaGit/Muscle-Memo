@@ -12,7 +12,7 @@ export class TemplateController {
         const data = (
             await this.templateRepository.find({
                 where: { user: { id: userId } },
-                relations: { exercises: { exerciseRef: true } },
+                relations: { exercises: { exerciseRef: true, customExerciseRef: true } },
             })
         ).map((workout) => ({
             ...workout,

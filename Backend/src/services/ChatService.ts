@@ -67,7 +67,8 @@ export const initChatService = (server: any) => {
                 "message",
                 msg.data.id,
                 message,
-                JSON.stringify(msg.data.sender)
+                JSON.stringify(msg.data.sender),
+                Date.now()
             );
             for (let userKey in userRoomMap[room]) {
                 let value = userRoomMap[room][userKey];

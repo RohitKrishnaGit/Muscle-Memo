@@ -59,10 +59,16 @@
 | 7/21/24 |         |            | 2        |            |           |        | Add retrofit for leaderboards and PRs                       |
 | 7/21/24 |         |            | 8        |            |           |        | Implement chat for friends and groups (missing chat history)|
 | 7/21/24 |         |            |          | 11         |           |        | Merged workout and history screen + bugfixes and backhandler|
+| 7/22/24 |         |            | 10       |            |           |        | Chat: Persisted in DB, fixed bugs (worked all night)        |
+| 7/22/24 |         |            | 3        |            |           |        | Added Push notifications for chat                           |
+| 7/22/24 |         |            | 6        |            |           |        | Added location data filtering for public workout search     |
 | 7/22/24 |         |            |          |            | 1         |        | Implement user report feature in backend                    |
 | 7/22/24 |         |            |          |            | 2         |        | Implement password reset feature in backend                 |
 | 7/22/24 |         |            |          | 6          |           |        | Refresh history on pull down, update state on log out, PRs  |
+| 7/23/24 |         |            | 10       |            |           |        | Workout search API finished and bugs fixed                  |
+| 7/23/24 |         |            | 8        |            |           |        | Enhancements, bugfixes, and changes for demo (all night)    |
 | 7/23/24 |         |            |          |            | 5         |        | Fix login screen redirect and friends screen functionality  |
 | 7/23/24 |         |            |          |            | 4         |        | Perform many hotfixes with socket.io and database entities  |
 | 7/24/24 |         |            |          |            | 1         |        | Do more socket fixes, edit templates and workout endpoint   |
 | 7/24/24 |         |            |          |            | 9         |        | Fix public workouts screen functionality and styling        |
+| 7/24/24 |         |            | 1        | 1          | 1         |        | Demo prep/planning                                          |

@@ -22,4 +22,7 @@ export class ExerciseRef {
 
     @Column({ nullable: true }) //todo: NOT NULLABLE
     imagePath?: string;
+
+    @Column({ default: false })
+    isCustom: boolean;
 }

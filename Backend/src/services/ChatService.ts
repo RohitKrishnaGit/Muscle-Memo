@@ -13,7 +13,16 @@ export const initChatService = (server: any) => {
     type UserDict = {
         [userId: number]: boolean;
     };
+
     let userRoomMap: { [room: string]: UserDict } = {};
+
+    const getDefaultRoom = (roomId: string): UserDict => {
+        const users = roomId.split("-");
+        return users.reduce(
+            (prev, cur) => ({ ...prev, [parseInt(cur)]: false }),
+            {} as UserDict
+        );
+    };
 
     io.on("connection", async (socket: any) => {
         let room = "default";
@@ -38,7 +47,7 @@ export const initChatService = (server: any) => {
                 userRoomMap = {
                     ...(userRoomMap ?? {}),
                     [room]: {
-                        ...(userRoomMap[room] ?? {}),
+                        ...(userRoomMap[room] ?? getDefaultRoom(room)),
                         [user.id]: true,
                     },
                 };
@@ -66,22 +75,24 @@ export const initChatService = (server: any) => {
                 if (!value) {
                     const userToSend = await uc.oneHelper(userKey);
                     if (userToSend) {
-                        for (let fcmToken in JSON.parse(
+                        const fcmTokens: string[] = JSON.parse(
                             userToSend.firebaseTokens
-                        )) {
+                        );
+                        fcmTokens.forEach((fcmToken) => {
                             console.log(
-                                `sent notification to ${userToSend.username}`
+                                `sent notification to ${userToSend.username} with fcmToken=${fcmToken}`
                             );
                             nc.notificationHelper(
                                 fcmToken,
                                 `From: ${user.username}`,
                                 message
                             );
-                        }
+                        });
                     }
                 }
             }
             console.log(`broadcasted ${message}`);
+            console.log(userRoomMap[room]);
         });
 
         socket.on("disconnect", async () => {

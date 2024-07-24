@@ -5,6 +5,9 @@ export const incomingPublicWorkoutRequestsSchema = object({
         userId: string({
             required_error: "userId is required",
         }).regex(/(^\d+$)|(^me$)/, "userId should be either numerical or me"),
+        workoutId: string({
+            required_error: "workoutId is required",
+        }).regex(/(^\d+$)|(^me$)/, "workoutId should be either numerical or me"),
     }),
 });
 

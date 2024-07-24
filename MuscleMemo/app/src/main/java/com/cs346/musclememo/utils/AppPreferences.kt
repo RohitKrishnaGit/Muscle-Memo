@@ -15,6 +15,8 @@ object AppPreferences {
             systemOfMeasurementDistance = "km"
         if (systemOfMeasurementWeight == null)
             systemOfMeasurementWeight = "kg"
+        if (isFirstTime == null)
+            isFirstTime = true
     }
 
     fun listen(listener: SharedPreferences. OnSharedPreferenceChangeListener){
@@ -48,9 +50,21 @@ object AppPreferences {
     var firebaseToken: String?
         get() = Key.FIREBASE_TOKEN.getString()
         set(value) = Key.FIREBASE_TOKEN.setString(value)
+        
+    var isFirstTime: Boolean?
+        get() = Key.FIRST_TIME.getBoolean()
+        set(value) = Key.FIRST_TIME.setBoolean(value)
+
+    var longitude: Float?
+        get() = Key.LONGITUDE.getFloat()
+        set(value) = Key.LONGITUDE.setFloat(value)
+
+    var latitude: Float?
+        get() = Key.LATITUDE.getFloat()
+        set(value) = Key.LATITUDE.setFloat(value)
 
     private enum class Key {
-        ACCESS_TOKEN, REFRESH_TOKEN, SYSTEMMEASUREMENTDISTANCE, SYSTEMMEASUREMENTWEIGHT, DARKMODE, FIREBASE_TOKEN;
+        ACCESS_TOKEN, REFRESH_TOKEN, SYSTEMMEASUREMENTDISTANCE, SYSTEMMEASUREMENTWEIGHT, DARKMODE, FIREBASE_TOKEN, LONGITUDE, LATITUDE, FIRST_TIME;
 
         fun getBoolean(): Boolean? = if (sharedPreferences!!.contains(name)) sharedPreferences!!.getBoolean(name, false) else null
         fun getFloat(): Float? = if (sharedPreferences!!.contains(name)) sharedPreferences!!.getFloat(name, 0f) else null

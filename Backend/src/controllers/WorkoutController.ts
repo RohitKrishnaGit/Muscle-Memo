@@ -12,12 +12,15 @@ export class WorkoutController {
         const data = (
             await this.workoutRepository.find({
                 where: { user: { id: userId } },
-                relations: { exercises: { exerciseRef: true } },
+                relations: {
+                    exercises: { exerciseRef: true, customExerciseRef: true },
+                },
             })
         ).map((workout) => ({
             ...workout,
             exercises: workout.exercises.map((exercise) => ({
                 ...exercise,
+                exerciseRef: exercise.exerciseRef ?? exercise.customExerciseRef,
                 exerciseSet: JSON.parse(exercise.exerciseSet),
             })),
         }));
@@ -28,15 +31,27 @@ export class WorkoutController {
         const userId = parseInt(request.params.userId);
         const id = parseInt(request.params.id);
 
-        const workout = await this.workoutRepository.findOneBy({
-            user: { id: userId },
-            id,
+        const workout = await this.workoutRepository.findOne({
+            where: {
+                user: { id: userId },
+                id,
+            },
+            relations: {
+                exercises: { exerciseRef: true, customExerciseRef: true },
+            },
         });
 
         if (!workout) {
             return failure("this workout does not exist");
         }
-        return success(workout);
+        return success({
+            ...workout,
+            exercises: workout.exercises.map((exercise) => ({
+                ...exercise,
+                exerciseRef: exercise.exerciseRef ?? exercise.customExerciseRef,
+                exerciseSet: JSON.parse(exercise.exerciseSet),
+            })),
+        });
     }
 
     async create(request: Request, response: Response, next: NextFunction) {

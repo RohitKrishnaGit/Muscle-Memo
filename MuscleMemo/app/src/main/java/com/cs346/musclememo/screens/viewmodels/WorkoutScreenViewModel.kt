@@ -271,11 +271,13 @@ class WorkoutScreenViewModel: ViewModel() {
     }
 
     fun finishWorkout(){
+        currentWorkout.duration = seconds
+        currentWorkout.date = System.currentTimeMillis()
         RetrofitInstance.workoutService.createWorkout(
             CreateWorkoutRequest(
                 name = currentWorkout.name,
-                date = System.currentTimeMillis(),
-                duration = seconds
+                date = currentWorkout.date,
+                duration = currentWorkout.duration
             )
         ).enqueue(object :
             Callback<ApiResponse<CreateWorkoutResponse>> {
@@ -350,7 +352,7 @@ class WorkoutScreenViewModel: ViewModel() {
     }
 
     private fun updatePersonalBest(value: Int, exerciseRefIndex: Int){
-        RetrofitInstance.prVisibilityService.updateUserPr(exerciseRefIndex, UpdateUserPrRequest(value)).enqueue(object: Callback<ApiResponse<String>>{
+        RetrofitInstance.userPrsService.updateUserPr(exerciseRefIndex.toString(), UpdateUserPrRequest(value)).enqueue(object: Callback<ApiResponse<String>>{
             override fun onResponse(
                 call: Call<ApiResponse<String>>,
                 response: Response<ApiResponse<String>>

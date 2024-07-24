@@ -71,7 +71,8 @@ export class UserPrsController {
         const userPrs = await this.userPrsRepository.createQueryBuilder('userPrs')
             .select([
                 'userPrs.userId',
-                `userPrs.${colName} AS ${colName}`
+                `userPrs.${colName} AS pr`,
+                'user.username AS username' 
             ])
             .innerJoin(
                 AllowedStatistics,
@@ -80,11 +81,12 @@ export class UserPrsController {
             )
             .orderBy('userPrs.' + colName, 'DESC')
             .take(count)
+            .innerJoin(
+                User,
+                'user',
+                `userPrs.userId = user.id`
+            )
             .getRawMany();
-
-        if (userPrs.length === 0) {
-            return failure("No user PRs exist");
-        }
 
         return success(userPrs);
     }
@@ -112,7 +114,8 @@ export class UserPrsController {
         const userPrs = await this.userPrsRepository.createQueryBuilder('userPrs')
             .select([
                 'userPrs.userId',
-                `userPrs.${colName} AS ${colName}`
+                `userPrs.${colName} AS pr`,
+                'user.username AS username' 
             ])
             .where('userPrs.userId IN (:...userIdList)', {userIdList: userIds})
             .innerJoin(
@@ -122,11 +125,12 @@ export class UserPrsController {
             )
             .orderBy('userPrs.' + colName, 'DESC')
             .take(count)
+            .innerJoin(
+                User,
+                'user',
+                `userPrs.userId = user.id`
+            )
             .getRawMany();
-
-        if (userPrs.length === 0) {
-            return failure("No user PRs exist");
-        }
 
         return success(userPrs);
     }

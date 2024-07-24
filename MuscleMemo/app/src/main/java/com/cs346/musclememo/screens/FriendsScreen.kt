@@ -286,7 +286,9 @@ fun AddFriendDialog(viewModel: FriendsScreenViewModel) {
             onConfirm = {
                 viewModel.updateDialogErrorMessage("")
                 viewModel.updateDialogSuccessMessage("")
-                viewModel.sendFriendRequest(viewModel.addFriendCode)
+                viewModel.sendFriendRequest(viewModel.addFriendCode) {
+                    viewModel.updateShowAddFriendDialog(false)
+                }
             },
             onDismissRequest = {
                 viewModel.updateShowAddFriendDialog(false)
@@ -301,7 +303,6 @@ fun AddFriendDialog(viewModel: FriendsScreenViewModel) {
                 )
             },
             errorText = viewModel.dialogErrorMessage,
-            successText = viewModel.dialogSuccessMessage,
             confirmButtonText = "Add",
             cancelButtonText = "Cancel"
         )
@@ -332,7 +333,6 @@ fun ReportFriendDialog(viewModel: FriendsScreenViewModel) {
                 )
             },
             errorText = viewModel.dialogErrorMessage,
-            successText = viewModel.dialogSuccessMessage,
             confirmButtonText = "Report",
             cancelButtonText = "Cancel"
         )

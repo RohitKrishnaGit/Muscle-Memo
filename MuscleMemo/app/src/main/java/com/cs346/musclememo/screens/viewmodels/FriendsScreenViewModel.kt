@@ -19,14 +19,14 @@ import retrofit2.Callback
 import retrofit2.Response
 
 data class Message(
-    val id: Double,
+    val id: Int,
     val roomId: Int,
     val message: String,
     val sender: Sender
 )
 
 data class Sender(
-    val id: Double,
+    val id: Int,
     val username: String,
     val email: String,
     val gender: String,
@@ -37,12 +37,9 @@ data class Sender(
 
 class FriendsScreenViewModel : ViewModel() {
     val sm = SocketManager()
-    private val _friends = mutableStateListOf<Friend>()
-    private val _incomingRequests = mutableStateListOf<Friend>()
+    val friends = mutableStateListOf<Friend>()
+    val incomingRequests = mutableStateListOf<Friend>()
     var currentUser: User? by mutableStateOf(null)
-
-    val friends: List<Friend> = _friends
-    val incomingRequests: List<Friend> = _incomingRequests
 
     init {
         getIncomingFriendRequests()
@@ -50,9 +47,7 @@ class FriendsScreenViewModel : ViewModel() {
         getCurrentUser()
     }
 
-    private val _receivedMessages = mutableStateListOf<Message>()
-
-    val receivedMessages: List<Message> get() = _receivedMessages
+    val receivedMessages = mutableStateListOf<Message>()
 
     var showAddFriendDialog by mutableStateOf(false)
         private set
@@ -122,8 +117,8 @@ class FriendsScreenViewModel : ViewModel() {
     }
 
     fun updateReceivedMessages(messages: List<Message>) {
-        _receivedMessages.clear()
-        _receivedMessages.addAll(messages)
+        receivedMessages.clear()
+        receivedMessages.addAll(messages)
     }
 
     fun getChatHistory(roomId: String) {
@@ -152,8 +147,8 @@ class FriendsScreenViewModel : ViewModel() {
     fun connectSocket(roomId: String) {
         sm.connect()
         sm.joinRoom(roomId, AppPreferences.refreshToken.toString())
-        sm.onMessageReceived { msg ->
-            println(msg)
+        sm.onMessageReceived { msgId: Int, msg: String, sender: Sender ->
+            receivedMessages.add(Message(msgId, roomId.toInt(), msg, sender))
         }
         sm.onHistoryRequest { getChatHistory(roomId) }
     }
@@ -207,8 +202,8 @@ class FriendsScreenViewModel : ViewModel() {
             ) {
                 if (response.isSuccessful) {
                     response.body()?.data?.let {
-                        _incomingRequests.clear()
-                        _incomingRequests.addAll(it)
+                        incomingRequests.clear()
+                        incomingRequests.addAll(it)
                     }
                 }
             }
@@ -259,10 +254,8 @@ class FriendsScreenViewModel : ViewModel() {
             ) {
                 if (response.isSuccessful) {
                     response.body()?.data?.let {
-                        for (friend in it) {
-                            println(friend)
-                            _friends.add(friend)
-                        }
+                        friends.clear()
+                        friends.addAll(it)
                     }
                 }
             }
@@ -285,7 +278,7 @@ class FriendsScreenViewModel : ViewModel() {
                 response: Response<ApiResponse<Void>>
             ) {
                 if (response.isSuccessful) {
-                    _friends.removeAll { it.id == friendId }
+                    friends.removeAll { it.id == friendId }
                 }
             }
 
@@ -301,22 +294,17 @@ class FriendsScreenViewModel : ViewModel() {
         val apiService = RetrofitInstance.friendService
         val call = apiService.acceptFriendRequest(FriendRequestAction(friendId))
 
-        call.enqueue(object : Callback<ApiResponse<List<Friend>>> {
-            override fun onResponse(call: Call<ApiResponse<List<Friend>>>, response: Response<ApiResponse<List<Friend>>>) {
+        call.enqueue(object : Callback<ApiResponse<String>> {
+            override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
                 if (response.isSuccessful) {
-                    response.body()?.data?.let { newFriends ->
-                        // Remove from incoming requests
-                        _incomingRequests.removeAll { it.id == friendId }
-                        // Add to friends list
-                        _friends.addAll(newFriends)
-                        println("Friend request accepted: $friendId")
-                    }
+                    getIncomingFriendRequests()
+                    getFriendByUserId()
                 } else {
                     println("Failed to accept friend request: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<ApiResponse<List<Friend>>>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
                 println("Failure: ${t.message}")
             }
         })
@@ -328,19 +316,16 @@ class FriendsScreenViewModel : ViewModel() {
         val apiService = RetrofitInstance.friendService
         val call = apiService.rejectFriendRequest(FriendRequestAction(friendId))
 
-        call.enqueue(object : Callback<ApiResponse<List<Friend>>> {
-            override fun onResponse(call: Call<ApiResponse<List<Friend>>>, response: Response<ApiResponse<List<Friend>>>) {
+        call.enqueue(object : Callback<ApiResponse<String>> {
+            override fun onResponse(call: Call<ApiResponse<String>>, response: Response<ApiResponse<String>>) {
                 if (response.isSuccessful) {
-                    response.body()?.data?.let { newFriends ->
-                        // Remove from incoming requests
-                        _incomingRequests.removeAll { it.id == friendId }
-                    }
+                    getIncomingFriendRequests()
                 } else {
                     println("Failed to reject friend request: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<ApiResponse<List<Friend>>>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
                 println("Failure: ${t.message}")
             }
         })
@@ -371,22 +356,22 @@ class FriendsScreenViewModel : ViewModel() {
     }
 
     fun removeIncomingFriendRequest(requestIndex: Int) {
-        if (requestIndex in _incomingRequests.indices) {
-            _incomingRequests.removeAt(requestIndex)
+        if (requestIndex in incomingRequests.indices) {
+            incomingRequests.removeAt(requestIndex)
         } else {
             println("Invalid index: $requestIndex")
         }
     }
 
     fun removeFriendIdx(friendIndex: Int) {
-        if (friendIndex in _friends.indices) {
-            _friends.removeAt(friendIndex)
+        if (friendIndex in friends.indices) {
+            friends.removeAt(friendIndex)
         } else {
             println("Invalid index: $friendIndex")
         }
     }
 
-    fun sendFriendRequest(friendCode: String) {
+    fun sendFriendRequest(friendCode: String, onSuccess: () -> Unit) {
         if (friendCode.isEmpty() || !friendCode.isDigitsOnly()) {
             dialogErrorMessage = "Please enter a valid friend code"
             return
@@ -401,7 +386,7 @@ class FriendsScreenViewModel : ViewModel() {
             override fun onResponse(call: Call<ApiResponse<Any>>, response: Response<ApiResponse<Any>>) {
                 if (response.isSuccessful) {
                     println("Friend request sent successfully to User ID: $friendCode")
-                    dialogSuccessMessage = "Friend request sent"
+                    onSuccess()
                 } else {
                     dialogErrorMessage = "Failed to send friend request: ${response.parseErrorBody()?.message}"
                 }

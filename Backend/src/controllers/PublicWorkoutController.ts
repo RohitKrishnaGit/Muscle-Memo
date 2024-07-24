@@ -9,6 +9,7 @@ import { ArrayContains } from "typeorm";
 export class PublicWorkoutController {
     private publicWorkoutRepository =
         AppDataSource.getRepository(PublicWorkout);
+    private userRepository = AppDataSource.getRepository(User);
 
     async all(request: Request, response: Response, next: NextFunction) {
         const userId = parseInt(request.params.userId);
@@ -24,9 +25,14 @@ export class PublicWorkoutController {
         const userId = parseInt(request.params.userId);
         const id = parseInt(request.params.id);
 
-        const publicWorkout = await this.publicWorkoutRepository.findOneBy({
-            creator: { id: userId },
-            id,
+        const publicWorkout = await this.publicWorkoutRepository.findOne({
+            where: {
+                creator: { id: userId },
+                id,
+            },
+            relations: {
+                users: true,
+            }
         });
 
         if (!publicWorkout) {
@@ -64,9 +70,13 @@ export class PublicWorkoutController {
     }
 
     async filter(request: Request, response: Response, next: NextFunction) {
-        const { gender, experience, latitude, longitude } = request.body;
+        const { userId, gender, experience, friendsOnly, latitude, longitude } = request.body;
 
         const nearby: string[] = []
+
+        const user = await this.userRepository.findOneBy({
+            id: userId,
+        })
 
         const geoQuery = geoFire.query({
             center: [+latitude, +longitude],
@@ -85,10 +95,14 @@ export class PublicWorkoutController {
 
         await sleep(50)
 
-        const publicWorkouts = await this.publicWorkoutRepository.findBy({
+        let publicWorkouts = await this.publicWorkoutRepository.findBy({
             gender,
             experience,
         })
+
+        if (friendsOnly) {
+            publicWorkouts = publicWorkouts.filter((pw) => user?.friends.includes(pw.creator));
+        }
 
         return success(
             publicWorkouts.filter((publicWorkout) => nearby.includes(publicWorkout.id.toString()))

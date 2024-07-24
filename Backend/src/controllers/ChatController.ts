@@ -2,12 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Chat } from "../entities/Chat";
 import { User } from "../entities/User";
-import { failure, success } from "../utils/responseTypes";
 import { UserToken } from "../entities/UserToken";
+import { failure, success } from "../utils/responseTypes";
 
 export class ChatController {
-    private chatRepository =
-        AppDataSource.getRepository(Chat);
+    private chatRepository = AppDataSource.getRepository(Chat);
     private tokenRepository = AppDataSource.getRepository(UserToken);
 
     async allHelper(roomId: string) {
@@ -24,7 +23,7 @@ export class ChatController {
     async all(request: Request, response: Response, next: NextFunction) {
         const roomId = request.params.roomId;
 
-        return this.allHelper(roomId)
+        return this.allHelper(roomId);
     }
 
     /* Shouldn't need to get single chat messages, keeping until remove confirmed */
@@ -58,26 +57,21 @@ export class ChatController {
             sender,
         });
 
-        await this.chatRepository.save(chat);
-
-        return success("saved message");
+        return success(this.chatRepository.save(chat));
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
         const roomId = request.params.roomId;
 
-        let chatsToRemove =
-            await this.chatRepository.findBy({
-                roomId,
-            });
+        let chatsToRemove = await this.chatRepository.findBy({
+            roomId,
+        });
 
         if (!chatsToRemove) {
             return failure("no chats with the roomId exist");
         }
 
-        await this.chatRepository.remove(
-            chatsToRemove
-        );
+        await this.chatRepository.remove(chatsToRemove);
 
         return success("chats have been removed");
     }
@@ -86,8 +80,8 @@ export class ChatController {
         const tokenObj = await this.tokenRepository.findOne({
             where: { token },
             relations: {
-                user: true
-            }
+                user: true,
+            },
         });
 
         if (!tokenObj) return null;

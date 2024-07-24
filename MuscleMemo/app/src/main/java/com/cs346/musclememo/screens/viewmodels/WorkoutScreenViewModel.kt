@@ -350,7 +350,7 @@ class WorkoutScreenViewModel: ViewModel() {
     }
 
     private fun updatePersonalBest(value: Int, exerciseRefIndex: Int){
-        RetrofitInstance.prVisibilityService.updateUserPr(exerciseRefIndex, UpdateUserPrRequest(value)).enqueue(object: Callback<ApiResponse<String>>{
+        RetrofitInstance.userPrsService.updateUserPr(exerciseRefIndex.toString(), UpdateUserPrRequest(value)).enqueue(object: Callback<ApiResponse<String>>{
             override fun onResponse(
                 call: Call<ApiResponse<String>>,
                 response: Response<ApiResponse<String>>

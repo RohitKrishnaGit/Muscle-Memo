@@ -7,13 +7,13 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-data class UpdateUserPrRequest(val Pr: Int)
+data class UpdateUserVisibilityPrRequest(val allowedValue: Boolean)
 
 
 interface PrVisibilityService {
-    @GET("/Pr/me/{exerciseRefId}")
+    @GET("/Pr/visibility/me/{exerciseRefId}")
     fun getUserPr(@Path("exerciseRefId") exerciseRefId: String): Call<ApiResponse<Boolean>>
 
-    @POST("/Pr/me/{exerciseRefId}")
-    fun updateUserPr(@Path("exerciseRefId") exerciseRefId: Int, @Body Pr: UpdateUserPrRequest): Call<ApiResponse<String>>
+    @POST("/Pr/visibility/me/{exerciseRefId}")
+    fun updateUserPr(@Path("exerciseRefId") exerciseRefId: Int, @Body Pr: UpdateUserVisibilityPrRequest): Call<ApiResponse<String>>
 }

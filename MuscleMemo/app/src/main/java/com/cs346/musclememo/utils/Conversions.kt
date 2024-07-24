@@ -152,3 +152,7 @@ fun convertPrNameToRefName(prName: String): String{
         refName += ")"
     return refName.replace("_", " ")
 }
+
+fun convertRefNameToPrName(refName: String): String{
+    return refName.replace("(", "_").replace(")", "").replace(" ", "_")
+}

@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val token = task.result
-                println("FCM Registration token: $token")
+                //println("FCM Registration token: $token")
                 AppPreferences.firebaseToken = token
             }
         }

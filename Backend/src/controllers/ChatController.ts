@@ -25,17 +25,20 @@ export class ChatController {
 
         return this.allHelper(roomId);
     }
-    
-    async createHelper(user: User, roomId: string, message: string, timestamp: number) {
-        const sender = user;
 
+    async createHelper(
+        sender: User,
+        roomId: string,
+        message: string,
+        timestamp: number
+    ) {
         if (!sender) return failure("unregistered sender");
 
         const chat = Object.assign(new Chat(), {
             roomId,
             message,
             sender,
-            timestamp
+            timestamp,
         });
 
         return success(this.chatRepository.save(chat));

@@ -16,6 +16,7 @@ import com.cs346.musclememo.api.services.UserPrsService
 import com.cs346.musclememo.api.services.TemplateService
 import com.cs346.musclememo.api.services.WorkoutService
 import com.cs346.musclememo.api.services.FriendService
+import com.cs346.musclememo.api.services.PublicWorkoutService
 import com.cs346.musclememo.classes.Friend
 import com.cs346.musclememo.classes.Template
 import retrofit2.Retrofit
@@ -46,6 +47,10 @@ object RetrofitInstance: RetrofitInterface {
 
     val friendService: FriendService by lazy {
         retrofit.create(FriendService::class.java)
+    }
+
+    val publicWorkoutService: PublicWorkoutService by lazy {
+        retrofit.create(PublicWorkoutService::class.java)
     }
 
     val workoutService: WorkoutService by lazy {

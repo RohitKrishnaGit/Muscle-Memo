@@ -36,9 +36,9 @@ class LeaderboardScreenViewModel : ViewModel() {
 
     val leaderboardEntries: List<LeaderboardEntry?>
         get() = if (!meOnLeaderboard)
-                    _leaderboardEntries.plus(myLeaderboardEntries[currentExerciseRef.name]).sortedBy { it?.value }
+                    _leaderboardEntries.plus(myLeaderboardEntries[currentExerciseRef.name]).sortedByDescending { it?.value }
                 else
-                    _leaderboardEntries
+                    _leaderboardEntries.sortedByDescending { it.value }
 
     var currentExerciseRef by mutableStateOf(ExerciseRef(id = 1))
     var exerciseRefs by mutableStateOf<List<ExerciseRef>>(listOf())
@@ -161,7 +161,6 @@ class LeaderboardScreenViewModel : ViewModel() {
                                 meOnLeaderboard = true
                         }
                         globalLeaderboardEntries.sortBy {it.value}
-                        println("$globalLeaderboardEntries")
                         }
                     }
             }
@@ -189,7 +188,6 @@ class LeaderboardScreenViewModel : ViewModel() {
                             friendsLeaderboardEntries.add(entry)
                         }
                         friendsLeaderboardEntries.sortBy {it.value}
-                        println("$friendsLeaderboardEntries")
                     }
                 }
             }
@@ -210,7 +208,6 @@ class LeaderboardScreenViewModel : ViewModel() {
             ) {
                 if (response.isSuccessful) {
                     exerciseRefs = response.body()?.data!!
-                    println(exerciseRefs)
                     onSuccess()
                 }
             }
@@ -240,8 +237,6 @@ class LeaderboardScreenViewModel : ViewModel() {
                             LeaderboardEntry(user.username, pr.value.toString())
                         fetchPrVisibility(refName)
                     }
-                    println("My leaderboard Entries:")
-                    println(myLeaderboardEntries)
                     onSuccess()
                 }
             }

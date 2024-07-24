@@ -1,7 +1,6 @@
 package com.cs346.musclememo.api.services
 
 import com.cs346.musclememo.api.types.ApiResponse
-import com.cs346.musclememo.classes.CustomExerciseRef
 import com.cs346.musclememo.classes.Exercise
 import com.cs346.musclememo.classes.ExerciseRef
 import com.cs346.musclememo.classes.ExerciseSet

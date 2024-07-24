@@ -46,7 +46,6 @@ fun BottomNavigationBar (
 
     val selected = remember { mutableStateOf(2) }
     LaunchedEffect (bottomBarState.value) {
-        println("bottom")
         if (bottomBarState.value)
             selected.value = 2
     }

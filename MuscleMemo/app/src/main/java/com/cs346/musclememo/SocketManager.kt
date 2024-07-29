@@ -28,6 +28,7 @@ class SocketManager {
     fun disconnect() {
         socket?.disconnect()
         socket?.off("message")
+        socket?.off("history")
     }
 
     fun isConnected(): Boolean {

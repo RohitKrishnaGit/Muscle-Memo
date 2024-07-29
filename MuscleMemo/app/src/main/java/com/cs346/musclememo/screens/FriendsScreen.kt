@@ -78,12 +78,13 @@ fun FriendsScreen(
                     Text(text = "Messages", fontSize = 20.sp)
                     Spacer(modifier = Modifier.height(5.dp))
                     LazyColumn {
-                        items(items = viewModel.allChats) { chat ->
+                        items(items = viewModel.allChats, key = { it.first.id }) { chat ->
                             if (chat.second?.isNotEmpty() == true) {
-                                ChatPreview(friend = chat.first, lastMessage = chat.second?.last(), onClick = {
+                                ChatPreview(friend = chat.first, lastMessage = chat.second?.last { it.message.isNotEmpty() }, onClick = {
                                     viewModel.updateSelectedFriend(chat.first)
                                     bottomBarState.value = false
                                     viewModel.updateFriendChatVisible(true)
+                                    println("HIHIHI: ${viewModel.selectedFriend}")
                                 })
                             }
                         }
@@ -125,7 +126,7 @@ fun FriendsScreen(
         gender = viewModel.selectedFriend?.gender,
         report = {viewModel.updateShowReportFriendDialog(true)},
         remove = {viewModel.updateShowRemoveFriendDialog(true)},
-        messages = viewModel.receivedMessages.sortedBy { it.timestamp },
+        messages = viewModel.receivedMessages.sortedBy { it.timestamp }.filter { it.message.isNotEmpty() },
         userId = viewModel.currentUser?.id ?: -1,
         currentMessage = viewModel.currentMessage,
         updateCurrentMessage = viewModel::updateCurrentMessage,
@@ -235,7 +236,7 @@ fun FriendChatInput(
                 onValueChange = { updateCurrentMessage(it) },
                 modifier = Modifier
                     .weight(1f),
-                placeholder = { Text("Message " + friendUsername) },
+                placeholder = { Text("Message $friendUsername") },
                 shape = RoundedCornerShape(20.dp)
             )
 

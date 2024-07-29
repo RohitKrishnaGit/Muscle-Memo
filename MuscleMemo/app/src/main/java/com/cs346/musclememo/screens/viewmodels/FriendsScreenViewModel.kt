@@ -92,7 +92,7 @@ class FriendsScreenViewModel : ViewModel() {
         errorMessage = error
     }
 
-    fun getAllChats(){
+    private fun getAllChats(){
         if (currentUser != null){
             allChats.clear()
             val allChatIds = mutableListOf<Pair<Friend,String>>()

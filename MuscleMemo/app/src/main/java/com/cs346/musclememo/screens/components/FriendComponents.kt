@@ -42,7 +42,7 @@ fun ChatPreview(
             .fillMaxWidth()
             .padding(10.dp),
         horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         DisplayProfilePicture(model = friend.profilePicture, size = 50.dp)
         Spacer(modifier = Modifier.width(10.dp))

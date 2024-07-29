@@ -97,9 +97,11 @@ class MainActivity : ComponentActivity() {
             return
         }
         fusedLocationClient.lastLocation
-            .addOnSuccessListener{location: Location ->
-                AppPreferences.latitude = location.latitude.toFloat()
-                AppPreferences.longitude = location.longitude.toFloat()
+            .addOnSuccessListener{location: Location? ->
+                location?.let {
+                    AppPreferences.latitude = location.latitude.toFloat()
+                    AppPreferences.longitude = location.longitude.toFloat()
+                }
             }
     }
 

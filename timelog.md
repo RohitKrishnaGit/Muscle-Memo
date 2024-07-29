@@ -77,3 +77,4 @@
 | 7/24/24 |         |            | 1        | 1          | 1         |        | Demo prep/planning                                           |
 | 7/24/24 |         | 10         |          |            |           |        | Public workouts, creating, joining, accepting workouts       |
 | 7/26/24 | 3       | 3          | 3        | 3          | 3         | 3      | Work on deliverable 6                                        |
+| 7/25/24 |         |            |          |            | 3         |        | Look into google play store, fix some chat bugs              |

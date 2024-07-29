@@ -77,6 +77,9 @@ export const initChatService = (server: any) => {
         );
 
         socket.on("message", async (message: string) => {
+            if (!user) {
+                console.log(`user is not set but received message: ${message}`);
+            }
             console.log(`Received message '${message}'
                 from user ${user.id}
                 in room ${room}`);

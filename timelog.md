@@ -58,6 +58,7 @@
 | 7/21/24 |         |            | 2        |            |           |        | Add remove and reject endpoints for friends                  |
 | 7/21/24 |         |            | 2        |            |           |        | Update Workouts table to contain date and duration           |
 | 7/21/24 |         |            | 2        |            |           |        | Add retrofit for leaderboards and PRs                        |
+| 7/21/24 |         |            |          |            |           | 10     | Implement add new exercise to workout + surrounding UI       |
 | 7/21/24 |         |            | 8        |            |           |        | Implement chat for friends and groups (missing chat history) |
 | 7/21/24 |         |            |          | 11         |           |        | Merged workout and history screen + bugfixes and backhandler |
 | 7/21/24 |         | 10         |          |            |           |        | Friends page, adding friends, accepting friend requests (FE) |
@@ -77,6 +78,8 @@
 | 7/23/24 |         |            |          |            | 4         |        | Perform many hotfixes with socket.io and database entities   |
 | 7/23/24 |         | 5          |          |            |           |        | Friends chat screen functionality                            |
 | 7/21/24 | 8       |            |          |            |           |        | Researched location tracking and push some template fixes    |
+| 7/24/24 |         |            |          |            |           | 10     | Implement Templates + Help Fix Templates Endpoint            |
+| 7/24/24 |         |            |          |            |           | 3      | Fix various UI and backend bugs                              |
 | 7/24/24 |         |            |          |            | 1         |        | Do more socket fixes, edit templates and workout endpoint    |
 | 7/24/24 |         |            |          |            | 9         |        | Fix public workouts screen functionality and styling         |
 | 7/24/24 |         |            | 1        | 1          | 1         |        | Demo prep/planning                                           |

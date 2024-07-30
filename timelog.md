@@ -66,6 +66,7 @@
 | 7/21/24 | 8       |            |          |            |           |        | Researched and Firebase for image uploads                    |
 | 7/21/24 | 1       |            |          |            |           |        | fix profile screen                                           |
 | 7/21/24 | 2       |            |          |            |           |        | Added Template Endpoints                                     |
+| 7/21/24 | 8       |            |          |            |           |        | Researched location tracking and push some template fixes    |
 | 7/22/24 |         |            | 10       |            |           |        | Persisted chat in DB, research GeoFire (worked all night)    |
 | 7/22/24 |         |            | 3        |            |           |        | Added Push notifications for chat                            |
 | 7/22/24 |         |            | 6        |            |           |        | Added location data filtering for public workout search      |
@@ -78,12 +79,15 @@
 | 7/23/24 |         |            |          |            | 5         |        | Fix login screen redirect and friends screen functionality   |
 | 7/23/24 |         |            |          |            | 4         |        | Perform many hotfixes with socket.io and database entities   |
 | 7/23/24 |         | 5          |          |            |           |        | Friends chat screen functionality                            |
-| 7/21/24 | 8       |            |          |            |           |        | Researched location tracking and push some template fixes    |
+| 7/23/24 |         |            |          | 2          |           |        | Added forgot password screen to login, checked email validity|
+| 7/23/24 |         |            |          | 6          |           |        | Implemented leaderboard                                      |
 | 7/24/24 |         |            |          |            |           | 10     | Implement Templates + Help Fix Templates Endpoint            |
 | 7/24/24 |         |            |          |            |           | 3      | Fix various UI and backend bugs                              |
 | 7/24/24 |         |            |          |            | 1         |        | Do more socket fixes, edit templates and workout endpoint    |
 | 7/24/24 |         |            |          |            | 9         |        | Fix public workouts screen functionality and styling         |
 | 7/24/24 |         |            | 1        | 1          | 1         |        | Demo prep/planning                                           |
 | 7/24/24 |         | 10         |          |            |           |        | Public workouts, creating, joining, accepting workouts (FE)  |
-| 7/26/24 | 3       | 3          | 3        | 3          | 3         | 3      | Work on deliverable 6                                        |
+| 7/24/24 |         |            |          | 10         |           |        | Reworked entirity of chat UI, chat fixes, general UI fixes   |
 | 7/25/24 |         |            |          |            | 3         |        | Look into google play store, fix some chat bugs              |
+| 7/26/24 | 3       | 3          | 3        |            | 3         | 3      | Work on deliverable 6                                        |
+| 7/30/24 |         |            |          | 3          |           |        | General chat UI fixes, cleaned up Join Workout UI            |

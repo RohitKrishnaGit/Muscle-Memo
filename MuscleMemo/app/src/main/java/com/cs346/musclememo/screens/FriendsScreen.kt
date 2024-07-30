@@ -87,8 +87,7 @@ fun FriendsScreen(
                     LazyColumn {
                         items(items = viewModel.allChats.toList(), key = { it.first.id }) { chat ->
                             if (chat.second.isNotEmpty()) {
-                                ChatPreview(friend = chat.first, lastMessage = chat.second.last { it.message.isNotEmpty() }, onClick = {
-
+                                ChatPreview(friend = chat.first, lastMessage = chat.second.lastOrNull { it.message.isNotEmpty() }, onClick = {
                                     if (!viewModel.isChatAnimated){
                                         viewModel.updateSelectedFriend(chat.first)
                                         bottomBarState.value = false

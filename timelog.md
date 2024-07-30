@@ -5,6 +5,7 @@
 | 5/30/24 | 2       | 2          | 2        | 2          | 2         | 2      | Work on deliverable 1                                        |
 | 6/13/24 | 2       | 2          | 2        | 2          | 2         | 2      | Work on deliverable 2                                        |
 | 6/21/24 |         |            |          |            | 2         |        | Set up android and backend express server                    |
+| 6/23/24 |         |            |          |            |           | 3      | Help scope out workout UI + workout structure/details        |
 | 6/23/24 | 2       |            | 2        |            | 2         |        | Help scope out initial table relations                       |
 | 6/24/24 |         |            |          |            | 4         |        | Configure ORM and establish initial table relations          |
 | 6/24/24 |         |            |          |            |           | 10     | Build basic workout screen UI for demo                       |

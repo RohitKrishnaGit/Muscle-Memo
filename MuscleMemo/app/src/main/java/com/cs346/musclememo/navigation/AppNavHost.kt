@@ -56,7 +56,7 @@ fun AppNavHost (
             WorkoutScreen(viewModel = workoutScreenViewModel)
         }
         composable(route = Screen.JoinWorkout.route) {
-            JoinWorkoutScreen()
+            JoinWorkoutScreen(bottomBarState = bottomBarState)
         }
     }
 }

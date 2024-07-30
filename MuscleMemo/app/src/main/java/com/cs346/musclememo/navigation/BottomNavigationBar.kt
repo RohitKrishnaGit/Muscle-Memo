@@ -7,6 +7,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -24,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,10 +50,10 @@ fun BottomNavigationBar (
         NavItem.Profile
     )
 
-    val selected = remember { mutableStateOf(2) }
+    val selected = remember { mutableIntStateOf(2) }
     LaunchedEffect (bottomBarState) {
         if (bottomBarState)
-            selected.value = 2
+            selected.value = items.indexOf(items.find {it.screen.route == navHostController.currentDestination?.route})
     }
     AnimatedVisibility(
         visible = bottomBarState,
@@ -97,14 +99,16 @@ fun NavBarItem (
     ) {
         Row (
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize()
         ){
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxSize()) {
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(value.icon, null, tint = if (highlighted) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = value.name, fontSize = 11.sp, fontWeight = if (highlighted) FontWeight.Bold else FontWeight.Normal, color = if (highlighted) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = value.name, fontSize = 10.sp, fontWeight = if (highlighted) FontWeight.Bold else FontWeight.Normal, color = if (highlighted) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.weight(1f))
             }
         }

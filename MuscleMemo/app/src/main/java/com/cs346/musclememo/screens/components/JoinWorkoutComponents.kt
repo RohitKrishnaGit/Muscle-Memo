@@ -69,7 +69,7 @@ fun WorkoutItem(index: Int, workout: PublicWorkout, tabState: String, viewModel:
             .fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "${index + 1}. ${workout.name}", fontSize = 20.sp)
+            Text(text = workout.name, fontSize = 20.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = workout.description)
             Spacer(modifier = Modifier.height(8.dp))
@@ -217,7 +217,7 @@ fun SelectExperienceLevel(
     updateExperience: (String) -> Unit,
 ) {
     val experienceLevels: List<String> = listOf(
-        "",
+        "Any",
         "Novice",
         "Intermediate",
         "Professional"
@@ -267,7 +267,7 @@ fun SelectGenderTag(
     updateGender: (String) -> Unit
 ) {
     val genderTags: List<String> = listOf(
-        "",
+        "Any",
         "Male",
         "Female"
     )

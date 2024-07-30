@@ -85,7 +85,8 @@ fun ChatHeader(
     username: String,
     gender: String? = null,
     report: () -> Unit = {},
-    remove: () -> Unit = {}
+    remove: () -> Unit = {},
+    reportable: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -104,7 +105,9 @@ fun ChatHeader(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            DisplayProfilePicture(model = profilePicture, size = 50.dp)
+            if (profilePicture != null){
+                DisplayProfilePicture(model = profilePicture, size = 50.dp)
+            }
             Spacer(modifier = Modifier.width(15.dp))
             Column(
                 modifier = Modifier.fillMaxHeight(),
@@ -123,10 +126,12 @@ fun ChatHeader(
                     )
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = report) {
-                Icon(Icons.Default.Flag, null, tint = MaterialTheme.colorScheme.error)
+            if (reportable){
+                IconButton(onClick = report) {
+                    Icon(Icons.Default.Flag, null, tint = MaterialTheme.colorScheme.error)
+                }
+                Spacer(modifier = Modifier.width(5.dp))
             }
-            Spacer(modifier = Modifier.width(5.dp))
             IconButton(
                 onClick = remove
             ) {

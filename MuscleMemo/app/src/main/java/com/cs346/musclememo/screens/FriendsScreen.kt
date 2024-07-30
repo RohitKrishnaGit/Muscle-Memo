@@ -158,6 +158,7 @@ fun Chat(
     profilePicture: Any?,
     friendUsername: String,
     gender: String? = null,
+    reportable: Boolean = true,
     report: () -> Unit = {},
     remove: () -> Unit = {},
     onBackPressed: () -> Unit = {},
@@ -194,7 +195,8 @@ fun Chat(
                     username = friendUsername,
                     gender = gender,
                     report = report,
-                    remove = remove
+                    remove = remove,
+                    reportable = reportable
                     )
 
                 // Initial scroll to bottom

@@ -15,7 +15,7 @@ sealed class NavItem(
     val screen: Screen
 ){
     object Friend : NavItem("Friends", Icons.Default.Favorite, Screen.Friends)
-    object JoinWorkout : NavItem("Find Workouts", Icons.Default.Search, Screen.JoinWorkout)
+    object JoinWorkout : NavItem("Join Workouts", Icons.Default.Search, Screen.JoinWorkout)
     object Workout : NavItem("Workout", Icons.Default.Add, Screen.Workout)
     object Leaderboard : NavItem("Rankings", Icons.Default.Leaderboard, Screen.Leaderboard)
     object Profile : NavItem("Profile", Icons.Default.AccountCircle, Screen.Profile)

@@ -69,13 +69,13 @@ class JoinWorkoutViewModel: ViewModel() {
     var friendsOnlyFilter by mutableStateOf(false)
         private set
 
-    var genderFilter by mutableStateOf<String>("")
+    var genderFilter by mutableStateOf<String>("Any")
         private set
 
     var genderFilterExpanded by mutableStateOf(false)
         private set
 
-    var experienceFilter by mutableStateOf("")
+    var experienceFilter by mutableStateOf("Any")
         private set
 
     var experienceFilterExpanded by mutableStateOf(false)
@@ -92,6 +92,8 @@ class JoinWorkoutViewModel: ViewModel() {
 
     var resultsScreenVisible by mutableStateOf(false)
         private set
+
+    var setBottomNavBar: (Boolean) -> Unit = {}
 
     fun updateResultsScreenVisible(visible: Boolean) {
         resultsScreenVisible = visible
@@ -228,18 +230,6 @@ class JoinWorkoutViewModel: ViewModel() {
         return isValid
     }
 
-    fun clearWorkouts() {
-        workouts.clear()
-    }
-
-    fun clearMyWorkouts() {
-        myWorkouts.clear()
-    }
-
-    fun clearJoinedWorkouts() {
-        joinedWorkouts.clear()
-    }
-
     fun clearRequests() {
         workoutRequests.clear()
     }
@@ -264,6 +254,7 @@ class JoinWorkoutViewModel: ViewModel() {
     fun selectWorkoutChat(workout: PublicWorkout) {
         selectWorkout(workout) { success ->
             updateWorkoutChatVisible(success)
+            setBottomNavBar(false)
         }
     }
 
@@ -437,24 +428,26 @@ class JoinWorkoutViewModel: ViewModel() {
     }
 
     fun deletePublicWorkout(publicWorkoutId: Int) {
-        val apiService = RetrofitInstance.publicWorkoutService
-        val call = apiService.deletePublicWorkout(publicWorkoutId.toString())
+        if (publicWorkoutId != -1){
+            val apiService = RetrofitInstance.publicWorkoutService
+            val call = apiService.deletePublicWorkout(publicWorkoutId.toString())
 
-        call.enqueue(object : Callback<ApiResponse<String>> {
-            override fun onResponse(
-                call: Call<ApiResponse<String>>,
-                response: Response<ApiResponse<String>>
-            ) {
-                if (response.isSuccessful) {
-                    getMyWorkouts()
-                    getJoinedWorkouts()
+            call.enqueue(object : Callback<ApiResponse<String>> {
+                override fun onResponse(
+                    call: Call<ApiResponse<String>>,
+                    response: Response<ApiResponse<String>>
+                ) {
+                    if (response.isSuccessful) {
+                        getMyWorkouts()
+                        getJoinedWorkouts()
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
-                println("Failure: ${t.message}")
-            }
-        })
+                override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
+                    println("Failure: ${t.message}")
+                }
+            })
+        }
     }
 
 

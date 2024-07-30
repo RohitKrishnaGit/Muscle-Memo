@@ -30,6 +30,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,8 +52,12 @@ import com.cs346.musclememo.utils.AppPreferences
 
 @Composable
 fun JoinWorkoutScreen(
-    viewModel: JoinWorkoutViewModel = viewModel<JoinWorkoutViewModel>()
+    viewModel: JoinWorkoutViewModel = viewModel<JoinWorkoutViewModel>(),
+    bottomBarState: MutableState<Boolean>
 ) {
+    LaunchedEffect (Unit) {
+        viewModel.setBottomNavBar = {bottomBarState.value = it}
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -70,7 +76,6 @@ fun JoinWorkoutScreen(
             Spacer(modifier = Modifier.height(8.dp))
             MMButton(
                 onClick = {
-//                    viewModel.resetWorkout()
                     viewModel.updateCreateWorkoutVisible(true)
                 }, text = "Start A Public Workout", maxWidth = true
             )
@@ -80,7 +85,7 @@ fun JoinWorkoutScreen(
             PublicWorkoutContent(viewModel)
         }
         WorkoutRequests(viewModel)
-        WorkoutChat(viewModel)
+        WorkoutChat(viewModel, bottomBarState)
     }
     CreatePublicWorkoutSheet(viewModel = viewModel)
     ResultsSheet(viewModel)
@@ -133,13 +138,6 @@ fun PublicWorkoutContent(
             }
         }
     }
-}
-
-@Composable
-fun MyResults(
-    viewModel: JoinWorkoutViewModel
-) {
-
 }
 
 @Composable
@@ -314,7 +312,7 @@ fun ResultsSheet(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            Column (modifier = Modifier.fillMaxSize()){
+            Column(modifier = Modifier.fillMaxSize()) {
                 TopAppBar(text = "Results") {
                     viewModel.updateResultsScreenVisible(false)
                 }
@@ -378,149 +376,46 @@ fun WorkoutRequests(viewModel: JoinWorkoutViewModel) {
 }
 
 @Composable
-fun WorkoutChat(viewModel: JoinWorkoutViewModel) {
-    AnimatedVisibility(
+fun WorkoutChat(
+    viewModel: JoinWorkoutViewModel,
+    bottomBarState: MutableState<Boolean>
+) {
+    Chat(
         visible = viewModel.workoutChatVisible,
-        enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn(),
-        exit = slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) + fadeOut()
-    ) {
-        viewModel.selectedWorkout?.let { workout ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
-            ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    DisposableEffect(Unit) {
-                        // Concatenate user ids to generate room id
-                        val roomId = "workout-${workout.id}"
-                        viewModel.connectSocket(roomId)
-                        onDispose {
-                            viewModel.disconnectSocket()
-                        }
-                    }
-                    FriendChatHeader(onClose = {
-                        viewModel.updateWorkoutChatVisible(false)
-                        viewModel.sm.disconnect()
-                    })
-                    WorkoutChatMessages(viewModel = viewModel)
-                    WorkoutChatInput(viewModel = viewModel)
+        startChat = {
+            DisposableEffect(Unit) {
+                // Concatenate user ids to generate room id
+                val workout = viewModel.selectedWorkout
+                if (workout != null) {
+                    val roomId = "workout-${workout.id}"
+                    viewModel.connectSocket(roomId)
+                }
+                onDispose {
+                    viewModel.disconnectSocket()
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun WorkoutChatMessages(viewModel: JoinWorkoutViewModel) {
-    val messageListState = rememberLazyListState()
-    LazyColumn(
-        state = messageListState,
-        modifier = Modifier.padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        itemsIndexed(items = viewModel.receivedMessages,
-            key = { index, message -> "${message.id}_$index" } // Ensure unique keys
-        ) { _, message ->
-            MessageBubble(message = message, currentUserId = viewModel.currentUser?.id)
-        }
-    }
-}
-
-@Composable
-fun FriendChatHeader(onClose: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.secondary)
-            .heightIn(min = 60.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(onClick = onClose) {
-            Icon(
-                Icons.Filled.Close,
-                contentDescription = "Close",
-                tint = Color.White
-            )
-        }
-        Text(
-            "Friend Chat",
-            modifier = Modifier.padding(end = 8.dp),
-            color = Color.White,
-            fontSize = 20.sp
-        )
-    }
-}
-
-@Composable
-fun MessageBubble(message: Message, currentUserId: Int?) {
-    val isCurrentUser = message.sender.id.toInt() == currentUserId
-    val bubbleColor = if (isCurrentUser) Color.Blue else Color.White
-    val textColor = if (isCurrentUser) Color.White else Color.Black
-    val horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
-
-    if (!isCurrentUser) {
-        Text(
-            text = message.sender.username,
-            color = Color.Gray,
-            fontSize = 12.sp,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-    }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        horizontalArrangement = horizontalArrangement
-    ) {
-        Box(
-            modifier = Modifier
-                .background(bubbleColor, shape = MaterialTheme.shapes.medium)
-                .padding(8.dp)
-        ) {
-            Text(
-                text = message.message,
-                color = textColor
-            )
-        }
-    }
-}
-
-@Composable
-fun WorkoutChatInput(viewModel: JoinWorkoutViewModel) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp), contentAlignment = Alignment.BottomCenter
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                value = viewModel.currentMessage,
-                onValueChange = { viewModel.updateCurrentMessage(it) },
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp),
-                placeholder = { Text("Type your message here...") },
-            )
-            IconButton(onClick = {
-                if (AppPreferences.refreshToken != null && viewModel.currentMessage.isNotBlank()) {
-                    viewModel.sm.sendMessage(viewModel.currentMessage)
-                    viewModel.updateCurrentMessage("")
-                }
-            }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Send",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+        },
+        profilePicture = null,
+        friendUsername = viewModel.selectedWorkout?.name ?: "Untitled Workout",
+        messages = viewModel.receivedMessages,
+        currentMessage = viewModel.currentMessage,
+        updateCurrentMessage = viewModel::updateCurrentMessage,
+        sendMessage = {
+            if (AppPreferences.refreshToken != null && viewModel.currentMessage.isNotBlank()) {
+                viewModel.sm.sendMessage(viewModel.currentMessage)
+                viewModel.updateCurrentMessage("")
             }
+        },
+        isTransitioning = {},
+        onBackPressed = {
+            viewModel.updateWorkoutChatVisible(false)
+            bottomBarState.value = true
+        },
+        reportable = false,
+        remove = {
+            viewModel.deletePublicWorkout(viewModel.selectedWorkout?.id ?: -1)
+            viewModel.updateWorkoutChatVisible(false)
+            bottomBarState.value = true
         }
-    }
+    )
 }
-
-

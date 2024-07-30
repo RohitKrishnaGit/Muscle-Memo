@@ -349,9 +349,12 @@ class JoinWorkoutViewModel: ViewModel() {
         val apiService = RetrofitInstance.publicWorkoutService
         val apiBody = CreatePublicWorkout(
             name = createWorkoutName,
+            date = System.currentTimeMillis(),
             experience = if(createWorkoutExperience == "Any") null else createWorkoutExperience,
             gender = if(createWorkoutGender == "Any") null else createWorkoutGender,
-            description = createWorkoutDescription
+            description = createWorkoutDescription,
+            latitude = AppPreferences.latitude.toString(),
+            longitude = AppPreferences.longitude.toString(),
         )
         val call = apiService.createPublicWorkout(apiBody)
 

@@ -92,12 +92,18 @@ class MainActivity : ComponentActivity() {
         }
     }
     private fun getLastLocation() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+        AppPreferences.latitude = 10f
+        AppPreferences.longitude = 10f
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
             return
         }
         fusedLocationClient.lastLocation
-            .addOnSuccessListener{location: Location? ->
+            .addOnSuccessListener { location: Location? ->
                 location?.let {
                     AppPreferences.latitude = location.latitude.toFloat()
                     AppPreferences.longitude = location.longitude.toFloat()

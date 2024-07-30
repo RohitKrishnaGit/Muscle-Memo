@@ -22,7 +22,7 @@ data class PublicWorkout(
 
 data class CreatePublicWorkout(
     val name: String,
-    val date: Int = 6,
+    val date: Long = 6,
     val experience: String? = null,
     val gender: String? = null,
     val latitude: String = "10",

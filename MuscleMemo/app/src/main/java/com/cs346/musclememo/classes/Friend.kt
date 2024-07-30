@@ -6,5 +6,5 @@ data class Friend(
     val email: String,
     val gender: String,
     val experience: String,
-    val profilePicture: String
+    val profilePicture: String?
 )

@@ -51,6 +51,7 @@
 | 7/20/24 |         |            | 2        |            |           |        | Add descriptions to all exerciseRefs                         |
 | 7/20/24 |         |            | 1        |            |           |        | Update Workouts table to contain date and duration           |
 | 7/20/24 |         |            |          | 4          |           |        | Reworked History Screen                                      |
+| 7/21/24 | 10      |            |          |            |           |        | Researched and implemented Firebase for push notifications   |
 | 7/21/24 |         |            |          |            | 3         |        | Use google gmail to send emails                              |
 | 7/21/24 |         |            |          |            | 7         |        | Assist Rohit and Matthew with socket.io and frontend bugs    |
 | 7/21/24 |         |            | 1        |            |           |        | Fix migration scripts                                        |
@@ -60,6 +61,9 @@
 | 7/21/24 |         |            | 8        |            |           |        | Implement chat for friends and groups (missing chat history) |
 | 7/21/24 |         |            |          | 11         |           |        | Merged workout and history screen + bugfixes and backhandler |
 | 7/21/24 |         | 10         |          |            |           |        | Friends page, adding friends, accepting friend requests      |
+| 7/21/24 | 8       |            |          |            |           |        | Researched and Firebase for image uploads                    |
+| 7/21/24 | 1       |            |          |            |           |        | fix profile screen                                           |
+| 7/21/24 | 2       |            |          |            |           |        | Added Template Endpoints                                     |
 | 7/22/24 |         |            | 10       |            |           |        | Persisted chat in DB, research GeoFire (worked all night)    |
 | 7/22/24 |         |            | 3        |            |           |        | Added Push notifications for chat                            |
 | 7/22/24 |         |            | 6        |            |           |        | Added location data filtering for public workout search      |
@@ -72,6 +76,7 @@
 | 7/23/24 |         |            |          |            | 5         |        | Fix login screen redirect and friends screen functionality   |
 | 7/23/24 |         |            |          |            | 4         |        | Perform many hotfixes with socket.io and database entities   |
 | 7/23/24 |         | 5          |          |            |           |        | Friends chat screen functionality                            |
+| 7/21/24 | 8       |            |          |            |           |        | Researched location tracking and push some template fixes    |
 | 7/24/24 |         |            |          |            | 1         |        | Do more socket fixes, edit templates and workout endpoint    |
 | 7/24/24 |         |            |          |            | 9         |        | Fix public workouts screen functionality and styling         |
 | 7/24/24 |         |            | 1        | 1          | 1         |        | Demo prep/planning                                           |

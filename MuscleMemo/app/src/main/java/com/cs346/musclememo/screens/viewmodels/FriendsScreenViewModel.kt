@@ -64,12 +64,6 @@ class FriendsScreenViewModel : ViewModel() {
         })
     }
 
-    var showFriendProfile by mutableStateOf(false)
-
-    fun updateShowFriendProfile(state: Boolean){
-        showFriendProfile = state
-    }
-
     var selectedFriend by mutableStateOf<Friend?>(null)
 
     fun updateSelectedFriend(friend: Friend){
@@ -104,7 +98,7 @@ class FriendsScreenViewModel : ViewModel() {
             allChats.clear()
             val allChatIds = mutableListOf<Pair<Friend,String>>()
             for (friend in friends) {
-                allChatIds.add(Pair( friend, generateRoomId(friend.id, currentUser!!.id)))
+                allChatIds.add(Pair(friend, generateRoomId(friend.id, currentUser!!.id)))
             }
 
             for (chatId in allChatIds) {
@@ -277,12 +271,6 @@ class FriendsScreenViewModel : ViewModel() {
 
     fun updateShowRemoveFriendDialog(state: Boolean){
         showRemoveFriendDialog = state
-    }
-
-    fun selectFriendChat(friendId: Int) {
-        selectFriend(friendId) { success ->
-            updateFriendChatVisible(success)
-        }
     }
 
     fun getIncomingFriendRequests() {

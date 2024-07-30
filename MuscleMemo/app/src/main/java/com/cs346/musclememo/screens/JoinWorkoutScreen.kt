@@ -11,20 +11,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -117,8 +122,7 @@ fun PublicWorkoutContent(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
+                    .fillMaxSize()
             ) {
                 SearchResults(viewModel, viewModel.joinedWorkouts)
             }
@@ -131,8 +135,7 @@ fun PublicWorkoutContent(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
+                    .fillMaxSize()
             ) {
                 SearchResults(viewModel, viewModel.myWorkouts)
             }
@@ -158,7 +161,6 @@ fun SearchFilters(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp)
         ) {
             Text(text = "Friends Only")
             Spacer(modifier = Modifier.weight(1f))
@@ -235,12 +237,21 @@ fun NewPublicWorkout(viewModel: JoinWorkoutViewModel) {
             ) {
                 Text("Workout Name")
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(value = viewModel.createWorkoutName,
+                OutlinedTextField(value = viewModel.createWorkoutName,
                     onValueChange = { viewModel.updateCreateWorkoutName(it) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 8.dp),
-                    placeholder = { Text("Power Gym Meetup 6/28") })
+                    placeholder = { Text("Untitled Workout") })
+                Spacer(modifier = Modifier.height(15.dp))
+                Text("Description")
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(value = viewModel.createWorkoutDescription,
+                    onValueChange = { viewModel.updateCreateWorkoutDescription(it) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 8.dp),
+                    placeholder = { Text("Write a description") })
                 Spacer(modifier = Modifier.height(15.dp))
                 Text("Gender Tag")
                 Spacer(modifier = Modifier.height(8.dp))
@@ -260,15 +271,6 @@ fun NewPublicWorkout(viewModel: JoinWorkoutViewModel) {
                     onExpandedChange = viewModel::updateExperienceExpanded,
                     updateExperience = viewModel::updateCreateWorkoutExperience
                 )
-                Spacer(modifier = Modifier.height(15.dp))
-                Text("Description")
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(value = viewModel.createWorkoutDescription,
-                    onValueChange = { viewModel.updateCreateWorkoutDescription(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 8.dp),
-                    placeholder = { Text("Going for PRs today") })
                 Spacer(modifier = Modifier.height(15.dp))
                 if (viewModel.showCreateError) {
                     Text(
@@ -316,7 +318,9 @@ fun ResultsSheet(
                 TopAppBar(text = "Results") {
                     viewModel.updateResultsScreenVisible(false)
                 }
-                SearchResults(viewModel, viewModel.workouts)
+                Column (modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)){
+                    SearchResults(viewModel, viewModel.workouts)
+                }
             }
         }
     }
@@ -328,19 +332,20 @@ fun RequestsHeader(onClose: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.secondary)
-            .heightIn(min = 60.dp),
+            .fillMaxHeight(0.1f)
+            .background(MaterialTheme.colorScheme.primaryContainer),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
     ) {
         IconButton(onClick = onClose) {
             Icon(
-                Icons.Filled.Close, contentDescription = "Close", tint = Color.White
+                Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Close", tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
+        Spacer(modifier = Modifier.width(10.dp))
         Text(
             "Requests to Join Workout",
-            modifier = Modifier.padding(end = 8.dp),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontSize = 20.sp
         )
     }

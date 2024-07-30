@@ -65,8 +65,8 @@ import com.cs346.musclememo.screens.viewmodels.LeaderboardScreenViewModel
 fun WorkoutItem(index: Int, workout: PublicWorkout, tabState: String, viewModel: JoinWorkoutViewModel) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
             .fillMaxWidth()
+            .padding(8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = workout.name, fontSize = 20.sp)
@@ -229,7 +229,7 @@ fun SelectExperienceLevel(
             expanded = expanded,
             onExpandedChange = onExpandedChange
         ) {
-            TextField(
+            OutlinedTextField(
                 value = experience,
                 onValueChange = {},
                 readOnly = true,
@@ -279,7 +279,7 @@ fun SelectGenderTag(
             expanded = expanded,
             onExpandedChange = onExpandedChange
         ) {
-            TextField(
+            OutlinedTextField(
                 value = gender,
                 onValueChange = {},
                 readOnly = true,

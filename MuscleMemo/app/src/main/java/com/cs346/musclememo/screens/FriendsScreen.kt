@@ -18,6 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,10 +82,11 @@ fun FriendsScreen(
                         items(items = viewModel.allChats, key = { it.first.id }) { chat ->
                             if (chat.second?.isNotEmpty() == true) {
                                 ChatPreview(friend = chat.first, lastMessage = chat.second?.last { it.message.isNotEmpty() }, onClick = {
-                                    viewModel.updateSelectedFriend(chat.first)
-                                    bottomBarState.value = false
-                                    viewModel.updateFriendChatVisible(true)
-                                    println("HIHIHI: ${viewModel.selectedFriend}")
+                                    if (!viewModel.isChatAnimated){
+                                        viewModel.updateSelectedFriend(chat.first)
+                                        bottomBarState.value = false
+                                        viewModel.updateFriendChatVisible(true)
+                                    }
                                 })
                             }
                         }
@@ -113,6 +115,7 @@ fun FriendsScreen(
                 }
                 onDispose {
                     viewModel.disconnectSocket()
+                    viewModel.updateIsChatAnimated(false)
                 }
             }
         },
@@ -126,8 +129,7 @@ fun FriendsScreen(
         gender = viewModel.selectedFriend?.gender,
         report = {viewModel.updateShowReportFriendDialog(true)},
         remove = {viewModel.updateShowRemoveFriendDialog(true)},
-        messages = viewModel.receivedMessages.sortedBy { it.timestamp }.filter { it.message.isNotEmpty() },
-        userId = viewModel.currentUser?.id ?: -1,
+        messages = viewModel.getChat(viewModel.selectedFriend),
         currentMessage = viewModel.currentMessage,
         updateCurrentMessage = viewModel::updateCurrentMessage,
         sendMessage = {
@@ -135,7 +137,8 @@ fun FriendsScreen(
                 viewModel.sm.sendMessage(viewModel.currentMessage)
                 viewModel.updateCurrentMessage("")
             }
-        }
+        },
+        isTransitioning = viewModel::updateIsChatAnimated
     )
     ReportFriendDialog(viewModel = viewModel)
     RemoveFriendDialog(viewModel = viewModel)
@@ -151,17 +154,22 @@ fun Chat(
     report: () -> Unit = {},
     remove: () -> Unit = {},
     onBackPressed: () -> Unit = {},
-    messages: List<Message>,
-    userId: Int,
+    messages: List<Message>?,
     currentMessage: String,
     updateCurrentMessage: (String) -> Unit,
-    sendMessage: () -> Unit
+    sendMessage: () -> Unit,
+    isTransitioning: (Boolean) -> Unit
 ){
+    val messageListState = rememberLazyListState()
     AnimatedVisibility(
         visible = visible,
         enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn(),
         exit = slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) + fadeOut()
     ) {
+        if (this.transition.currentState == this.transition.targetState) {
+            isTransitioning(false)
+        }
+
         Box (modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background))
@@ -179,7 +187,19 @@ fun Chat(
                     report = report,
                     remove = remove
                     )
-                val messageListState = rememberLazyListState()
+
+                // Initial scroll to bottom
+                LaunchedEffect(Unit) {
+                    messageListState.scrollToItem(messageListState.layoutInfo.totalItemsCount)
+                }
+
+                // Scroll to bottom on change
+                if (messages != null) {
+                    LaunchedEffect(messages.size){
+                        messageListState.scrollToItem(messageListState.layoutInfo.totalItemsCount)
+                    }
+                }
+
                 LazyColumn(
                     state = messageListState,
                     modifier = Modifier
@@ -187,13 +207,17 @@ fun Chat(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    var lastMessage: Message = Message(-1, "", "", Sender(-1, "", "", "", "", "", ""), -1)
-                    itemsIndexed(
-                        items = messages,
-                        key = { index, message -> "${message.id}_$index" } // Ensure unique keys
-                    ) { _, message ->
-                        ChatBubble(message = message, lastMessage.sender.username)
-                        lastMessage = message
+                    if (messages != null){
+                        val sortedMessages = messages.sortedBy { it.timestamp }.filter { it.message.isNotEmpty() }
+                        itemsIndexed(
+                            items = sortedMessages,
+                            key = { index, message -> "${message.id}_$index" } // Ensure unique keys
+                        ) { index, message ->
+                            ChatBubble(
+                                message = message,
+                                if (index > 0) sortedMessages[index - 1].sender.username else ""
+                            )
+                        }
                     }
                 }
                 FriendChatInput(
@@ -206,10 +230,6 @@ fun Chat(
         }
     }
 }
-
-
-
-
 
 @Composable
 fun FriendChatInput(

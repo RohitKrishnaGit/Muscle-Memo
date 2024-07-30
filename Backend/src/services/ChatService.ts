@@ -56,17 +56,17 @@ export const initChatService = (server: any) => {
                         [user.id]: true,
                     },
                 };
-                const msg = await chatController.createHelper(
-                    user,
-                    room,
-                    "",
-                    Date.now()
-                );
-                if (msg.error || !msg.data) {
-                    return;
-                }
                 const msgs = (await chatController.allHelper(room)).data
                 if(msgs && msgs.length === 0)  {
+                    const msg = await chatController.createHelper(
+                        user,
+                        room,
+                        "",
+                        Date.now()
+                    );
+                    if (msg.error || !msg.data) {
+                        return;
+                    }
                     io.to(room).emit(
                         "message",
                         msg.data.id,

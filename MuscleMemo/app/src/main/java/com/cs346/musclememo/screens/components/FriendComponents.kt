@@ -161,7 +161,7 @@ fun ChatBubble(
                     Text(text = message.sender.username)
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                        text = epochToDate(message.timestamp),
+                        text = epochToDate(message.timestamp, time = true),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 9.sp
                     )

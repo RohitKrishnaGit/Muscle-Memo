@@ -43,6 +43,7 @@ class FriendsScreenViewModel : ViewModel() {
     var currentUser: User? by mutableStateOf(null)
 
     var isChatRefreshing by mutableStateOf(false)
+    var isChatAnimated by mutableStateOf(false)
 
     init {
         getIncomingFriendRequests()
@@ -74,6 +75,10 @@ class FriendsScreenViewModel : ViewModel() {
     }
 
     var allChats = mutableStateListOf<Pair<Friend,List<Message>?>>()
+
+    fun getChat (friend: Friend?): List<Message>?{
+        return allChats.find { it.first == friend }?.second
+    }
 
     var showFriendsList by mutableStateOf(false)
 
@@ -192,6 +197,11 @@ class FriendsScreenViewModel : ViewModel() {
 
     fun updateFriendChatVisible(visible: Boolean) {
         friendChatVisible = visible
+        isChatAnimated = true
+    }
+
+    fun updateIsChatAnimated(visible: Boolean){
+        isChatAnimated = visible
     }
 
     fun updateReceivedMessages(messages: List<Message>) {

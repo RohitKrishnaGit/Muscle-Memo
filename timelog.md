@@ -60,7 +60,7 @@
 | 7/21/24 |         |            | 2        |            |           |        | Add retrofit for leaderboards and PRs                        |
 | 7/21/24 |         |            | 8        |            |           |        | Implement chat for friends and groups (missing chat history) |
 | 7/21/24 |         |            |          | 11         |           |        | Merged workout and history screen + bugfixes and backhandler |
-| 7/21/24 |         | 10         |          |            |           |        | Friends page, adding friends, accepting friend requests      |
+| 7/21/24 |         | 10         |          |            |           |        | Friends page, adding friends, accepting friend requests (FE) |
 | 7/21/24 | 8       |            |          |            |           |        | Researched and Firebase for image uploads                    |
 | 7/21/24 | 1       |            |          |            |           |        | fix profile screen                                           |
 | 7/21/24 | 2       |            |          |            |           |        | Added Template Endpoints                                     |
@@ -80,6 +80,6 @@
 | 7/24/24 |         |            |          |            | 1         |        | Do more socket fixes, edit templates and workout endpoint    |
 | 7/24/24 |         |            |          |            | 9         |        | Fix public workouts screen functionality and styling         |
 | 7/24/24 |         |            | 1        | 1          | 1         |        | Demo prep/planning                                           |
-| 7/24/24 |         | 10         |          |            |           |        | Public workouts, creating, joining, accepting workouts       |
+| 7/24/24 |         | 10         |          |            |           |        | Public workouts, creating, joining, accepting workouts (FE)  |
 | 7/26/24 | 3       | 3          | 3        | 3          | 3         | 3      | Work on deliverable 6                                        |
 | 7/25/24 |         |            |          |            | 3         |        | Look into google play store, fix some chat bugs              |

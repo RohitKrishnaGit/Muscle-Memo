@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -161,16 +162,18 @@ fun MainScreen() {
         }
     }
 
+    val selected = remember { mutableIntStateOf(2)}
+
     MuscleMemoTheme (
         darkTheme = isDarkTheme.value ?: isSystemInDarkTheme()
     ) {
         Scaffold(
             modifier = Modifier.imePadding(),
-            bottomBar = { BottomNavigationBar(bottomBarState = bottomBarState.value, navHostController = navController) },
+            bottomBar = { BottomNavigationBar(bottomBarState = bottomBarState.value, navHostController = navController, selected = selected)},
         ) { innerPadding ->
             // Apply the padding globally to the whole BottomNavScreensController
             Box(modifier = Modifier.padding(innerPadding)) {
-                AppNavHost(navController = navController, bottomBarState = bottomBarState, startDestination = startRoute.value)
+                AppNavHost(navController = navController, bottomBarState = bottomBarState, startDestination = startRoute.value, selected = selected)
             }
         }
     }

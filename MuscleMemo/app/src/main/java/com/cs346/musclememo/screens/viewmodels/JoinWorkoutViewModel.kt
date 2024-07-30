@@ -69,7 +69,7 @@ class JoinWorkoutViewModel: ViewModel() {
     var friendsOnlyFilter by mutableStateOf(false)
         private set
 
-    var genderFilter by mutableStateOf<String>("Any")
+    var genderFilter by mutableStateOf("Any")
         private set
 
     var genderFilterExpanded by mutableStateOf(false)
@@ -103,7 +103,7 @@ class JoinWorkoutViewModel: ViewModel() {
         currentMessage = message
     }
 
-    fun getCurrentUser() {
+    private fun getCurrentUser() {
         val apiService = RetrofitInstance.userService
         val call = apiService.getMyUser()
 
@@ -135,7 +135,7 @@ class JoinWorkoutViewModel: ViewModel() {
         sm.onHistoryRequest { getChatHistory(roomId) }
     }
 
-    fun getChatHistory(roomId: String) {
+    private fun getChatHistory(roomId: String) {
         val apiService = RetrofitInstance.friendService
         val call = apiService.getChat(roomId)
 
@@ -246,7 +246,7 @@ class JoinWorkoutViewModel: ViewModel() {
         }
     }
 
-    fun selectWorkout(workout: PublicWorkout, onComplete: (Boolean) -> Unit) {
+    private fun selectWorkout(workout: PublicWorkout, onComplete: (Boolean) -> Unit) {
         selectedWorkout = workout
         onComplete(true)
     }

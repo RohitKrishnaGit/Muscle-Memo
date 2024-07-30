@@ -3,6 +3,7 @@ package com.cs346.musclememo.navigation
 import android.graphics.Paint.Join
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,6 +25,7 @@ fun AppNavHost (
     navController: NavHostController,
     bottomBarState: MutableState<Boolean>,
     startDestination: String,
+    selected: MutableIntState
 ) {
     val workoutScreenViewModel = viewModel<WorkoutScreenViewModel>()
 
@@ -32,6 +34,7 @@ fun AppNavHost (
         startDestination = startDestination
     ) {
         composable(route = Screen.Login.route) {
+            selected.intValue = 2
             LoginScreen(onSuccessLogin = {
                 workoutScreenViewModel.resetState()
                 navController.navigate(NavItem.Workout.screen.route) { popUpTo(navController.graph.id) {inclusive = true} }
@@ -39,6 +42,7 @@ fun AppNavHost (
             })
         }
         composable(route = Screen.Profile.route) {
+            selected.intValue = 4
             ProfileScreen( signOut = {
                 bottomBarState.value = false
                 navController.navigate(Screen.Login.route) { popUpTo(navController.graph.id) {inclusive = true} }
@@ -47,15 +51,19 @@ fun AppNavHost (
             })
         }
         composable(route = Screen.Leaderboard.route) {
+            selected.intValue = 3
             LeaderboardScreen()
         }
         composable(route = Screen.Friends.route) {
+            selected.intValue = 0
             FriendsScreen(bottomBarState = bottomBarState)
         }
         composable(route = Screen.Workout.route) {
+            selected.intValue = 2
             WorkoutScreen(viewModel = workoutScreenViewModel)
         }
         composable(route = Screen.JoinWorkout.route) {
+            selected.intValue = 1
             JoinWorkoutScreen(bottomBarState = bottomBarState)
         }
     }

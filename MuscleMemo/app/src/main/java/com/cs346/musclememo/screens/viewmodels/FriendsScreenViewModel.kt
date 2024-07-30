@@ -126,9 +126,6 @@ class FriendsScreenViewModel : ViewModel() {
         }
     }
 
-    var showAddFriendDialog by mutableStateOf(false)
-        private set
-
     var showReportFriendDialog by mutableStateOf(false)
         private set
 
@@ -145,24 +142,11 @@ class FriendsScreenViewModel : ViewModel() {
     var currentMessage by mutableStateOf("")
         private set
 
-    var addFriendVisible by mutableStateOf(false)
-        private set
-
-    var selectedFriendUser by mutableStateOf<User?>(null)
-        private set
-
-    var friendProfileVisible by mutableStateOf(false)
-        private set
-
     var friendChatVisible by mutableStateOf(false)
         private set
 
     fun updateCurrentMessage(message: String) {
         currentMessage = message
-    }
-
-    fun updateShowAddFriendDialog(visible: Boolean) {
-        showAddFriendDialog = visible
     }
 
     fun updateShowReportFriendDialog(visible: Boolean) {
@@ -179,14 +163,6 @@ class FriendsScreenViewModel : ViewModel() {
 
     fun updateAddFriendCode(code: String) {
         addFriendCode = code
-    }
-
-    fun setAddFriendScreenVisible(visible: Boolean) {
-        addFriendVisible = visible
-    }
-
-    fun updateFriendProfileVisible(visible: Boolean) {
-        friendProfileVisible = visible
     }
 
     fun updateFriendChatVisible(visible: Boolean) {
@@ -206,7 +182,7 @@ class FriendsScreenViewModel : ViewModel() {
         }
     }
 
-    fun getChatHistory(roomId: String) {
+    private fun getChatHistory(roomId: String) {
         val apiService = RetrofitInstance.friendService
         val call = apiService.getChat(roomId)
 
@@ -238,32 +214,6 @@ class FriendsScreenViewModel : ViewModel() {
     }
     fun disconnectSocket() {
         sm.disconnect()
-    }
-
-    fun selectFriend(friendId: Int, onComplete: (Boolean) -> Unit) {
-        val apiService = RetrofitInstance.friendService
-        val call = apiService.getFriendById(friendId)
-
-        call.enqueue(object : Callback<ApiResponse<User>> {
-            override fun onResponse(call: Call<ApiResponse<User>>, response: Response<ApiResponse<User>>) {
-                if (response.isSuccessful) {
-                    response.body()?.data?.let { friend ->
-                        selectedFriendUser = friend
-                        onComplete(true)
-                    } ?: run {
-                        onComplete(false)
-                    }
-                } else {
-                    // Handle error response
-                    onComplete(false)
-                }
-            }
-
-            override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
-                // Handle call failure
-                onComplete(false)
-            }
-        })
     }
 
     var showRemoveFriendDialog by mutableStateOf(false)
@@ -302,7 +252,7 @@ class FriendsScreenViewModel : ViewModel() {
         return "$minId-$maxId"
     }
 
-    fun getCurrentUser(onSuccess: () -> Unit) {
+    private fun getCurrentUser(onSuccess: () -> Unit) {
         val apiService = RetrofitInstance.userService
         val call = apiService.getMyUser()
 
@@ -447,14 +397,6 @@ class FriendsScreenViewModel : ViewModel() {
             incomingRequests.removeAt(requestIndex)
         } else {
             println("Invalid index: $requestIndex")
-        }
-    }
-
-    fun removeFriendIdx(friendIndex: Int) {
-        if (friendIndex in friends.indices) {
-            friends.removeAt(friendIndex)
-        } else {
-            println("Invalid index: $friendIndex")
         }
     }
 

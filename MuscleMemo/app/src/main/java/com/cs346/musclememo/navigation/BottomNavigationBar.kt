@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,7 +41,8 @@ import androidx.navigation.NavHostController
 @Composable
 fun BottomNavigationBar (
     bottomBarState: Boolean,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    selected: MutableIntState
 ) {
     val items = listOf(
         NavItem.Friend,
@@ -49,11 +51,9 @@ fun BottomNavigationBar (
         NavItem.Leaderboard,
         NavItem.Profile
     )
-
-    val selected = remember { mutableIntStateOf(2) }
     LaunchedEffect (bottomBarState) {
         if (bottomBarState)
-            selected.value = items.indexOf(items.find {it.screen.route == navHostController.currentDestination?.route})
+            selected.intValue = items.indexOf(items.find {it.screen.route == navHostController.currentDestination?.route})
     }
     AnimatedVisibility(
         visible = bottomBarState,
@@ -67,11 +67,10 @@ fun BottomNavigationBar (
                     items.forEachIndexed { index, item ->
                         NavBarItem(
                             value = item,
-                            highlighted = (index == selected.value),
+                            highlighted = (index == selected.intValue),
                             modifier = Modifier.weight(1f)
                         ) {
-                            if (index != selected.value) {
-                                selected.value = index
+                            if (index != selected.intValue) {
                                 navHostController.navigate(item.screen.route)
                             }
                         }

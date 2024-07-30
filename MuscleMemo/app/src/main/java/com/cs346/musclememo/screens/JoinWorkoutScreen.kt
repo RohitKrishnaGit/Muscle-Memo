@@ -1,5 +1,6 @@
 package com.cs346.musclememo.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -15,24 +16,18 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -52,7 +47,6 @@ import com.cs346.musclememo.screens.components.SelectGenderTag
 import com.cs346.musclememo.screens.components.TopAppBar
 import com.cs346.musclememo.screens.components.WorkoutList
 import com.cs346.musclememo.screens.viewmodels.JoinWorkoutViewModel
-import com.cs346.musclememo.screens.viewmodels.Message
 import com.cs346.musclememo.utils.AppPreferences
 
 @Composable
@@ -208,6 +202,10 @@ fun SearchFilters(
 fun CreatePublicWorkoutSheet(
     viewModel: JoinWorkoutViewModel
 ) {
+    BackHandler(viewModel.createWorkoutVisible) {
+        viewModel.updateCreateWorkoutVisible(false)
+    }
+
     AnimatedVisibility(
         visible = viewModel.createWorkoutVisible,
         enter = slideInHorizontally(initialOffsetX = { it }),
@@ -304,6 +302,10 @@ fun NewPublicWorkout(viewModel: JoinWorkoutViewModel) {
 fun ResultsSheet(
     viewModel: JoinWorkoutViewModel
 ) {
+    BackHandler(viewModel.resultsScreenVisible) {
+        viewModel.updateResultsScreenVisible(false)
+    }
+
     AnimatedVisibility(
         visible = viewModel.resultsScreenVisible,
         enter = slideInHorizontally(initialOffsetX = { it }),
@@ -318,7 +320,9 @@ fun ResultsSheet(
                 TopAppBar(text = "Results") {
                     viewModel.updateResultsScreenVisible(false)
                 }
-                Column (modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)){
+                Column (modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)){
                     SearchResults(viewModel, viewModel.workouts)
                 }
             }
@@ -353,6 +357,9 @@ fun RequestsHeader(onClose: () -> Unit) {
 
 @Composable
 fun WorkoutRequests(viewModel: JoinWorkoutViewModel) {
+    BackHandler (viewModel.requestsVisible)  {
+        viewModel.updateRequestsVisible(false)
+    }
     AnimatedVisibility(
         visible = viewModel.requestsVisible,
         enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn(),

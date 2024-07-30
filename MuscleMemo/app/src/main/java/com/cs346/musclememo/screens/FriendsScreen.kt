@@ -1,5 +1,6 @@
 package com.cs346.musclememo.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,11 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,10 +30,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cs346.musclememo.screens.components.*
 import com.cs346.musclememo.screens.viewmodels.FriendsScreenViewModel
 import com.cs346.musclememo.screens.viewmodels.Message
-import com.cs346.musclememo.screens.viewmodels.Sender
 import com.cs346.musclememo.utils.AppPreferences
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,7 +127,7 @@ fun FriendsScreen(
             if (!viewModel.showFriendsList)
                 bottomBarState.value = true
         },
-        profilePicture = viewModel.selectedFriend?.profilePicture ?: null,
+        profilePicture = viewModel.selectedFriend?.profilePicture,
         friendUsername = viewModel.selectedFriend?.username ?: "",
         gender = viewModel.selectedFriend?.gender,
         report = {viewModel.updateShowReportFriendDialog(true)},
@@ -170,6 +166,10 @@ fun Chat(
 ){
     val messageListState = rememberLazyListState()
     val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current)
+
+    BackHandler(visible) {
+        onBackPressed()
+    }
 
     AnimatedVisibility(
         visible = visible,
@@ -301,6 +301,17 @@ fun FriendsList(
     viewModel: FriendsScreenViewModel,
     bottomBarState: MutableState<Boolean>
 ){
+    val onBackPressed = {
+        viewModel.updateErrorMessage("")
+        viewModel.updateSuccessMessage("")
+        bottomBarState.value = true
+        viewModel.updateShowFriendsList(false)
+    }
+
+    BackHandler(viewModel.showFriendsList) {
+        onBackPressed()
+    }
+
     AnimatedVisibility(
         visible = viewModel.showFriendsList,
         enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }),
@@ -314,12 +325,7 @@ fun FriendsList(
             Column(
                 modifier = Modifier.fillMaxSize()
             ){
-                TopAppBar(text = "Friends List") {
-                    viewModel.updateErrorMessage("")
-                    viewModel.updateSuccessMessage("")
-                    bottomBarState.value = true
-                    viewModel.updateShowFriendsList(false)
-                }
+                TopAppBar(text = "Friends List", onBackPressed = onBackPressed)
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -357,7 +363,7 @@ fun FriendsList(
                                     IconButton(onClick = {
                                         viewModel.updateErrorMessage("")
                                         viewModel.updateSuccessMessage("")
-                                        viewModel.sendFriendRequest(viewModel.addFriendCode.toString()) {
+                                        viewModel.sendFriendRequest(viewModel.addFriendCode) {
                                             viewModel.updateAddFriendCode("")
                                             viewModel.updateSuccessMessage("Friend request sent!")
                                             viewModel.refreshChats()

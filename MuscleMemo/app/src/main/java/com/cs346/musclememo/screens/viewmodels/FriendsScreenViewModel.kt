@@ -2,8 +2,10 @@ package com.cs346.musclememo.screens.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import com.cs346.musclememo.SocketManager
@@ -74,10 +76,10 @@ class FriendsScreenViewModel : ViewModel() {
         selectedFriend = friend
     }
 
-    var allChats = mutableStateListOf<Pair<Friend,List<Message>?>>()
+    var allChats: MutableMap<Friend, MutableList<Message>> = mutableStateMapOf()
 
     fun getChat (friend: Friend?): List<Message>?{
-        return allChats.find { it.first == friend }?.second
+        return allChats[friend]?.toList()
     }
 
     var showFriendsList by mutableStateOf(false)
@@ -113,7 +115,7 @@ class FriendsScreenViewModel : ViewModel() {
                         response: Response<ApiResponse<List<Message>>>
                     ) {
                         if (response.isSuccessful){
-                            allChats.add(Pair(chatId.first, response.body()?.data))
+                            allChats[chatId.first] = response.body()?.data?.toMutableStateList() ?: mutableStateListOf()
                             println("Added $chatId")
                         }
                         else {
@@ -129,8 +131,6 @@ class FriendsScreenViewModel : ViewModel() {
             }
         }
     }
-
-    val receivedMessages = mutableStateListOf<Message>()
 
     var showAddFriendDialog by mutableStateOf(false)
         private set
@@ -205,8 +205,11 @@ class FriendsScreenViewModel : ViewModel() {
     }
 
     fun updateReceivedMessages(messages: List<Message>) {
-        receivedMessages.clear()
-        receivedMessages.addAll(messages)
+        val foundMessages = allChats[selectedFriend]
+        if (foundMessages != null){
+            foundMessages.clear()
+            foundMessages.addAll(messages)
+        }
     }
 
     fun getChatHistory(roomId: String) {
@@ -219,7 +222,6 @@ class FriendsScreenViewModel : ViewModel() {
                     response.body()?.data?.let { messages ->
                         updateReceivedMessages(messages)
                     }
-                    println(receivedMessages)
                     println(response.body())
                 } else {
                     println("Failed to get chat history: ${response.message()}")
@@ -236,7 +238,7 @@ class FriendsScreenViewModel : ViewModel() {
         sm.connect()
         sm.joinRoom(roomId, AppPreferences.refreshToken.toString())
         sm.onMessageReceived { msgId: Int, msg: String, sender: Sender, timestamp: Long ->
-            receivedMessages.add(Message(msgId, roomId, msg, sender, timestamp))
+            allChats[selectedFriend]?.add(Message(msgId, roomId, msg, sender, timestamp))
         }
         sm.onHistoryRequest { getChatHistory(roomId) }
     }

@@ -359,7 +359,7 @@ fun FriendsList(
                                         viewModel.updateSuccessMessage("")
                                         viewModel.sendFriendRequest(viewModel.addFriendCode.toString()) {
                                             viewModel.updateAddFriendCode("")
-                                            viewModel.updateSuccessMessage("Friend Added Successfully!")
+                                            viewModel.updateSuccessMessage("Friend request sent!")
                                             viewModel.refreshChats()
                                         }
                                     }) {

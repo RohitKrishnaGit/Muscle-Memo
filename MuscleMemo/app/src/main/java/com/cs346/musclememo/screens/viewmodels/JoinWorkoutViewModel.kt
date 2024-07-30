@@ -45,13 +45,13 @@ class JoinWorkoutViewModel: ViewModel() {
     var createWorkoutName by mutableStateOf("")
         private set
 
-    var createWorkoutExperience by mutableStateOf("")
+    var createWorkoutExperience by mutableStateOf("Any")
         private set
 
     var experienceExpanded by mutableStateOf(false)
         private set
 
-    var createWorkoutGender by mutableStateOf("")
+    var createWorkoutGender by mutableStateOf("Any")
         private set
 
     var genderExpanded by mutableStateOf(false)
@@ -349,8 +349,8 @@ class JoinWorkoutViewModel: ViewModel() {
         val apiService = RetrofitInstance.publicWorkoutService
         val apiBody = CreatePublicWorkout(
             name = createWorkoutName,
-            experience = if(createWorkoutExperience == "") null else createWorkoutExperience,
-            gender = if(createWorkoutGender == "") null else createWorkoutGender,
+            experience = if(createWorkoutExperience == "Any") null else createWorkoutExperience,
+            gender = if(createWorkoutGender == "Any") null else createWorkoutGender,
             description = createWorkoutDescription
         )
         val call = apiService.createPublicWorkout(apiBody)
@@ -454,8 +454,8 @@ class JoinWorkoutViewModel: ViewModel() {
 
     fun getWorkouts(onSuccess: () -> Unit) {
 
-        val genderValue: String? = genderFilter?.takeIf { it.isNotEmpty() }
-        val experienceValue: String? = experienceFilter?.takeIf { it.isNotEmpty() }
+        val genderValue: String? = genderFilter.takeIf { it.isNotEmpty() && it != "Any" }
+        val experienceValue: String? = experienceFilter.takeIf { it.isNotEmpty() && it != "Any" }
 
         println("Gender: $genderValue, Experience: $experienceValue, Friends Only: $friendsOnlyFilter")
 
@@ -470,13 +470,6 @@ class JoinWorkoutViewModel: ViewModel() {
             longitude = "10"
         )
         val call = apiService.filterPublicWorkout(apiBody)
-//        val call = apiService.filterPublicWorkout(
-//            gender = genderValue,
-//            experience = experienceValue,
-//            friendsOnly = friendsOnlyFilter,
-//            latitude = "10",
-//            longitude = "10"
-//        )
 
         call.enqueue(object : Callback<ApiResponse<List<PublicWorkout>>> {
             override fun onResponse(

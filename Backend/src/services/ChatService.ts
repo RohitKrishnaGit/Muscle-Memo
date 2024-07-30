@@ -65,13 +65,16 @@ export const initChatService = (server: any) => {
                 if (msg.error || !msg.data) {
                     return;
                 }
-                io.to(room).emit(
-                    "message",
-                    msg.data.id,
-                    "",
-                    JSON.stringify(msg.data.sender),
-                    Date.now()
-                );
+                const msgs = (await chatController.allHelper(room)).data
+                if(msgs && msgs.length === 0)  {
+                    io.to(room).emit(
+                        "message",
+                        msg.data.id,
+                        "",
+                        JSON.stringify(msg.data.sender),
+                        Date.now()
+                    );
+                }
                 io.to(socket.id).emit("history", "fetch history");
             }
         );

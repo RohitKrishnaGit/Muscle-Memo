@@ -15,3 +15,7 @@ Matthew Mach m4mach@uwaterloo.ca
 Dereck Tu d8tu@uwaterloo.ca
 
 Jun Zheng j256zhen@uwaterloo.ca
+
+## Download
+
+Download the APK [in the releases tab](https://github.com/RohitKrishnaGit/CS446-ECE452-Project/releases)

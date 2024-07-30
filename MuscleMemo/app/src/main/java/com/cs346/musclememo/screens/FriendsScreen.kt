@@ -20,8 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.modifier.modifierLocalMapOf
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,6 +34,8 @@ import com.cs346.musclememo.screens.viewmodels.FriendsScreenViewModel
 import com.cs346.musclememo.screens.viewmodels.Message
 import com.cs346.musclememo.screens.viewmodels.Sender
 import com.cs346.musclememo.utils.AppPreferences
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,9 +85,10 @@ fun FriendsScreen(
                     Text(text = "Messages", fontSize = 20.sp)
                     Spacer(modifier = Modifier.height(5.dp))
                     LazyColumn {
-                        items(items = viewModel.allChats, key = { it.first.id }) { chat ->
-                            if (chat.second?.isNotEmpty() == true) {
-                                ChatPreview(friend = chat.first, lastMessage = chat.second?.last { it.message.isNotEmpty() }, onClick = {
+                        items(items = viewModel.allChats.toList(), key = { it.first.id }) { chat ->
+                            if (chat.second.isNotEmpty()) {
+                                ChatPreview(friend = chat.first, lastMessage = chat.second.last { it.message.isNotEmpty() }, onClick = {
+
                                     if (!viewModel.isChatAnimated){
                                         viewModel.updateSelectedFriend(chat.first)
                                         bottomBarState.value = false
@@ -161,6 +168,8 @@ fun Chat(
     isTransitioning: (Boolean) -> Unit
 ){
     val messageListState = rememberLazyListState()
+    val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current)
+
     AnimatedVisibility(
         visible = visible,
         enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn(),
@@ -190,6 +199,12 @@ fun Chat(
 
                 // Initial scroll to bottom
                 LaunchedEffect(Unit) {
+                    messageListState.scrollToItem(messageListState.layoutInfo.totalItemsCount)
+                }
+
+                LaunchedEffect(isImeVisible > 0) {
+                    // Wait for keyboard to come up
+                    delay(200)
                     messageListState.scrollToItem(messageListState.layoutInfo.totalItemsCount)
                 }
 

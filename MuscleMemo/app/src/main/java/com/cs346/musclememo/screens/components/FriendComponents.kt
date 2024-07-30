@@ -26,6 +26,8 @@ import com.cs346.musclememo.classes.Friend
 import com.cs346.musclememo.screens.viewmodels.FriendsScreenViewModel
 import com.cs346.musclememo.screens.viewmodels.Message
 import com.cs346.musclememo.utils.epochToDate
+import kotlin.math.max
+import kotlin.math.min
 
 @Composable
 fun ChatPreview(
@@ -50,9 +52,11 @@ fun ChatPreview(
             Column(
                 modifier = Modifier.fillMaxHeight()
             ) {
+                val message = (lastMessage.sender.username + ": " + lastMessage.message).replace("\n", " ")
+                val maxLength = min(message.length, 30)
                 Text(text = friend.username)
                 Text(
-                    text = lastMessage.sender.username + ": " + lastMessage.message,
+                    text = message.substring(0, maxLength).plus(if (maxLength == 30) "..." else ""),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 12.sp
                 )

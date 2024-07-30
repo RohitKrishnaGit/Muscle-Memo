@@ -82,10 +82,6 @@ class FriendsScreenViewModel : ViewModel() {
         return allChats[friend]?.toList()
     }
 
-    fun getChat (friend: Friend?): List<Message>?{
-        return allChats.find { it.first == friend }?.second
-    }
-
     var showFriendsList by mutableStateOf(false)
 
     fun updateShowFriendsList(state: Boolean){

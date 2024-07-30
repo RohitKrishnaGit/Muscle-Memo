@@ -88,6 +88,7 @@ fun FriendsScreen(
                         items(items = viewModel.allChats.toList(), key = { it.first.id }) { chat ->
                             if (chat.second.isNotEmpty()) {
                                 ChatPreview(friend = chat.first, lastMessage = chat.second.last { it.message.isNotEmpty() }, onClick = {
+
                                     if (!viewModel.isChatAnimated){
                                         viewModel.updateSelectedFriend(chat.first)
                                         bottomBarState.value = false
@@ -168,6 +169,7 @@ fun Chat(
 ){
     val messageListState = rememberLazyListState()
     val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current)
+
     AnimatedVisibility(
         visible = visible,
         enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn(),

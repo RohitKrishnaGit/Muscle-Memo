@@ -39,6 +39,11 @@ fun FriendsScreen(
     viewModel: FriendsScreenViewModel = viewModel<FriendsScreenViewModel>(),
     bottomBarState: MutableState<Boolean>
 ){
+    LaunchedEffect (viewModel.showFriendsList) {
+        if (!viewModel.showFriendsList)
+            viewModel.refreshChats()
+    }
+
     Box (
         modifier = Modifier
             .fillMaxSize()
@@ -316,6 +321,10 @@ fun FriendsList(
         enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }),
         exit = slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth })
     ){
+        LaunchedEffect (Unit) {
+            viewModel.getFriendByUserId(onSuccess = {})
+        }
+
         Box (
             modifier = Modifier
                 .fillMaxSize()
